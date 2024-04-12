@@ -66,6 +66,13 @@ Position Position::operator*(const int multiplier) const
     return result;
 }
 
+Position Position::operator~() const
+{
+    Position result(*this);
+
+    return result *= -1;
+}
+
 bool Position::operator==(const Position& rightOperand) const
 {
     return m_x == rightOperand.m_x && m_y == rightOperand.m_y;

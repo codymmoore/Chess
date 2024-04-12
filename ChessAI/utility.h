@@ -30,6 +30,7 @@ struct Position
     Position operator-(const Position& rightOperand) const;
     Position& operator*=(const int multiplier);
     Position operator*(const int multiplier) const;
+    Position operator~() const;
     bool operator==(const Position& rightOperand) const;
     bool operator!=(const Position& rightOperand) const;
 };

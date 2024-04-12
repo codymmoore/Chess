@@ -2,16 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="pawnIsValidMoveTest.cpp">
-      <Filter>isValidMoveTests</Filter>
-    </ClCompile>
+    <ClCompile Include="isValidMoveTest.cpp" />
+    <ClCompile Include="getValidMovesTest.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="isValidMoveTests">
-      <UniqueIdentifier>{ffc0e32d-c7c9-4535-8882-a32a61724802}</UniqueIdentifier>
-    </Filter>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
