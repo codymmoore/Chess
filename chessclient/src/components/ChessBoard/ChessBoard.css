@@ -1,0 +1,20 @@
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 100px);
+    grid-template-rows: repeat(8, 100px);
+    gap: 0px;
+    width: fit-content;
+    height: fit-content;
+    border: 5px solid black;
+}
+
+.chessboard-outer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+    padding: 100px;
+    border: 10px double black;
+    background-color: #240000;
+}
