@@ -8,10 +8,6 @@
 
 namespace boost
 {
-	namespace json
-	{
-		class object;
-	}
 	namespace asio
 	{
 		namespace ip

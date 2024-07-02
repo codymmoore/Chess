@@ -135,7 +135,6 @@
     <ClInclude Include="BitBoard.h" />
     <ClInclude Include="chess.h" />
     <ClInclude Include="chessServer.h" />
-    <ClInclude Include="consoleManager.h" />
     <ClInclude Include="chessController.h" />
     <ClInclude Include="move.h" />
     <ClInclude Include="utility.h" />
