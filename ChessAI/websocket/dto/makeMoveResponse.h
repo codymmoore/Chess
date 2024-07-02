@@ -1,7 +1,7 @@
 #pragma once
 
 #include "message.h"
-#include "utility.h"
+#include "../../utility.h"
 
 namespace boost
 {

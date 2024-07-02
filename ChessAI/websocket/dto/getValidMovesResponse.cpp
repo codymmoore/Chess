@@ -1,5 +1,5 @@
 #include "getValidMovesResponse.h"
-#include "utility.h"
+#include "../../utility.h"
 #include <boost/json.hpp>
 
 using namespace boost;

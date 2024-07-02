@@ -1,5 +1,5 @@
 #include "startGameRequest.h"
-#include "chessServer.h"
+#include "../../chessServer.h"
 #include <boost/json.hpp>
 
 using namespace boost;

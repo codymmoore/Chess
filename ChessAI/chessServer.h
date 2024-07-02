@@ -1,8 +1,8 @@
 #pragma once
 
 #include "chessController.h"
-#include "webSocketManager.h"
-#include "message.h"
+#include "websocket/webSocketManager.h"
+#include "websocket/dto/message.h"
 #include "chess.h"
 #include <memory>
 

@@ -51,44 +51,44 @@
     <ClInclude Include="chessController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="startGameRequest.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="startGameResponse.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="endGameRequest.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="endGameResponse.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="message.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="makeMoveRequest.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="makeMoveResponse.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="getValidMovesRequest.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="getValidMovesResponse.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="updateClientRequest.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="updateClientResponse.h">
-      <Filter>Header Files\websocket\dto</Filter>
-    </ClInclude>
-    <ClInclude Include="webSocketManager.h">
-      <Filter>Header Files\websocket</Filter>
-    </ClInclude>
     <ClInclude Include="chessServer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\endGameRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\endGameResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\getValidMovesRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\getValidMovesResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\makeMoveRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\makeMoveResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\message.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\startGameRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\startGameResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\updateClientRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\dto\updateClientResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="websocket\webSocketManager.h">
+      <Filter>Header Files\websocket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -110,47 +110,47 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="startGameRequest.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="startGameResponse.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="endGameRequest.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="endGameResponse.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="message.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="makeMoveRequest.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="makeMoveResponse.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="getValidMovesRequest.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="getValidMovesResponse.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="updateClientRequest.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
-    <ClCompile Include="updateClientResponse.cpp">
-      <Filter>Source Files\websocket\dto</Filter>
-    </ClCompile>
     <ClCompile Include="chessController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="webSocketManager.cpp">
-      <Filter>Source Files\websocket</Filter>
-    </ClCompile>
     <ClCompile Include="chessServer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\endGameRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\endGameResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\getValidMovesRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\getValidMovesResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\makeMoveRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\makeMoveResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\message.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\startGameRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\startGameResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\updateClientRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\dto\updateClientResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="websocket\webSocketManager.cpp">
+      <Filter>Source Files\websocket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

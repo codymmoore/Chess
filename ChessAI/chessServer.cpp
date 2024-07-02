@@ -1,16 +1,16 @@
 #include "chessServer.h"
 #include "agent.h"
 
-#include "startGameRequest.h"
-#include "startGameResponse.h"
-#include "getValidMovesRequest.h"
-#include "getValidMovesResponse.h"
-#include "makeMoveRequest.h"
-#include "makeMoveResponse.h"
-#include "updateClientRequest.h"
-#include "updateClientResponse.h"
-#include "endGameRequest.h"
-#include "endGameResponse.h"
+#include "websocket/dto/startGameRequest.h"
+#include "websocket/dto/startGameResponse.h"
+#include "websocket/dto/getValidMovesRequest.h"
+#include "websocket/dto/getValidMovesResponse.h"
+#include "websocket/dto/makeMoveRequest.h"
+#include "websocket/dto/makeMoveResponse.h"
+#include "websocket/dto/updateClientRequest.h"
+#include "websocket/dto/updateClientResponse.h"
+#include "websocket/dto/endGameRequest.h"
+#include "websocket/dto/endGameResponse.h"
 
 #include <boost/asio/ip/tcp.hpp>
 

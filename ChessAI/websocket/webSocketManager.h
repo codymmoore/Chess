@@ -1,6 +1,6 @@
 #pragma once
 
-#include "message.h"
+#include "dto/message.h"
 #include <boost/beast/websocket.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
