@@ -17,32 +17,29 @@
 using namespace websocket::dto;
 using tcp = boost::asio::ip::tcp;
 
+const unsigned int NUMBER_OF_GAME_TYPES = 3;
+
+constexpr const char* GAME_TYPE_STRINGS[NUMBER_OF_GAME_TYPES] = {
+	"HUMAN_VS_HUMAN",
+	"HUMAN_VS_AI",
+	"AI_VS_AI"
+};
+
 GameType getGameTypeFromString(const std::string& gameTypeString)
 {
-	if (gameTypeString == "HUMAN_VS_HUMAN")
-		return GameType::HUMAN_VS_HUMAN;
-	else if (gameTypeString == "HUMAN_VS_AI")
-		return GameType::HUMAN_VS_AI;
-	else if (gameTypeString == "AI_VS_AI")
-		return GameType::AI_VS_AI;
-	else
+	for (int i = 0; i < NUMBER_OF_GAME_TYPES; i++)
 	{
-		const std::string exceptionMessage = "No matching value of GameType for string \"" + gameTypeString + "\"";
-		throw std::exception(exceptionMessage.c_str());
+		if (GAME_TYPE_STRINGS[i] == gameTypeString)
+			return static_cast<GameType>(i);
 	}
+
+	const std::string exceptionMessage = "No matching value of GameType for string \"" + gameTypeString + "\"";
+	throw std::exception(exceptionMessage.c_str());
 }
 
 std::string toString(const GameType gameType)
 {
-	switch (gameType)
-	{
-	case GameType::HUMAN_VS_HUMAN:
-		return "HUMAN_VS_HUMAN";
-	case GameType::HUMAN_VS_AI:
-		return "HUMAN_VS_AI";
-	case GameType::AI_VS_AI:
-		return "AI_VS_AI";
-	}
+	return GAME_TYPE_STRINGS[gameType];
 }
 
 ChessServer::ChessServer(const tcp::endpoint& endpoint) : _webSocketManager(endpoint), _chessController(_chessState)

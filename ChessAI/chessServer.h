@@ -26,9 +26,9 @@ namespace boost
  */
 enum GameType
 {
-	HUMAN_VS_HUMAN,
-	HUMAN_VS_AI,
-	AI_VS_AI
+	HUMAN_VS_HUMAN = 0,
+	HUMAN_VS_AI = 1,
+	AI_VS_AI = 2
 };
 
 /**

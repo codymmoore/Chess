@@ -17,7 +17,7 @@ using namespace boost;
 
 const unsigned int NUMBER_OF_MESSAGE_TYPES = 10;
 
-constexpr const char* MESSAGE_TYPE_STRINGS[10] = {
+constexpr const char* MESSAGE_TYPE_STRINGS[NUMBER_OF_MESSAGE_TYPES] = {
 	"START_GAME_REQUEST",
 	"START_GAME_RESPONSE",
 	"GET_VALID_MOVES_REQUEST",
@@ -42,7 +42,7 @@ namespace websocket
 					return static_cast<MessageType>(i);
 			}
 
-			std::string errorMessage = "String does not match a MessageType: " + messageTypeString;
+			std::string errorMessage = "No matching value of MessageType for string \"" + messageTypeString + "\"";
 			throw std::exception(errorMessage.c_str());
 		}
 
