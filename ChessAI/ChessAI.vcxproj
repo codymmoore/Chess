@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>C:\Users\Coco\Dev\lib\boost_1_85_0\lib64-msvc-14.3;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -124,32 +127,74 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="agent.h" />
     <ClInclude Include="BitBoard.h" />
     <ClInclude Include="chess.h" />
+    <ClInclude Include="chessServer.h" />
     <ClInclude Include="consoleManager.h" />
+    <ClInclude Include="endGameRequest.h" />
+    <ClInclude Include="endGameResponse.h" />
+    <ClInclude Include="chessController.h" />
+    <ClInclude Include="getValidMovesRequest.h" />
+    <ClInclude Include="getValidMovesResponse.h" />
+    <ClInclude Include="makeMoveRequest.h" />
+    <ClInclude Include="makeMoveResponse.h" />
+    <ClInclude Include="message.h" />
     <ClInclude Include="move.h" />
+    <ClInclude Include="startGameRequest.h" />
+    <ClInclude Include="startGameResponse.h" />
+    <ClInclude Include="updateClientRequest.h" />
+    <ClInclude Include="updateClientResponse.h" />
     <ClInclude Include="utility.h" />
+    <ClInclude Include="webSocketManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="agent.cpp" />
     <ClCompile Include="agentVsAgentTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="BitBoard.cpp" />
     <ClCompile Include="chess.cpp" />
+    <ClCompile Include="chessServer.cpp" />
     <ClCompile Include="consoleManager.cpp" />
     <ClCompile Include="consoleUtilTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="endGameRequest.cpp" />
+    <ClCompile Include="endGameResponse.cpp" />
+    <ClCompile Include="chessController.cpp" />
+    <ClCompile Include="getValidMovesRequest.cpp" />
+    <ClCompile Include="getValidMovesResponse.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="makeMoveRequest.cpp" />
+    <ClCompile Include="makeMoveResponse.cpp" />
+    <ClCompile Include="message.cpp" />
     <ClCompile Include="move.cpp" />
+    <ClCompile Include="startGameRequest.cpp" />
+    <ClCompile Include="startGameResponse.cpp" />
+    <ClCompile Include="updateClientRequest.cpp" />
+    <ClCompile Include="updateClientResponse.cpp" />
     <ClCompile Include="utility.cpp" />
+    <ClCompile Include="webSocketManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\boost.1.85.0\build\boost.targets" Condition="Exists('..\packages\boost.1.85.0\build\boost.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\boost.1.85.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.85.0\build\boost.targets'))" />
+  </Target>
 </Project>

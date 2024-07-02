@@ -16,6 +16,18 @@
     <Filter Include="Test Files">
       <UniqueIdentifier>{2393a4e0-fda4-4ac3-8e64-4339dbeb1524}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\websocket">
+      <UniqueIdentifier>{19642b87-4805-439e-89c5-08b7a5b08549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\websocket\dto">
+      <UniqueIdentifier>{a81516e0-3cf4-4ed8-8eb0-878fe8646c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\websocket">
+      <UniqueIdentifier>{8ab51198-9f37-4dad-847d-20074c4a6a13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\websocket\dto">
+      <UniqueIdentifier>{ee7fd9b9-182d-4d1a-8c15-4ab2b7220e22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="agent.h">
@@ -34,6 +46,48 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="consoleManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="chessController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="startGameRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="startGameResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="endGameRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="endGameResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="message.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="makeMoveRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="makeMoveResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="getValidMovesRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="getValidMovesResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="updateClientRequest.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="updateClientResponse.h">
+      <Filter>Header Files\websocket\dto</Filter>
+    </ClInclude>
+    <ClInclude Include="webSocketManager.h">
+      <Filter>Header Files\websocket</Filter>
+    </ClInclude>
+    <ClInclude Include="chessServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,5 +116,53 @@
     <ClCompile Include="consoleManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="startGameRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="startGameResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="endGameRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="endGameResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="message.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="makeMoveRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="makeMoveResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="getValidMovesRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="getValidMovesResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="updateClientRequest.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="updateClientResponse.cpp">
+      <Filter>Source Files\websocket\dto</Filter>
+    </ClCompile>
+    <ClCompile Include="chessController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="webSocketManager.cpp">
+      <Filter>Source Files\websocket</Filter>
+    </ClCompile>
+    <ClCompile Include="chessServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
