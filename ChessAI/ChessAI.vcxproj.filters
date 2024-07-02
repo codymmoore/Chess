@@ -107,15 +107,6 @@
     <ClCompile Include="utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="agentVsAgentTest.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
-    <ClCompile Include="consoleUtilTest.cpp">
-      <Filter>Test Files</Filter>
-    </ClCompile>
-    <ClCompile Include="consoleManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

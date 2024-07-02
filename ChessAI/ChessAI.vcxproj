@@ -154,19 +154,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="agent.cpp" />
-    <ClCompile Include="agentVsAgentTest.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="BitBoard.cpp" />
     <ClCompile Include="chess.cpp" />
     <ClCompile Include="chessServer.cpp" />
-    <ClCompile Include="consoleManager.cpp" />
-    <ClCompile Include="consoleUtilTest.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="endGameRequest.cpp" />
     <ClCompile Include="endGameResponse.cpp" />
     <ClCompile Include="chessController.cpp" />
