@@ -16,6 +16,7 @@ namespace boost
 		}
 	}
 }
+class Agent;
 
 /**
  * Indicates the type of chess game.
@@ -74,6 +75,20 @@ private:
 	 *
 	 */
 	void aiVsAi();
+
+	/**
+	 * Handles a human player's turn.
+	 *
+	 * /return true if game is still in progress, false otherwise
+	 */
+	bool handleHumanTurn();
+
+	/**
+	 * Handles an AI player's turn.
+	 *
+	 * /return true if game is still in progress, false otherwise
+	 */
+	bool handleAiTurn(Agent& agent);
 
 	/**
 	 * Handles client requests.

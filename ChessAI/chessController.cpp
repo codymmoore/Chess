@@ -18,10 +18,22 @@ ChessController::ChessController(ChessState& chessState) : _chessState(chessStat
 {
 }
 
+StartGameResponse ChessController::startGame(const StartGameRequest& request)
+{
+	_chessState.reset();
+
+	StartGameResponse response;
+	response.whitePieces = _chessState.getWhitePieces();
+	response.blackPieces = _chessState.getBlackPieces();
+
+	return response;
+}
+
 GetValidMovesResponse ChessController::getValidMoves(const GetValidMovesRequest& request)
 {
 	GetValidMovesResponse response;
 	response.moves = Move::getValidMoves(request.color, request.piece, _chessState);
+
 	return response;
 }
 
@@ -32,6 +44,15 @@ MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 	MakeMoveResponse response;
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
+
+	return response;
+}
+
+EndGameResponse ChessController::endGame(const EndGameRequest& request)
+{
+	_chessState.clear();
+
+	EndGameResponse response;
 
 	return response;
 }

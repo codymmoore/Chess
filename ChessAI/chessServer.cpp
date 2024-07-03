@@ -50,19 +50,16 @@ void ChessServer::run()
 {
 	while (true)
 	{
-		std::unique_ptr<Message> message = _webSocketManager.read();
+		const std::unique_ptr<Message> message = _webSocketManager.read();
 
 		if (message->getMessageType() != START_GAME_REQUEST)
 		{
 			std::string errorMessage = "Unexpected message type received. Game session has not been started: " + toString(message->getMessageType());
 			throw std::exception(errorMessage.c_str());
 		}
-
 		const GameType gameType = dynamic_cast<StartGameRequest*>(message.get())->gameType;
 
-		StartGameResponse response;
-		response.whitePieces = _chessState.getWhitePieces();
-		response.blackPieces = _chessState.getBlackPieces();
+		StartGameResponse response = _chessController.startGame(static_cast<StartGameRequest&>(*message));
 		_webSocketManager.write(response);
 
 		switch (gameType)
@@ -74,7 +71,6 @@ void ChessServer::run()
 			aiVsAi();
 			break;
 		}
-		_chessState.reset();
 	}
 }
 
@@ -85,89 +81,65 @@ void ChessServer::humanVsAi()
 
 	while (gameInProgress)
 	{
-		MessageType messageType;
+		gameInProgress = handleHumanTurn();
 
-		// Handle user input
-		do
-		{
-			std::unique_ptr<Message> message = _webSocketManager.read();
-			messageType = message->getMessageType();
-
-			std::unique_ptr<Message> response = handleRequest(*message);
-			_webSocketManager.write(*response);
-
-			if (messageType == MessageType::END_GAME_REQUEST)
-				return;
-		} while (messageType != MessageType::MAKE_MOVE_REQUEST);
-
-		UpdateClientRequest updateClientRequest;
 		if (_chessState.getNextTurn() != NEUTRAL)
-		{
-			// Handle AI move
-			MoveNode move = agent.prunedIterDepthLimitedMinimax();
-
-			updateClientRequest.source = move.m_source;
-			updateClientRequest.destination = move.m_destination;
-			updateClientRequest.promotion = move.m_promotion;
-		}
-		updateClientRequest.nextTurn = _chessState.getNextTurn();
-		updateClientRequest.winner = _chessState.getWinner();
-
-		_webSocketManager.write(updateClientRequest);
-		_webSocketManager.read();
-
-		std::unique_ptr<Message> message = _webSocketManager.read();
-
-		if (message->getMessageType() == END_GAME_REQUEST)
-		{
-			gameInProgress = false;
-			_webSocketManager.write(EndGameResponse());
-		}
-
-		gameInProgress = _chessState.getNextTurn() != NEUTRAL;
+			gameInProgress = handleAiTurn(agent);
 	}
 }
 
 void ChessServer::aiVsAi()
 {
 	bool gameInProgress = true;
-	int it = 0;
-	Agent agent1(Color::WHITE, _chessState);
-	Agent agent2(Color::BLACK, _chessState);
+	Agent agentWhite(Color::WHITE, _chessState);
+	Agent agentBlack(Color::BLACK, _chessState);
 
 	while (gameInProgress)
 	{
-		Agent& agent = it % 2 == 0 ? agent1 : agent2;
-
-		MoveNode move = agent.prunedIterDepthLimitedMinimax();
-
-		UpdateClientRequest updateClientRequest;
-
-		gameInProgress = _chessState.getNextTurn() != NEUTRAL;
-
-		if (gameInProgress)
-		{
-			updateClientRequest.source = move.m_source;
-			updateClientRequest.destination = move.m_destination;
-			updateClientRequest.promotion = move.m_promotion;
-		}
-		updateClientRequest.nextTurn = _chessState.getNextTurn();
-		updateClientRequest.winner = _chessState.getWinner();
-
-		_webSocketManager.write(updateClientRequest);
-		std::unique_ptr<Message> message = _webSocketManager.read();
-
-		if (message->getMessageType() == END_GAME_REQUEST)
-		{
-			gameInProgress = false;
-			_webSocketManager.write(EndGameResponse());
-		}
-		else if (message->getMessageType() != UPDATE_CLIENT_RESPONSE)
-		{
-			std::string errorMessage = "Unexpected request type received: " + toString(message->getMessageType());
-			throw std::exception(errorMessage.c_str());
-		}
+		gameInProgress = handleAiTurn(_chessState.getNextTurn() == WHITE ? agentWhite : agentBlack);
 	}
+}
+
+bool ChessServer::handleHumanTurn()
+{
+	MessageType messageType;
+	do
+	{
+		const std::unique_ptr<Message> message = _webSocketManager.read();
+		messageType = message->getMessageType();
+
+		const std::unique_ptr<Message> response = handleRequest(*message);
+		_webSocketManager.write(*response);
+
+		if (messageType == MessageType::END_GAME_REQUEST)
+			return false;
+	} while (messageType != MessageType::MAKE_MOVE_REQUEST);
+
+	return _chessState.getNextTurn() != NEUTRAL;
+}
+
+bool ChessServer::handleAiTurn(Agent& agent)
+{
+	MoveNode move = agent.prunedIterDepthLimitedMinimax();
+
+	UpdateClientRequest updateClientRequest;
+	updateClientRequest.source = move.m_source;
+	updateClientRequest.destination = move.m_destination;
+	updateClientRequest.promotion = move.m_promotion;
+	updateClientRequest.nextTurn = _chessState.getNextTurn();
+	updateClientRequest.winner = _chessState.getWinner();
+
+	_webSocketManager.write(updateClientRequest);
+	const std::unique_ptr<Message> message = _webSocketManager.read();
+
+	if (message->getMessageType() == END_GAME_REQUEST)
+	{
+		const EndGameResponse response = _chessController.endGame(static_cast<EndGameRequest&>(*message));
+		_webSocketManager.write(response);
+		return false;
+	}
+
+	return _chessState.getNextTurn() != NEUTRAL;
 }
 
 std::unique_ptr<Message> ChessServer::handleRequest(const Message& request)
