@@ -8,7 +8,7 @@
 
 /* ---------- Global Constants ---------- */
 const int NUM_RANKS = 8, // number of rows
-          NUM_FILES = 8; // number of columns
+NUM_FILES = 8; // number of columns
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \struct:    Position
@@ -19,19 +19,19 @@ const int NUM_RANKS = 8, // number of rows
 /////////////////////////////////////////////////////////////////////////////////////////////
 struct Position
 {
-    int m_x, m_y;
+	int m_x, m_y;
 
-    Position() = default;
-    Position(const int x, const int y) : m_x(x), m_y(y) {}
-    Position& operator=(const Position& rightOperand);
-    Position& operator+=(const Position& rightOperand);
-    Position operator+(const Position& rightOperand) const;
-    Position& operator-=(const Position& rightOperand);
-    Position operator-(const Position& rightOperand) const;
-    Position& operator*=(const int multiplier);
-    Position operator*(const int multiplier) const;
-    bool operator==(const Position& rightOperand) const;
-    bool operator!=(const Position& rightOperand) const;
+	Position() = default;
+	Position(const int x, const int y) : m_x(x), m_y(y) {}
+	Position& operator=(const Position& rightOperand);
+	Position& operator+=(const Position& rightOperand);
+	Position operator+(const Position& rightOperand) const;
+	Position& operator-=(const Position& rightOperand);
+	Position operator-(const Position& rightOperand) const;
+	Position& operator*=(const int multiplier);
+	Position operator*(const int multiplier) const;
+	bool operator==(const Position& rightOperand) const;
+	bool operator!=(const Position& rightOperand) const;
 };
 
 // Used to output Position objects
@@ -40,14 +40,14 @@ std::ostream& operator<<(std::ostream& out, const Position& pos);
 // Used for using Position as key in unordered_maps
 struct PositionHasher
 {
-    std::size_t operator()(const Position& position) const;
+	std::size_t operator()(const Position& position) const;
 };
 
 // Directions
 const Position UP(0, -1),
-               DOWN(0, 1),
-               LEFT(-1, 0),
-               RIGHT(1, 0);
+DOWN(0, 1),
+LEFT(-1, 0),
+RIGHT(1, 0);
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \enum:     Color
@@ -58,14 +58,17 @@ const Position UP(0, -1),
 /////////////////////////////////////////////////////////////////////////////////////////////
 enum Color
 {
-    WHITE      = 0,
-    BLACK      = 1,
-    NUM_COLORS = 2,
-    NEUTRAL    = 3
+	WHITE = 0,
+	BLACK = 1,
+	NUM_COLORS = 2,
+	NEUTRAL = 3
 };
 
 // Returns opposite color
 Color operator~(const Color color);
+
+// Converts string to Color
+Color getColorFromString(const std::string& colorString);
 
 // Converts Color to string
 std::string toString(const Color& color);
@@ -79,18 +82,21 @@ std::string toString(const Color& color);
 /////////////////////////////////////////////////////////////////////////////////////////////
 enum PieceType
 {
-    PAWN   = 0,
-    KNIGHT = 1,
-    BISHOP = 2,
-    ROOK   = 3,
-    QUEEN  = 4,
-    KING   = 5,
-    NUM_PIECE_TYPES = 6,
-    NONE = 7
+	PAWN = 0,
+	KNIGHT = 1,
+	BISHOP = 2,
+	ROOK = 3,
+	QUEEN = 4,
+	KING = 5,
+	NUM_PIECE_TYPES = 6,
+	NONE = 7
 };
 
 // Converts PieceType to string
 std::string toString(const PieceType& pieceType);
+
+// Converts string to PieceType
+PieceType getPieceTypeFromString(const std::string& pieceTypeString);
 
 // Split string into substrings using delimeter
 std::vector<std::string> stringSplit(const std::string& originalString, const char delim);
