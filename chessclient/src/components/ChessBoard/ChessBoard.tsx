@@ -1,5 +1,6 @@
 import { Square } from '..';
-import { Coordinate } from '../../common/types';
+import { PieceType, Color } from '../../common/enums';
+import { Position } from '../../common/types';
 import './ChessBoard.css';
 
 const BOARD_WIDTH = 8, BOARD_HEIGHT = 8;
@@ -11,8 +12,8 @@ export function ChessBoard() {
         const squares = [];
         for (let col = 0; col < BOARD_WIDTH; col++) {
             const isBlack = (row + col) % 2 === 1;
-            const coordinate: Coordinate = { x: row, y: col };
-            squares.push(<Square key={`${row}-${col}`} color={isBlack ? 'black' : 'white'} coordinate={coordinate} piece={null} />);
+            const position: Position = { x: row, y: col };
+            squares.push(<Square key={`${row}-${col}`} color={isBlack ? 'black' : 'white'} position={position} piece={{ type: PieceType.Pawn, color: Color.White }} />);
         }
         board.push(
             <div key={row}>

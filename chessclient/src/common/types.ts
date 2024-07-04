@@ -1,18 +1,16 @@
-export enum PieceType {
-    Pawn = 'pawn',
-    Knight = 'knight',
-    Bishop = 'bishop',
-    Rook = 'rook',
-    Queen = 'queen',
-    King = 'king'
-}
+import { PieceType, Color } from './enums'
 
 export type Piece = {
     type: PieceType;
-    color: 'white' | 'black';
+    color: Color;
 }
 
-export type Coordinate = {
+export type Position = {
     x: number;
     y: number;
-}
+};
+
+export type PieceData = {
+    type: PieceType;
+    position: Position;
+};
