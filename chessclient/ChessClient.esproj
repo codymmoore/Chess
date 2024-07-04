@@ -12,6 +12,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\components\Button\" />
+    <Folder Include="src\components\WebSocketContext\" />
     <Folder Include="src\components\Square\" />
     <Folder Include="src\common\" />
   </ItemGroup>

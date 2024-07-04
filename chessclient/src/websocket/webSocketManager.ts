@@ -51,6 +51,7 @@ export class WebSocketManager {
      * @param message The message to be sent
      */
     send(message: Message): void {
+        tmp = this.webSocket.readyState == WebSocket.OPEN;
         this.webSocket.send(message.toJson());
     }
 

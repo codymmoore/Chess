@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from './../../components';
-import { GameType } from './../Game/Game';
+import { Button, getWebSocketManager } from './../../components';
 import chessTitle from '../../assets/chessTitle.png';
+import { StartGameRequest } from '../../websocket/message';
 import './MainMenu.css';
+import { GameType } from '../../common/enums';
 
 const buttonStyle: React.CSSProperties = {
     width: '75%',
@@ -20,7 +21,10 @@ function applyBackground() {
 }
 
 export default function MainMenu() {
+    const webSocketManager = getWebSocketManager();
+    webSocketManager.send(new StartGameRequest({ gameType: GameType.HumanVsAi }));
     const navigate = useNavigate();
+
     function startGame(gameType: GameType) {
         navigate(`/play/${gameType}`);
     }
@@ -32,12 +36,12 @@ export default function MainMenu() {
             <img src={chessTitle} />
             <Button
                 label='Human vs. AI'
-                onClick={() => startGame('human-vs-ai')}
+                onClick={() => startGame(GameType.HumanVsAi)}
                 style={buttonStyle}
             />
             <Button
                 label='AI vs. AI'
-                onClick={() => startGame('ai-vs-ai')}
+                onClick={() => startGame(GameType.AiVsAii)}
                 style={buttonStyle}
             />
         </div>
