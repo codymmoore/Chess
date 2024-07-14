@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { ChessBoard } from './../../components/ChessBoard/ChessBoard';
+import { ChessBoard } from './../../components';
 import './Game.css';
 
 export type GameType = 'human-vs-ai' | 'ai-vs-ai';

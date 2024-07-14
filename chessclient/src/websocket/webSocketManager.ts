@@ -1,4 +1,4 @@
-import { Message } from './message'
+import { Message } from './message';
 
 /**
 * Manages a WebSocket connection.
@@ -23,7 +23,7 @@ export class WebSocketManager {
      * 
      * @param callback The function that will be executed
      */
-    setOnMessage(callback: (event: Event) => void): void {
+    setOnMessage(callback: (event: MessageEvent) => void): void {
         this.webSocket.onmessage = callback;
     }
 
@@ -51,7 +51,6 @@ export class WebSocketManager {
      * @param message The message to be sent
      */
     send(message: Message): void {
-        tmp = this.webSocket.readyState == WebSocket.OPEN;
         this.webSocket.send(message.toJson());
     }
 

@@ -29,5 +29,5 @@ export enum MessageType {
 
 export enum GameType {
     HumanVsAi = 'HUMAN_VS_AI',
-    AiVsAii = 'AI_VS_AI'
+    AiVsAi = 'AI_VS_AI'
 }

@@ -1,6 +1,7 @@
 #include "chessServer.h"
 
-using tcp = boost::asio::ip::tcp;
+namespace asio = boost::asio;
+using tcp = asio::ip::tcp;
 
 int main(int arc, char* argv[])
 {
@@ -12,6 +13,18 @@ int main(int arc, char* argv[])
 			ChessServer chessServer(endpoint);
 			chessServer.run();
 		}
+	}
+	catch (const boost::system::system_error& e)
+	{
+		if (e.code() == asio::error::connection_aborted)
+		{
+			std::cerr << "Connection aborted" << std::endl;
+		}
+		else
+		{
+			std::cerr << "Unexpected error from Boost: " << e.code().message() << std::endl;
+		}
+		return 1;
 	}
 	catch (const std::exception& e)
 	{

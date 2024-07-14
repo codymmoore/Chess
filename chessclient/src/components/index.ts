@@ -1,10 +1,9 @@
 import Button from './Button/Button';
 import Square from './Square/Square';
-import { WebSocketProvider, getWebSocketManager } from './WebSocketContext/WebSocketContext';
+import ChessBoard from './ChessBoard/ChessBoard';
 
 export {
     Button,
     Square,
-    WebSocketProvider,
-    getWebSocketManager
+    ChessBoard
 }

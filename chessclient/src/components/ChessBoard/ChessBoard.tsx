@@ -5,7 +5,12 @@ import './ChessBoard.css';
 
 const BOARD_WIDTH = 8, BOARD_HEIGHT = 8;
 
-export function ChessBoard() {
+/**
+ * React component used to render a chess board.
+ * 
+ * @returns The chess board React node
+ */
+export default function ChessBoard() {
     const board = [];
 
     for (let row = 0; row < BOARD_HEIGHT; row++) {
