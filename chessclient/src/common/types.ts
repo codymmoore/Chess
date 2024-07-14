@@ -10,7 +10,8 @@ export type Position = {
     y: number;
 };
 
-export type PieceData = {
+export type PiecePayload = {
+    color: Color;
     type: PieceType;
     position: Position;
 };

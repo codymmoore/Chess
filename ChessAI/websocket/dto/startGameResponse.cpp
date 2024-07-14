@@ -21,32 +21,22 @@ namespace websocket
 
 		void StartGameResponse::fromJson(const json::object& json)
 		{
-			json::array whitePiecesJson = json.at("whitePieces").as_array();
-			for (int i = 0; i < whitePiecesJson.size(); i++)
+			json::array piecesJson = json.at("pieces").as_array();
+			for (int i = 0; i < piecesJson.size(); i++)
 			{
-				json::object pieceJson = whitePiecesJson[i].as_object();
-				PieceNode piece;
-				piece.m_pieceType = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
+				json::object pieceJson = piecesJson[i].as_object();
+				PiecePayload piece;
+
+				piece.color = getColorFromString(pieceJson.at("color").as_string().c_str());
+				piece.type = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
 
 				json::object positionJson = pieceJson.at("position").as_object();
-				piece.m_position.m_x = positionJson.at("x").as_int64();
-				piece.m_position.m_y = positionJson.at("y").as_int64();
+				Position position;
+				position.m_x = positionJson.at("x").as_int64();
+				position.m_y = positionJson.at("y").as_int64();
+				piece.position = position;
 
-				whitePieces.push_back(piece);
-			}
-
-			json::array blackPiecesJson = json.at("blackPieces").as_array();
-			for (int i = 0; i < blackPiecesJson.size(); i++)
-			{
-				json::object pieceJson = blackPiecesJson[i].as_object();
-				PieceNode piece;
-				piece.m_pieceType = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
-
-				json::object positionJson = pieceJson.at("position").as_object();
-				piece.m_position.m_x = positionJson.at("x").as_int64();
-				piece.m_position.m_y = positionJson.at("y").as_int64();
-
-				blackPieces.push_back(piece);
+				pieces.push_back(piece);
 			}
 		}
 
@@ -56,35 +46,21 @@ namespace websocket
 
 			json::object data;
 
-			json::array whitePiecesJson;
-			for (const PieceNode& piece : whitePieces)
+			json::array piecesJson;
+			for (const PiecePayload& piece : pieces)
 			{
 				json::object pieceJson;
-				pieceJson["type"] = toString(piece.m_pieceType);
+				pieceJson["color"] = toString(piece.color);
+				pieceJson["type"] = toString(piece.type);
 
 				json::object positionJson;
-				positionJson["x"] = piece.m_position.m_x;
-				positionJson["y"] = piece.m_position.m_y;
+				positionJson["x"] = piece.position.m_x;
+				positionJson["y"] = piece.position.m_y;
 
 				pieceJson["position"] = positionJson;
-				whitePiecesJson.push_back(pieceJson);
+				piecesJson.push_back(pieceJson);
 			}
-			data["whitePieces"] = whitePiecesJson;
-
-			json::array blackPiecesJson;
-			for (const PieceNode& piece : blackPieces)
-			{
-				json::object pieceJson;
-				pieceJson["type"] = toString(piece.m_pieceType);
-
-				json::object positionJson;
-				positionJson["x"] = piece.m_position.m_x;
-				positionJson["y"] = piece.m_position.m_y;
-
-				pieceJson["position"] = positionJson;
-				blackPiecesJson.push_back(pieceJson);
-			}
-			data["blackPieces"] = blackPiecesJson;
+			data["pieces"] = piecesJson;
 
 			result["data"] = data;
 

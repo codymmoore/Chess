@@ -3,8 +3,6 @@
 #include "message.h"
 #include <vector>
 
-struct PieceNode;
-
 namespace boost
 {
 	namespace json
@@ -22,8 +20,7 @@ namespace websocket
 		 */
 		struct StartGameResponse : Message
 		{
-			std::vector<PieceNode> whitePieces;
-			std::vector<PieceNode> blackPieces;
+			std::vector<PiecePayload> pieces;
 
 			StartGameResponse() = default;
 

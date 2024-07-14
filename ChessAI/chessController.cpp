@@ -23,8 +23,24 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 	_chessState.reset();
 
 	StartGameResponse response;
-	response.whitePieces = _chessState.getWhitePieces();
-	response.blackPieces = _chessState.getBlackPieces();
+
+	for (const PieceNode& piece : _chessState.getWhitePieces())
+	{
+		PiecePayload piecePayload;
+		piecePayload.color = Color::WHITE;
+		piecePayload.type = piece.m_pieceType;
+		piecePayload.position = piece.m_position;
+		response.pieces.push_back(piecePayload);
+	}
+
+	for (const PieceNode& piece : _chessState.getBlackPieces())
+	{
+		PiecePayload piecePayload;
+		piecePayload.color = Color::BLACK;
+		piecePayload.type = piece.m_pieceType;
+		piecePayload.position = piece.m_position;
+		response.pieces.push_back(piecePayload);
+	}
 
 	return response;
 }
@@ -32,7 +48,11 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 GetValidMovesResponse ChessController::getValidMoves(const GetValidMovesRequest& request)
 {
 	GetValidMovesResponse response;
-	response.moves = Move::getValidMoves(request.color, request.piece, _chessState);
+
+	PieceNode piece;
+	piece.m_pieceType = request.piece.type;
+	piece.m_position = request.piece.position;
+	response.moves = Move::getValidMoves(request.piece.color, piece, _chessState);
 
 	return response;
 }

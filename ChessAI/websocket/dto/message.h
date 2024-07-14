@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../utility.h"
+
 #include <string>
 #include <memory>
 
@@ -15,6 +17,16 @@ namespace websocket
 {
 	namespace dto
 	{
+		/**
+		 * Stores piece information to be sent via WebSocket.
+		 */
+		struct PiecePayload
+		{
+			Color color;
+			PieceType type;
+			Position position;
+		};
+
 		/**
 		 * Describes the different types of messages to be sent/received through a WebSocket connection.
 		 */

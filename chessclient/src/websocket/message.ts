@@ -1,5 +1,5 @@
 import { MessageType, GameType, Color, PieceType } from '../common/enums';
-import { PieceData, Position } from '../common/types'
+import { PiecePayload, Position } from '../common/types'
 import { MessageError } from '../common/errors';
 
 /**
@@ -80,37 +80,30 @@ export class StartGameRequest extends Message {
  * Response to StartGameRequest.
  */
 export class StartGameResponse extends Message {
-    whitePieces: PieceData[] | null = null;
-    blackPieces: PieceData[] | null = null;
+    pieces: PiecePayload[] | null = null;
 
     /**
      * Creates an instance of StartGameResponse.
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: {
-        whitePieces: PieceData[],
-        blackPieces: PieceData[]
-    } | null = null) {
+    constructor(data: { pieces: PiecePayload[] } | null = null) {
         super(MessageType.StartGameRequest);
 
         if (data) {
-            this.whitePieces = data.whitePieces;
-            this.blackPieces = data.blackPieces;
+            this.pieces = data.pieces;
         }
     }
 
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
-        this.whitePieces = data['whitePieces'];
-        this.blackPieces = data['blackPieces'];
+        this.pieces = data['pieces'];
     }
 
     getData(): object {
         return {
-            whitePieces: this.whitePieces,
-            blackPieces: this.blackPieces
+            pieces: this.pieces
         };
     }
 }
@@ -119,19 +112,17 @@ export class StartGameResponse extends Message {
  * Request to get valid moves for a piece.
  */
 export class GetValidMovesRequest extends Message {
-    color: Color | null = null;
-    piece: PieceData | null = null;
+    piece: PiecePayload | null = null;
 
     /**
      * Creates an instance of GetValidMovesRequest.
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: { color: Color, piece: PieceData } | null = null) {
+    constructor(data: { piece: PiecePayload } | null = null) {
         super(MessageType.GetValidMovesRequest);
 
         if (data) {
-            this.color = data.color as Color;
             this.piece = data.piece;
         }
     }
@@ -139,13 +130,11 @@ export class GetValidMovesRequest extends Message {
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
-        this.piece = data['piece']
-        this.color = data['color'] as Color;
+        this.piece = data['piece'];
     }
 
     getData(): object {
         return {
-            color: this.color,
             piece: this.piece
         };
     }
