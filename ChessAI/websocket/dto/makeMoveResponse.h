@@ -20,6 +20,7 @@ namespace websocket
 		 */
 		struct MakeMoveResponse : Message
 		{
+			bool success;
 			Color nextTurn, winner;
 
 			MakeMoveResponse() = default;

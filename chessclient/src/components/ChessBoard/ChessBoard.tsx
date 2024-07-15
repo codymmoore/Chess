@@ -1,6 +1,5 @@
 import { Square } from '..';
-import { PieceType, Color } from '../../common/enums';
-import { Position, Piece } from '../../common/types';
+import { Piece } from '../../common/types';
 import './ChessBoard.css';
 
 interface ChessBoardProps {

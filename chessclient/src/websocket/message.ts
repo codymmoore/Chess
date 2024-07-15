@@ -176,8 +176,7 @@ export class GetValidMovesResponse extends Message {
  * Request to move a piece.
  */
 export class MakeMoveRequest extends Message {
-    player: Color | null = null;
-    piece: PieceData | null = null;
+    piece: PiecePayload | null = null;
     destination: Position | null = null;
     promotion: PieceType | null = null;
 
@@ -187,15 +186,13 @@ export class MakeMoveRequest extends Message {
      * @param data The data used to populate the message
      */
     constructor(data: {
-        player: Color,
-        piece: PieceData,
+        piece: PiecePayload,
         destination: Position,
         promotion: PieceType
     } | null = null) {
         super(MessageType.MakeMoveRequest);
 
         if (data) {
-            this.player = data.player;
             this.piece = data.piece;
             this.destination = data.destination;
             this.promotion = data.promotion;
@@ -205,7 +202,6 @@ export class MakeMoveRequest extends Message {
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
-        this.player = data['player'] as Color;
         this.piece = data['piece'];
         this.destination = data['destination'];
         this.promotion = data['promotion'] as PieceType;
@@ -213,7 +209,6 @@ export class MakeMoveRequest extends Message {
 
     getData(): object {
         return {
-            player: this.player,
             piece: this.piece,
             destination: this.destination,
             promotion: this.promotion
@@ -225,6 +220,7 @@ export class MakeMoveRequest extends Message {
  * Response to MakeMoveRequest.
  */
 export class MakeMoveResponse extends Message {
+    success: boolean | null = null;
     nextTurn: Color | null = null;
     winner: Color | null = null;
 
@@ -233,10 +229,11 @@ export class MakeMoveResponse extends Message {
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: { nextTurn: Color, winner: Color } | null = null) {
+    constructor(data: { success: boolean, nextTurn: Color, winner: Color } | null = null) {
         super(MessageType.MakeMoveResponse);
 
         if (data) {
+            this.success = data.success;
             this.nextTurn = data.nextTurn;
             this.winner = data.winner;
         }
@@ -245,12 +242,14 @@ export class MakeMoveResponse extends Message {
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
+        this.success = data['success'];
         this.nextTurn = data['nextTurn'] as Color;
         this.winner = data['winner'] as Color;
     }
 
     getData(): object {
         return {
+            success: this.success,
             nextTurn: this.nextTurn,
             winner: this.winner
         };

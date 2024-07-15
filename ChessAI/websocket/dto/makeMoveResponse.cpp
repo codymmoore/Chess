@@ -20,6 +20,7 @@ namespace websocket
 
 		void MakeMoveResponse::fromJson(const json::object& json)
 		{
+			success = json.at("success").as_bool();
 			nextTurn = getColorFromString(json.at("nextTurn").as_string().c_str());
 			winner = getColorFromString(json.at("winner").as_string().c_str());
 		}
@@ -29,6 +30,7 @@ namespace websocket
 			json::object result = Message::toJson();
 
 			json::object data;
+			data["success"] = success;
 			data["nextTurn"] = toString(nextTurn);
 			data["winner"] = toString(winner);
 			result["data"] = data;

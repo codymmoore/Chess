@@ -20,8 +20,7 @@ namespace websocket
 		 */
 		struct MakeMoveRequest : Message
 		{
-			Color player;
-			PieceNode piece;
+			PiecePayload piece;
 			Position destination;
 			PieceType promotion;
 

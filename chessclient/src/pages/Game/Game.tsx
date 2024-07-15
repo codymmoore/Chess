@@ -26,8 +26,8 @@ function initializeBoard(pieces: PiecePayload[]) {
     }
 
     // Populate board
-    for (let piece of pieces) {
-        let position = piece.position;
+    for (const piece of pieces) {
+        const position = piece.position;
         board[position.y][position.x] = {
             color: piece.color,
             type: piece.type
@@ -37,6 +37,9 @@ function initializeBoard(pieces: PiecePayload[]) {
     return board;
 }
 
+/**
+ * Applies a background to the game page.
+ */
 function applyBackground() {
     document.body.style.backgroundImage = 'radial-gradient(circle, #434343, #000000)';
     document.body.style.backgroundSize = 'cover';

@@ -59,9 +59,18 @@ GetValidMovesResponse ChessController::getValidMoves(const GetValidMovesRequest&
 
 MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 {
-	Move::makeMove(request.player, request.piece, request.destination, _chessState, request.promotion);
-
 	MakeMoveResponse response;
+	PieceNode piece(request.piece.position, request.piece.type);
+
+	if (Move::isValidMove(request.piece.color, piece, request.destination, _chessState))
+	{
+		Move::makeMove(request.piece.color, piece, request.destination, _chessState, request.promotion);
+		response.success = true;
+	}
+	else
+	{
+		response.success = false;
+	}
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
 
