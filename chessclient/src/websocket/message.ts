@@ -88,7 +88,7 @@ export class StartGameResponse extends Message {
      * @param data The data used to populate the message
      */
     constructor(data: { pieces: PiecePayload[] } | null = null) {
-        super(MessageType.StartGameRequest);
+        super(MessageType.StartGameResponse);
 
         if (data) {
             this.pieces = data.pieces;

@@ -1,4 +1,4 @@
-import Message from './message';
+import { Message } from './message';
 
 /**
  * Queue used to handle messages.
@@ -18,10 +18,18 @@ export default class MessageQueue {
     /**
      * Retrieve a message from the queue.
      * 
-     * @returns The last message in the queue.
+     * @returns A Promise for the last message in the queue
      */
-    dequeue(): Message {
-        return this.queue.shift();
+    async dequeue(): Promise<Message> {
+        return new Promise<Message>((resolve) => {
+            const checkQueue = () => {
+                if (!this.isEmpty()) {
+                    resolve(this.queue.shift()!);
+                    clearInterval(interval);
+                }
+            };
+            const interval = setInterval(checkQueue, 100);
+        });
     }
 
     /**

@@ -5,8 +5,9 @@ import './MainMenu.css';
 import chessTitle from '../../assets/chessTitle.png';
 import { Button } from './../../components';
 import { useWebSocketContext } from '../../contexts/WebSocketContext';
-import { StartGameRequest } from '../../websocket/message';
-import { GameType } from '../../common/enums';
+import { useMessageQueueContext } from '../../contexts/MessageQueueContext';
+import { StartGameRequest, StartGameResponse } from '../../websocket/message';
+import { GameType, MessageType } from '../../common/enums';
 
 const buttonStyle: React.CSSProperties = {
     width: '75%',
@@ -33,10 +34,18 @@ function applyBackground() {
 export default function MainMenu() {
     const navigate = useNavigate();
     const webSocketContext = useWebSocketContext();
+    const messageQueue = useMessageQueueContext();
 
     function startGame(gameType: GameType) {
         webSocketContext.send(new StartGameRequest({ gameType: gameType }));
-        navigate(`/play/${gameType}`);
+
+        messageQueue.dequeue().then((message) => {
+            if (message.messageType !== MessageType.StartGameResponse) {
+                throw new Error(`Unexpected message type: ${message.messageType}. Expected ${MessageType.StartGameResponse}`);
+            }
+
+            navigate(`/play/${gameType}`, { state: { pieces: (message as StartGameResponse).pieces } });
+        });
     }
 
     applyBackground();
