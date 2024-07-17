@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { memo } from 'react';
 import { Piece, Position } from '../../common/types';
-import '../Square/Square.css';
-import { getPieceImage } from '../../common/util';
+import ChessPiece from '../ChessPiece/ChessPiece';
+import './Square.css';
 
 export interface SquareProps {
     color: 'white' | 'black';
@@ -13,20 +13,18 @@ function toString(position: Position): string {
     return `Position: { x: ${position.x}, y: ${position.y} }`;
 }
 
-function pieceToString(piece: Piece | null): string {
-    if (piece == null) {
-        return 'Piece: {}';
-    } else {
-        return `Piece: { type: ${piece.type}, color: ${piece.color} }`;
-    }
-}
-
-export default function Square(props: SquareProps) {
-    const [piece, setPiece] = useState(props.piece);
-
+const Square = memo(function Square({ color, position, piece }: SquareProps) {
     return (
-        <div className={`square ${props.color}`} onClick={() => { alert(`${toString(props.position) + ', ' + pieceToString(piece)}`); }}>
-            {piece && (<img src={getPieceImage(piece)} width='105%' height='105%' />)}
+        <div className={`square ${color}`} onClick={() => { alert(`${toString(position)}`); }}>
+            {piece &&
+                <ChessPiece
+                    color={piece.color}
+                    type={piece.type}
+                    position={position}
+                />
+            }
         </div>
     );
-}
+});
+
+export default Square;
