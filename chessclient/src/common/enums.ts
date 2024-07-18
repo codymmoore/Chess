@@ -31,3 +31,7 @@ export enum GameType {
     HumanVsAi = 'HUMAN_VS_AI',
     AiVsAi = 'AI_VS_AI'
 }
+
+export enum DraggableItem {
+    ChessPiece = 'CHESS_PIECE'
+}
