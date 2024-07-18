@@ -11,9 +11,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <DndProvider backend={HTML5Backend}>
             <WebSocketProvider>
-                <MessageQueueProvider>
-                    <App />
-                </MessageQueueProvider>
+                <App />
             </WebSocketProvider>
         </DndProvider>
     </React.StrictMode>,

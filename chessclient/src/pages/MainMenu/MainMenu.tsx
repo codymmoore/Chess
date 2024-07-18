@@ -34,18 +34,12 @@ function applyBackground() {
 export default function MainMenu() {
     const navigate = useNavigate();
     const webSocketContext = useWebSocketContext();
-    const messageQueue = useMessageQueueContext();
 
     function startGame(gameType: GameType) {
-        webSocketContext.send(new StartGameRequest({ gameType: gameType }));
-
-        messageQueue.dequeue().then((message) => {
-            if (message.messageType !== MessageType.StartGameResponse) {
-                throw new Error(`Unexpected message type: ${message.messageType}. Expected ${MessageType.StartGameResponse}`);
-            }
-
+        webSocketContext.setMessageListener(MessageType.StartGameResponse, (message) => {
             navigate(`/play/${gameType}`, { state: { pieces: (message as StartGameResponse).pieces } });
         });
+        webSocketContext.send(new StartGameRequest({ gameType: gameType }));
     }
 
     applyBackground();

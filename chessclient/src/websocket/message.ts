@@ -6,7 +6,7 @@ import { MessageError } from '../common/errors';
  * Base type for all messages sent and received from WebSocket connection.
  */
 export abstract class Message {
-    messageType: MessageType;
+    type: MessageType;
 
     /**
      * Creates a new instance of Message.
@@ -14,7 +14,7 @@ export abstract class Message {
      * @param messageType The type of message being created
      */
     constructor(messageType: MessageType) {
-        this.messageType = messageType;
+        this.type = messageType;
     }
 
     /**
@@ -31,7 +31,7 @@ export abstract class Message {
      */
     toJson(): string {
         return JSON.stringify({
-            type: this.messageType,
+            type: this.type,
             data: this.getData()
         });
     }
