@@ -103,9 +103,10 @@ void ChessServer::aiVsAi()
 bool ChessServer::handleHumanTurn()
 {
 	MessageType messageType;
+	std::unique_ptr<Message> message;
 	do
 	{
-		const std::unique_ptr<Message> message = _webSocketManager.read();
+		message = _webSocketManager.read();
 		messageType = message->getMessageType();
 
 		const std::unique_ptr<Message> response = handleRequest(*message);
@@ -113,7 +114,7 @@ bool ChessServer::handleHumanTurn()
 
 		if (messageType == MessageType::END_GAME_REQUEST)
 			return false;
-	} while (messageType != MessageType::MAKE_MOVE_REQUEST);
+	} while (messageType != MessageType::MAKE_MOVE_REQUEST || !static_cast<MakeMoveResponse&>(*message).success);
 
 	return _chessState.getNextTurn() != NEUTRAL;
 }

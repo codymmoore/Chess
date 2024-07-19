@@ -217,7 +217,7 @@ export class MakeMoveRequest extends Message {
 }
 
 /**
- * Response to MakeMoveRequest.
+ * Response to MakeMoveResponse.
  */
 export class MakeMoveResponse extends Message {
     success: boolean | null = null;

@@ -9,6 +9,7 @@ export interface SquareProps {
     color: 'white' | 'black';
     position: Position;
     piece: Piece | null;
+    makeMove: (source: Position, destination: Position) => void;
 }
 
 function toString(position: Position): string {
@@ -16,18 +17,20 @@ function toString(position: Position): string {
 }
 
 const Square = memo(function Square(props: SquareProps) {
-    const [piece, setPiece] = useState(props.piece);
     const [{ isOver }, dropRef] = useDrop({
         accept: DraggableItem.ChessPiece,
-        drop: (item: ChessPieceProps) => { setPiece({ color: item.color, type: item.type }); }
+        drop: (item: ChessPieceProps) => { props.makeMove(item.position, props.position); },
+        collect: (monitor) => ({
+            isOver: monitor.isOver()
+        })
     });
 
     return (
-        <div ref={dropRef} className={`square ${props.color}`} onClick={() => { alert(`${toString(props.position)}`); }}>
-            {piece &&
+        <div ref={dropRef} className={`square ${props.color} ${isOver ? 'highlight' : ''}`} onClick={() => { alert(`${toString(props.position)}`); }}>
+            {props.piece &&
                 <ChessPiece
-                    color={piece.color}
-                    type={piece.type}
+                    color={props.piece.color}
+                    type={props.piece.type}
                     position={props.position}
                 />
             }
