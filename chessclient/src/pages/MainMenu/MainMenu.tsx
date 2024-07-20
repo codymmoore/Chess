@@ -37,7 +37,8 @@ export default function MainMenu() {
 
     function startGame(gameType: GameType) {
         webSocketContext.setMessageListener(MessageType.StartGameResponse, (message) => {
-            navigate(`/play/${gameType}`, { state: { pieces: (message as StartGameResponse).pieces } });
+            const response = message as StartGameResponse;
+            navigate(`/play/${gameType}`, { state: { pieces: response.pieces, nextTurn: response.nextTurn, winner: response.winner } });
         });
         webSocketContext.send(new StartGameRequest({ gameType: gameType }));
     }

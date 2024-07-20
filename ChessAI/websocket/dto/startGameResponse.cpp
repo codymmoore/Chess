@@ -37,6 +37,9 @@ namespace websocket
 				piece.position = position;
 
 				pieces.push_back(piece);
+
+				nextTurn = getColorFromString(json.at("nextTurn").as_string().c_str());
+				winner = getColorFromString(json.at("winner").as_string().c_str());
 			}
 		}
 
@@ -61,6 +64,9 @@ namespace websocket
 				piecesJson.push_back(pieceJson);
 			}
 			data["pieces"] = piecesJson;
+
+			data["nextTurn"] = toString(nextTurn);
+			data["winner"] = toString(winner);
 
 			result["data"] = data;
 

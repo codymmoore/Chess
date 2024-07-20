@@ -21,6 +21,7 @@ namespace websocket
 		struct StartGameResponse : Message
 		{
 			std::vector<PiecePayload> pieces;
+			Color nextTurn, winner;
 
 			StartGameResponse() = default;
 

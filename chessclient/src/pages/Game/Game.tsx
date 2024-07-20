@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { ChessBoard } from '../../components';
 import { Piece, PiecePayload, Position } from '../../common/types';
 import { PieceType, MessageType, Color } from '../../common/enums';
@@ -54,12 +54,13 @@ function applyBackground() {
  * @returns The React node for the chess game
  */
 export default function Game() {
-    const { gameType } = useParams();
     const location = useLocation();
-    const { pieces } = location.state;
-    const [board, setBoard] = useState<(Piece | null)[][]>(initializeBoard(pieces));
-    const [nextTurn, setNextTurn] = useState<Color>(Color.Neutral);
-    const [winner, setWinner] = useState<Color>(Color.Neutral);
+    const state = location.state;
+
+    const [board, setBoard] = useState<(Piece | null)[][]>(initializeBoard(state.pieces));
+    const [nextTurn, setNextTurn] = useState<Color>(state.nextTurn);
+    const [winner, setWinner] = useState<Color>(state.winner);
+
     const prevBoard = useRef<(Piece | null)[][] | null>(null);
     const webSocketManager = useWebSocketContext();
 
@@ -95,6 +96,18 @@ export default function Game() {
         setNextTurn(request.nextTurn!);
         setWinner(request.winner!);
         webSocketManager.send(new UpdateClientResponse());
+
+        if (request.nextTurn! === Color.Neutral) {
+            let gameEndMessage = 'Winner: ';
+            if (request.winner === Color.White) {
+                gameEndMessage += 'White';
+            } else if (request.winner === Color.Black) {
+                gameEndMessage += 'Black';
+            } else {
+                gameEndMessage += 'Tie';
+            }
+            alert(gameEndMessage);
+        }
     });
 
     /**
@@ -104,27 +117,34 @@ export default function Game() {
      * @param destination The new position of the piece
      */
     function makeMove(source: Position, destination: Position) {
-        const piece = board[source.y][source.x];
+        if (nextTurn === Color.White) {
+            const piece = board[source.y][source.x];
 
-        const request = new MakeMoveRequest({
-            piece: {
-                color: piece!.color,
-                type: piece!.type,
-                position: source
-            },
-            destination: destination,
-            promotion: PieceType.Queen
-        });
-        webSocketManager.send(request);
+            const request = new MakeMoveRequest({
+                piece: {
+                    color: piece!.color,
+                    type: piece!.type,
+                    position: source
+                },
+                destination: destination,
+                promotion: PieceType.Queen
+            });
+            webSocketManager.send(request);
 
-        movePiece(source, destination);
+            movePiece(source, destination);
+        }
     }
 
     applyBackground();
     return (
-        <div>
-            <h1>{gameType}</h1>
-            <ChessBoard board={board} makeMove={makeMove} />
+        <div className="game-container">
+            <div className="game-info">
+                <h2>Current turn:</h2>
+                <h2>{nextTurn === Color.White ? 'White' : 'Black'}</h2>
+            </div>
+            <div className="chessboard-container">
+                <ChessBoard board={board} makeMove={makeMove} />
+            </div>
         </div>
     );
 }

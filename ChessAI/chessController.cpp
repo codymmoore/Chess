@@ -42,6 +42,9 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 		response.pieces.push_back(piecePayload);
 	}
 
+	response.nextTurn = _chessState.getNextTurn();
+	response.winner = _chessState.getWinner();
+
 	return response;
 }
 

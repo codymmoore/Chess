@@ -81,17 +81,21 @@ export class StartGameRequest extends Message {
  */
 export class StartGameResponse extends Message {
     pieces: PiecePayload[] | null = null;
+    nextTurn: Color | null = null;
+    winner: Color | null = null;
 
     /**
      * Creates an instance of StartGameResponse.
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: { pieces: PiecePayload[] } | null = null) {
+    constructor(data: { pieces: PiecePayload[], nextTurn: Color, winner: Color } | null = null) {
         super(MessageType.StartGameResponse);
 
         if (data) {
             this.pieces = data.pieces;
+            this.nextTurn = data.nextTurn;
+            this.winner = data.winner;
         }
     }
 
@@ -99,11 +103,15 @@ export class StartGameResponse extends Message {
         const data = JSON.parse(json)['data'];
 
         this.pieces = data['pieces'];
+        this.nextTurn = data['nextTurn'];
+        this.winner = data['winner'];
     }
 
     getData(): object {
         return {
-            pieces: this.pieces
+            pieces: this.pieces,
+            nextTurn: this.nextTurn,
+            winner: this.winner
         };
     }
 }
