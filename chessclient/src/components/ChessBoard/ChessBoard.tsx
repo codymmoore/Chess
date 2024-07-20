@@ -10,6 +10,7 @@ interface ChessBoardProps {
 /**
  * React component used to render a chess board.
  * 
+ * @param param0 Properties used to render the chess board
  * @returns The chess board React node
  */
 export default function ChessBoard({ board, makeMove }: ChessBoardProps) {
@@ -17,12 +18,12 @@ export default function ChessBoard({ board, makeMove }: ChessBoardProps) {
         <div className='chessboard-outer-wrapper'>
             <div className="chessboard">
                 {board.map((row, y) =>
-                    row.map((square, x) => (
+                    row.map((piece, x) => (
                         <Square
                             key={`${y}-${x}`}
                             color={(y + x) % 2 === 1 ? 'black' : 'white'}
                             position={{ x: x, y: y }}
-                            piece={square}
+                            piece={piece}
                             makeMove={makeMove}
                         />
                     ))

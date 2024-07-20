@@ -1,7 +1,7 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { Piece, Position } from '../../common/types';
-import { DraggableItem, Color, PieceType } from '../../common/enums';
+import { DraggableItem } from '../../common/enums';
 import ChessPiece, { ChessPieceProps } from '../ChessPiece/ChessPiece';
 import './Square.css';
 
@@ -12,26 +12,28 @@ export interface SquareProps {
     makeMove: (source: Position, destination: Position) => void;
 }
 
-function toString(position: Position): string {
-    return `Position: { x: ${position.x}, y: ${position.y} }`;
-}
-
-const Square = memo(function Square(props: SquareProps) {
+/**
+ * React component used to render a square within a chess board.
+ * 
+ * @param param0 Properties used to render the square
+ * @return The square React node
+ */
+const Square = memo(function Square({ color, position, piece, makeMove }: SquareProps) {
     const [{ isOver }, dropRef] = useDrop({
         accept: DraggableItem.ChessPiece,
-        drop: (item: ChessPieceProps) => { props.makeMove(item.position, props.position); },
+        drop: (item: ChessPieceProps) => { makeMove(item.position, position); },
         collect: (monitor) => ({
             isOver: monitor.isOver()
         })
     });
 
     return (
-        <div ref={dropRef} className={`square ${props.color} ${isOver ? 'highlight' : ''}`} onClick={() => { alert(`${toString(props.position)}`); }}>
-            {props.piece &&
+        <div ref={dropRef} className={`square ${color} ${isOver ? 'highlight' : ''}`}>
+            {piece &&
                 <ChessPiece
-                    color={props.piece.color}
-                    type={props.piece.type}
-                    position={props.position}
+                    color={piece.color}
+                    type={piece.type}
+                    position={position}
                 />
             }
         </div>

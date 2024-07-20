@@ -60,7 +60,7 @@ export default function Game() {
     const [board, setBoard] = useState<(Piece | null)[][]>(initializeBoard(pieces));
     const [nextTurn, setNextTurn] = useState<Color>(Color.Neutral);
     const [winner, setWinner] = useState<Color>(Color.Neutral);
-    let prevBoard = useRef<(Piece | null)[][] | null>(null);
+    const prevBoard = useRef<(Piece | null)[][] | null>(null);
     const webSocketManager = useWebSocketContext();
 
     webSocketManager.setMessageListener(MessageType.MakeMoveResponse, (message) => {
