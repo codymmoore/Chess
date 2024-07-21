@@ -50,6 +50,7 @@ export default function Game() {
             setBoard(prevBoard.current!);
             prevBoard.current = null;
         }
+        setBoard(getBoardFromJson(response.board!));
         setNextTurn(response.nextTurn!);
         setWinner(response.winner!);
     });

@@ -11,6 +11,7 @@
 
 #include "chess.h"
 #include "move.h"
+#include <memory>
 
 using namespace websocket::dto;
 
@@ -56,6 +57,7 @@ MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 	{
 		response.success = false;
 	}
+	response.board = std::make_unique<const BitBoard>(_chessState.getBoard());
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
 

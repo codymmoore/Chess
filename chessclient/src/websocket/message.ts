@@ -229,6 +229,7 @@ export class MakeMoveRequest extends Message {
  */
 export class MakeMoveResponse extends Message {
     success: boolean | null = null;
+    board: string[][] | null = null;
     nextTurn: Color | null = null;
     winner: Color | null = null;
 
@@ -237,11 +238,12 @@ export class MakeMoveResponse extends Message {
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: { success: boolean, nextTurn: Color, winner: Color } | null = null) {
+    constructor(data: { success: boolean, board: string[][], nextTurn: Color, winner: Color } | null = null) {
         super(MessageType.MakeMoveResponse);
 
         if (data) {
             this.success = data.success;
+            this.board = data.board;
             this.nextTurn = data.nextTurn;
             this.winner = data.winner;
         }
@@ -251,6 +253,7 @@ export class MakeMoveResponse extends Message {
         const data = JSON.parse(json)['data'];
 
         this.success = data['success'];
+        this.board = data['board'];
         this.nextTurn = data['nextTurn'] as Color;
         this.winner = data['winner'] as Color;
     }
@@ -258,6 +261,7 @@ export class MakeMoveResponse extends Message {
     getData(): object {
         return {
             success: this.success,
+            board: this.board,
             nextTurn: this.nextTurn,
             winner: this.winner
         };

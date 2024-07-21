@@ -1,7 +1,6 @@
 #pragma once
 
 #include "message.h"
-#include <vector>
 
 namespace boost
 {
