@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { Color, PieceType, DraggableItem } from '../../common/enums';
 import { Position } from '../../common/types';
@@ -17,7 +17,7 @@ export interface ChessPieceProps {
  * @param param0 Properties used to render the chess piece
  * @returns The chess piece React node
  */
-const ChessPiece = memo(function ChessPiece({ color, type, position }: ChessPieceProps) {
+export default function ChessPiece({ color, type, position }: ChessPieceProps) {
     const [{ isDragging }, dragRef, preview] = useDrag({
         type: DraggableItem.ChessPiece,
         item: { color, type, position },
@@ -36,6 +36,4 @@ const ChessPiece = memo(function ChessPiece({ color, type, position }: ChessPiec
     return (
         <img ref={dragRef} src={getPieceImage(color, type)} className='chess-piece' />
     );
-});
-
-export default ChessPiece;
+}

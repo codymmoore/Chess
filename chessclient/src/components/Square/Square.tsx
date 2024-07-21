@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { Piece, Position } from '../../common/types';
 import { DraggableItem } from '../../common/enums';
@@ -18,7 +17,7 @@ export interface SquareProps {
  * @param param0 Properties used to render the square
  * @return The square React node
  */
-const Square = memo(function Square({ color, position, piece, makeMove }: SquareProps) {
+export default function Square({ color, position, piece, makeMove }: SquareProps) {
     const [{ isOver }, dropRef] = useDrop({
         accept: DraggableItem.ChessPiece,
         drop: (item: ChessPieceProps) => { makeMove(item.position, position); },
@@ -38,6 +37,4 @@ const Square = memo(function Square({ color, position, piece, makeMove }: Square
             }
         </div>
     );
-});
-
-export default Square;
+}
