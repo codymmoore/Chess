@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import { MainMenu, Game } from './pages';
 import './App.css';
 

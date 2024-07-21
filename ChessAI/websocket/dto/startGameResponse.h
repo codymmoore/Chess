@@ -1,9 +1,6 @@
 #pragma once
 
 #include "message.h"
-#include <vector>
-
-struct PieceNode;
 
 namespace boost
 {
@@ -22,8 +19,8 @@ namespace websocket
 		 */
 		struct StartGameResponse : Message
 		{
-			std::vector<PieceNode> whitePieces;
-			std::vector<PieceNode> blackPieces;
+			std::unique_ptr<const BitBoard> board;
+			Color nextTurn, winner;
 
 			StartGameResponse() = default;
 

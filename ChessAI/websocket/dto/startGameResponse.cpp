@@ -21,33 +21,10 @@ namespace websocket
 
 		void StartGameResponse::fromJson(const json::object& json)
 		{
-			json::array whitePiecesJson = json.at("whitePieces").as_array();
-			for (int i = 0; i < whitePiecesJson.size(); i++)
-			{
-				json::object pieceJson = whitePiecesJson[i].as_object();
-				PieceNode piece;
-				piece.m_pieceType = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
-
-				json::object positionJson = pieceJson.at("position").as_object();
-				piece.m_position.m_x = positionJson.at("x").as_int64();
-				piece.m_position.m_y = positionJson.at("y").as_int64();
-
-				whitePieces.push_back(piece);
-			}
-
-			json::array blackPiecesJson = json.at("blackPieces").as_array();
-			for (int i = 0; i < blackPiecesJson.size(); i++)
-			{
-				json::object pieceJson = blackPiecesJson[i].as_object();
-				PieceNode piece;
-				piece.m_pieceType = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
-
-				json::object positionJson = pieceJson.at("position").as_object();
-				piece.m_position.m_x = positionJson.at("x").as_int64();
-				piece.m_position.m_y = positionJson.at("y").as_int64();
-
-				blackPieces.push_back(piece);
-			}
+			const json::array boardJson = json.at("board").as_array();
+			board = std::make_unique<const BitBoard>(getBoardFromJson(boardJson));
+			nextTurn = getColorFromString(json.at("nextTurn").as_string().c_str());
+			winner = getColorFromString(json.at("winner").as_string().c_str());
 		}
 
 		json::object StartGameResponse::toJson() const
@@ -56,35 +33,9 @@ namespace websocket
 
 			json::object data;
 
-			json::array whitePiecesJson;
-			for (const PieceNode& piece : whitePieces)
-			{
-				json::object pieceJson;
-				pieceJson["type"] = toString(piece.m_pieceType);
-
-				json::object positionJson;
-				positionJson["x"] = piece.m_position.m_x;
-				positionJson["y"] = piece.m_position.m_y;
-
-				pieceJson["position"] = positionJson;
-				whitePiecesJson.push_back(pieceJson);
-			}
-			data["whitePieces"] = whitePiecesJson;
-
-			json::array blackPiecesJson;
-			for (const PieceNode& piece : blackPieces)
-			{
-				json::object pieceJson;
-				pieceJson["type"] = toString(piece.m_pieceType);
-
-				json::object positionJson;
-				positionJson["x"] = piece.m_position.m_x;
-				positionJson["y"] = piece.m_position.m_y;
-
-				pieceJson["position"] = positionJson;
-				blackPiecesJson.push_back(pieceJson);
-			}
-			data["blackPieces"] = blackPiecesJson;
+			data["board"] = getJsonFromBoard(*board);
+			data["nextTurn"] = toString(nextTurn);
+			data["winner"] = toString(winner);
 
 			result["data"] = data;
 

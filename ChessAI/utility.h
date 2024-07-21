@@ -5,6 +5,9 @@
 #include <vector>
 #include <cinttypes>
 #include <cmath>
+#include <boost/json.hpp>
+
+class BitBoard;
 
 /* ---------- Global Constants ---------- */
 const int NUM_RANKS = 8, // number of rows
@@ -113,4 +116,22 @@ std::string toFileAndRank(const int x, const int y);
 // Convert Position object to string containing rank and file
 std::string toFileAndRank(const Position& pos);
 
+/**
+ * Converts a BitBoard to a JSON array.
+ *
+ * \param board The BitBoard to be converted
+ * \return The JSON representation of the board
+ */
+boost::json::array getJsonFromBoard(const BitBoard& board);
+
+/**
+ * Converts a JSON array to a BitBoard.
+ *
+ * \param boardJson The JSON representation of a board
+ * \return A new BitBoard instance
+ */
+BitBoard getBoardFromJson(const boost::json::array& boardJson);
+
 #endif // UTILITY_H
+
+

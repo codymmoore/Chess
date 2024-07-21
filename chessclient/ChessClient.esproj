@@ -14,5 +14,6 @@
     <Folder Include="src\components\Button\" />
     <Folder Include="src\components\Square\" />
     <Folder Include="src\common\" />
+    <Folder Include="src\contexts\" />
   </ItemGroup>
 </Project>

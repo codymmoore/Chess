@@ -135,6 +135,7 @@ public:
 	const std::vector<PieceNode>& getWhitePieces() const;
 	const std::vector<PieceNode>& getBlackPieces() const;
 	std::string getFenString() const;
+	const BitBoard& getBoard() const;
 
 	// Modifiers
 	void setState(const std::string& gameState);

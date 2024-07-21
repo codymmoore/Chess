@@ -102,18 +102,19 @@ void ChessServer::aiVsAi()
 
 bool ChessServer::handleHumanTurn()
 {
-	MessageType messageType;
-	do
+	bool run = true;
+	while (run)
 	{
 		const std::unique_ptr<Message> message = _webSocketManager.read();
-		messageType = message->getMessageType();
+		const MessageType messageType = message->getMessageType();
 
 		const std::unique_ptr<Message> response = handleRequest(*message);
 		_webSocketManager.write(*response);
 
 		if (messageType == MessageType::END_GAME_REQUEST)
 			return false;
-	} while (messageType != MessageType::MAKE_MOVE_REQUEST);
+		run = messageType != MessageType::MAKE_MOVE_REQUEST || !static_cast<MakeMoveResponse&>(*response).success;
+	}
 
 	return _chessState.getNextTurn() != NEUTRAL;
 }
@@ -123,9 +124,7 @@ bool ChessServer::handleAiTurn(Agent& agent)
 	MoveNode move = agent.prunedIterDepthLimitedMinimax();
 
 	UpdateClientRequest updateClientRequest;
-	updateClientRequest.source = move.m_source;
-	updateClientRequest.destination = move.m_destination;
-	updateClientRequest.promotion = move.m_promotion;
+	updateClientRequest.board = std::make_unique<const BitBoard>(_chessState.getBoard());
 	updateClientRequest.nextTurn = _chessState.getNextTurn();
 	updateClientRequest.winner = _chessState.getWinner();
 

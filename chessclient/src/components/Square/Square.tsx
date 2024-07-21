@@ -1,32 +1,40 @@
-import { useState } from 'react';
-import { Piece, Coordinate } from '../../common/types';
-import '../Square/Square.css';
-import { getPieceImage } from '../../common/util';
+import { useDrop } from 'react-dnd';
+import { Piece, Position } from '../../common/types';
+import { DraggableItem } from '../../common/enums';
+import ChessPiece, { ChessPieceProps } from '../ChessPiece/ChessPiece';
+import './Square.css';
 
 export interface SquareProps {
     color: 'white' | 'black';
-    coordinate: Coordinate;
+    position: Position;
     piece: Piece | null;
+    makeMove: (source: Position, destination: Position) => void;
 }
 
-function coordToString(coordinate: Coordinate): string {
-    return `Coordinate: { x: ${coordinate.x}, y: ${coordinate.y} }`;
-}
-
-function pieceToString(piece: Piece | null): string {
-    if (piece == null) {
-        return 'Piece: {}';
-    } else {
-        return `Piece: { type: ${piece.type}, color: ${piece.color} }`;
-    }
-}
-
-export default function Square(props: SquareProps) {
-    const [piece, setPiece] = useState(props.piece);
+/**
+ * React component used to render a square within a chess board.
+ * 
+ * @param param0 Properties used to render the square
+ * @return The square React node
+ */
+export default function Square({ color, position, piece, makeMove }: SquareProps) {
+    const [{ isOver }, dropRef] = useDrop({
+        accept: DraggableItem.ChessPiece,
+        drop: (item: ChessPieceProps) => { makeMove(item.position, position); },
+        collect: (monitor) => ({
+            isOver: monitor.isOver()
+        })
+    });
 
     return (
-        <div className={`square ${props.color}`} onClick={() => { alert(`${coordToString(props.coordinate) + ', ' + pieceToString(piece)}`); }}>
-            {piece && (<img src={getPieceImage(piece)} width='105%' height='105%' />)}
+        <div ref={dropRef} className={`square ${color} ${isOver ? 'highlight' : ''}`}>
+            {piece &&
+                <ChessPiece
+                    color={piece.color}
+                    type={piece.type}
+                    position={position}
+                />
+            }
         </div>
     );
 }

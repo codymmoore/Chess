@@ -516,6 +516,16 @@ std::string ChessState::getFenString() const
 	return fenString;
 }
 
+/**
+ * Retrieve the board.
+ *
+ * \return The BitBoard instance representing the board state
+ */
+const BitBoard& ChessState::getBoard() const
+{
+	return m_board;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  void setState(const std::string& gameState)
 ///

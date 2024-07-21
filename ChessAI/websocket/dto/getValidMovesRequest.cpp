@@ -21,12 +21,12 @@ namespace websocket
 		void GetValidMovesRequest::fromJson(const json::object& json)
 		{
 			json::object pieceJson = json.at("piece").as_object();
-			piece.m_pieceType = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
-			color = getColorFromString(pieceJson.at("color").as_string().c_str());
+			piece.color = getColorFromString(pieceJson.at("color").as_string().c_str());
+			piece.type = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
 
 			json::object positionJson = pieceJson.at("position").as_object();
-			piece.m_position.m_x = positionJson.at("x").as_int64();
-			piece.m_position.m_y = positionJson.at("y").as_int64();
+			piece.position.m_x = positionJson.at("x").as_int64();
+			piece.position.m_y = positionJson.at("y").as_int64();
 		}
 
 		json::object GetValidMovesRequest::toJson() const
@@ -36,12 +36,12 @@ namespace websocket
 			json::object data;
 
 			json::object pieceJson;
-			pieceJson["type"] = toString(piece.m_pieceType);
-			pieceJson["color"] = toString(color);
+			pieceJson["color"] = toString(piece.color);
+			pieceJson["type"] = toString(piece.type);
 
 			json::object positionJson;
-			positionJson["x"] = piece.m_position.m_x;
-			positionJson["y"] = piece.m_position.m_y;
+			positionJson["x"] = piece.position.m_x;
+			positionJson["y"] = piece.position.m_y;
 			pieceJson["position"] = positionJson;
 
 			data["piece"] = pieceJson;

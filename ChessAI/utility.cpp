@@ -1,5 +1,9 @@
 #include "utility.h"
 #include <sstream>
+#include <boost/json.hpp>
+#include "BitBoard.h"
+
+using namespace boost;
 
 // Used for hashing Position objects
 const int X_SHIFT = static_cast<int>(log2(NUM_FILES) + 1);
@@ -258,4 +262,70 @@ std::string toFileAndRank(const int x, const int y)
 std::string toFileAndRank(const Position& pos)
 {
 	return toFileAndRank(pos.m_x, pos.m_y);
+}
+
+json::array getJsonFromBoard(const BitBoard& board)
+{
+	json::array result = json::array(NUM_RANKS, json::array(NUM_FILES));
+	for (int y = 0; y < NUM_RANKS; y++)
+	{
+		for (int x = 0; x < NUM_FILES; x++)
+		{
+			bool occupied = false;
+			std::string symbol = " ";
+
+			int color = WHITE;
+			while (color < NUM_COLORS && !occupied)
+			{
+				int pieceType = PAWN;
+				while (pieceType < NUM_PIECE_TYPES && !occupied)
+				{
+					if (board.posIsOccupiedByColorPiece(x, y, (Color)color, (PieceType)pieceType))
+					{
+						symbol = std::string(1, PIECE_SYMBOLS[color][pieceType]);
+						occupied = true;
+					}
+					pieceType += 1;
+				}
+				color += 1;
+			}
+			result.at(y).at(x) = symbol;
+		}
+	}
+
+	return result;
+}
+
+BitBoard getBoardFromJson(const json::array& boardJson)
+{
+	BitBoard result;
+	for (int y = 0; y < NUM_RANKS; y++)
+	{
+		const json::array rowJson = boardJson[y].as_array();
+		for (int x = 0; x < NUM_FILES; x++)
+		{
+			const char symbol = rowJson[x].as_string().front();
+			if (symbol != ' ')
+			{
+				bool searching = false;
+				int color = WHITE;
+				while (color < NUM_COLORS && searching)
+				{
+					int pieceType = PAWN;
+					while (pieceType < NUM_PIECE_TYPES && searching)
+					{
+						if (PIECE_SYMBOLS[color][pieceType] == symbol)
+						{
+							result.addPiece(y, x, (Color)color, (PieceType)pieceType);
+							searching = false;
+						}
+						pieceType += 1;
+					}
+					color += 1;
+				}
+			}
+		}
+	}
+
+	return result;
 }

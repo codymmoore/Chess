@@ -1,29 +1,34 @@
 import { Square } from '..';
-import { Coordinate } from '../../common/types';
+import { Piece, Position } from '../../common/types';
 import './ChessBoard.css';
 
-const BOARD_WIDTH = 8, BOARD_HEIGHT = 8;
+interface ChessBoardProps {
+    board: (Piece | null)[][];
+    makeMove: (source: Position, destination: Position) => void;
+}
 
-export function ChessBoard() {
-    const board = [];
-
-    for (let row = 0; row < BOARD_HEIGHT; row++) {
-        const squares = [];
-        for (let col = 0; col < BOARD_WIDTH; col++) {
-            const isBlack = (row + col) % 2 === 1;
-            const coordinate: Coordinate = { x: row, y: col };
-            squares.push(<Square key={`${row}-${col}`} color={isBlack ? 'black' : 'white'} coordinate={coordinate} piece={null} />);
-        }
-        board.push(
-            <div key={row}>
-                {squares}
+/**
+ * React component used to render a chess board.
+ * 
+ * @param param0 Properties used to render the chess board
+ * @returns The chess board React node
+ */
+export default function ChessBoard({ board, makeMove }: ChessBoardProps) {
+    return (
+        <div className='chessboard-outer-wrapper'>
+            <div className="chessboard">
+                {board.map((row, y) =>
+                    row.map((piece, x) => (
+                        <Square
+                            key={`${y}-${x}`}
+                            color={(y + x) % 2 === 1 ? 'black' : 'white'}
+                            position={{ x: x, y: y }}
+                            piece={piece}
+                            makeMove={makeMove}
+                        />
+                    ))
+                )}
             </div>
-        );
-    }
-
-    return <div className='chessboard-outer-wrapper'>
-        <div className="chessboard">
-            {board}
         </div>
-    </div>;
+    );
 }

@@ -11,6 +11,7 @@
 
 #include "chess.h"
 #include "move.h"
+#include <memory>
 
 using namespace websocket::dto;
 
@@ -23,8 +24,9 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 	_chessState.reset();
 
 	StartGameResponse response;
-	response.whitePieces = _chessState.getWhitePieces();
-	response.blackPieces = _chessState.getBlackPieces();
+	response.board = std::make_unique<const BitBoard>(_chessState.getBoard());
+	response.nextTurn = _chessState.getNextTurn();
+	response.winner = _chessState.getWinner();
 
 	return response;
 }
@@ -32,16 +34,30 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 GetValidMovesResponse ChessController::getValidMoves(const GetValidMovesRequest& request)
 {
 	GetValidMovesResponse response;
-	response.moves = Move::getValidMoves(request.color, request.piece, _chessState);
+
+	PieceNode piece;
+	piece.m_pieceType = request.piece.type;
+	piece.m_position = request.piece.position;
+	response.moves = Move::getValidMoves(request.piece.color, piece, _chessState);
 
 	return response;
 }
 
 MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 {
-	Move::makeMove(request.player, request.piece, request.destination, _chessState, request.promotion);
-
 	MakeMoveResponse response;
+	PieceNode piece(request.piece.position, request.piece.type);
+
+	if (Move::isValidMove(request.piece.color, piece, request.destination, _chessState))
+	{
+		Move::makeMove(request.piece.color, piece, request.destination, _chessState, request.promotion);
+		response.success = true;
+	}
+	else
+	{
+		response.success = false;
+	}
+	response.board = std::make_unique<const BitBoard>(_chessState.getBoard());
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
 
