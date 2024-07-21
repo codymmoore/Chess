@@ -80,7 +80,7 @@ export class StartGameRequest extends Message {
  * Response to StartGameRequest.
  */
 export class StartGameResponse extends Message {
-    pieces: PiecePayload[] | null = null;
+    board: string[][] | null = null;
     nextTurn: Color | null = null;
     winner: Color | null = null;
 
@@ -89,11 +89,11 @@ export class StartGameResponse extends Message {
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: { pieces: PiecePayload[], nextTurn: Color, winner: Color } | null = null) {
+    constructor(data: { board: string[][], nextTurn: Color, winner: Color } | null = null) {
         super(MessageType.StartGameResponse);
 
         if (data) {
-            this.pieces = data.pieces;
+            this.board = data.board;
             this.nextTurn = data.nextTurn;
             this.winner = data.winner;
         }
@@ -102,14 +102,14 @@ export class StartGameResponse extends Message {
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
-        this.pieces = data['pieces'];
+        this.board = data['board'];
         this.nextTurn = data['nextTurn'];
         this.winner = data['winner'];
     }
 
     getData(): object {
         return {
-            pieces: this.pieces,
+            board: this.board,
             nextTurn: this.nextTurn,
             winner: this.winner
         };
@@ -268,9 +268,7 @@ export class MakeMoveResponse extends Message {
  * Request to update the client.
  */
 export class UpdateClientRequest extends Message {
-    source: Position | null = null;
-    destination: Position | null = null;
-    promotion: PieceType | null = null;
+    board: string[][] | null = null;
     nextTurn: Color | null = null;
     winner: Color | null = null;
 
@@ -279,19 +277,11 @@ export class UpdateClientRequest extends Message {
      * 
      * @param data The data used to populate the message
      */
-    constructor(data: {
-        source: Position,
-        destination: Position,
-        promotion: PieceType,
-        nextTurn: Color,
-        winner: Color;
-    } | null = null) {
+    constructor(data: { board: string[][], nextTurn: Color, winner: Color } | null = null) {
         super(MessageType.UpdateClientRequest);
 
         if (data) {
-            this.source = data.source;
-            this.destination = data.destination;
-            this.promotion = data.promotion;
+            this.board = data.board;
             this.nextTurn = data.nextTurn;
             this.winner = data.winner;
         }
@@ -300,18 +290,14 @@ export class UpdateClientRequest extends Message {
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
-        this.source = data['source'];
-        this.destination = data['destination'];
-        this.promotion = data['promotion'];
+        this.board = data['board'];
         this.nextTurn = data['nextTurn'];
         this.winner = data['winner'];
     }
 
     getData(): object {
         return {
-            source: this.source,
-            destination: this.destination,
-            promotion: this.promotion,
+            board: this.board,
             nextTurn: this.nextTurn,
             winner: this.winner
         };

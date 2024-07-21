@@ -5,7 +5,6 @@ import './MainMenu.css';
 import chessTitle from '../../assets/chessTitle.png';
 import { Button } from './../../components';
 import { useWebSocketContext } from '../../contexts/WebSocketContext';
-import { useMessageQueueContext } from '../../contexts/MessageQueueContext';
 import { StartGameRequest, StartGameResponse } from '../../websocket/message';
 import { GameType, MessageType } from '../../common/enums';
 
@@ -38,7 +37,7 @@ export default function MainMenu() {
     function startGame(gameType: GameType) {
         webSocketContext.setMessageListener(MessageType.StartGameResponse, (message) => {
             const response = message as StartGameResponse;
-            navigate(`/play/${gameType}`, { state: { pieces: response.pieces, nextTurn: response.nextTurn, winner: response.winner } });
+            navigate(`/play/${gameType}`, { state: { board: response.board, nextTurn: response.nextTurn, winner: response.winner } });
         });
         webSocketContext.send(new StartGameRequest({ gameType: gameType }));
     }

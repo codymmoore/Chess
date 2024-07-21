@@ -4,8 +4,7 @@ export enum PieceType {
     Bishop = 'BISHOP',
     Rook = 'ROOK',
     Queen = 'QUEEN',
-    King = 'KING',
-    None = 'NONE'
+    King = 'KING'
 }
 
 export enum Color {

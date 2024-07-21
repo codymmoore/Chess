@@ -1,5 +1,6 @@
 #include "updateClientRequest.h"
 #include <boost/json.hpp>
+#include "../../BitBoard.h"
 
 using namespace boost;
 
@@ -20,16 +21,8 @@ namespace websocket
 
 		void UpdateClientRequest::fromJson(const json::object& json)
 		{
-			json::object sourceJson = json.at("source").as_object();
-			source.m_x = sourceJson["x"].as_int64();
-			source.m_y = sourceJson["y"].as_int64();
-
-			json::object destinationJson = json.at("destination").as_object();
-			destination.m_x = destinationJson["x"].as_int64();
-			destination.m_y = destinationJson["y"].as_int64();
-
-			promotion = getPieceTypeFromString(json.at("promotion").as_string().c_str());
-
+			const json::array boardJson = json.at("board").as_array();
+			board = std::make_unique<const BitBoard>(getBoardFromJson(boardJson));
 			nextTurn = getColorFromString(json.at("nextTurn").as_string().c_str());
 			winner = getColorFromString(json.at("winner").as_string().c_str());
 		}
@@ -40,17 +33,7 @@ namespace websocket
 
 			json::object data;
 
-			json::object sourceJson;
-			sourceJson["x"] = source.m_x;
-			sourceJson["y"] = source.m_y;
-			data["source"] = sourceJson;
-
-			json::object destinationJson;
-			destinationJson["x"] = destination.m_x;
-			destinationJson["y"] = destination.m_y;
-			data["destination"] = destinationJson;
-
-			data["promotion"] = toString(promotion);
+			data["board"] = getJsonFromBoard(*board);
 			data["nextTurn"] = toString(nextTurn);
 			data["winner"] = toString(winner);
 

@@ -124,9 +124,7 @@ bool ChessServer::handleAiTurn(Agent& agent)
 	MoveNode move = agent.prunedIterDepthLimitedMinimax();
 
 	UpdateClientRequest updateClientRequest;
-	updateClientRequest.source = move.m_source;
-	updateClientRequest.destination = move.m_destination;
-	updateClientRequest.promotion = move.m_promotion;
+	updateClientRequest.board = std::make_unique<const BitBoard>(_chessState.getBoard());
 	updateClientRequest.nextTurn = _chessState.getNextTurn();
 	updateClientRequest.winner = _chessState.getWinner();
 

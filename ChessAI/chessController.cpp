@@ -23,25 +23,7 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 	_chessState.reset();
 
 	StartGameResponse response;
-
-	for (const PieceNode& piece : _chessState.getWhitePieces())
-	{
-		PiecePayload piecePayload;
-		piecePayload.color = Color::WHITE;
-		piecePayload.type = piece.m_pieceType;
-		piecePayload.position = piece.m_position;
-		response.pieces.push_back(piecePayload);
-	}
-
-	for (const PieceNode& piece : _chessState.getBlackPieces())
-	{
-		PiecePayload piecePayload;
-		piecePayload.color = Color::BLACK;
-		piecePayload.type = piece.m_pieceType;
-		piecePayload.position = piece.m_position;
-		response.pieces.push_back(piecePayload);
-	}
-
+	response.board = std::make_unique<const BitBoard>(_chessState.getBoard());
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
 

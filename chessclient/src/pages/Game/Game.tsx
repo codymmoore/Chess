@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ChessBoard } from '../../components';
-import { Piece, PiecePayload, Position } from '../../common/types';
+import { Piece, Position } from '../../common/types';
 import { PieceType, MessageType, Color } from '../../common/enums';
-import { BOARD_WIDTH, BOARD_HEIGHT } from '../../common/constants';
+import { BOARD_WIDTH, BOARD_HEIGHT, PIECE_TO_SYMBOL_MAP, SYMBOL_TO_PIECE_MAP } from '../../common/constants';
 import { useWebSocketContext } from '../../contexts/WebSocketContext';
 import { MakeMoveRequest, MakeMoveResponse, UpdateClientRequest, UpdateClientResponse } from '../../websocket/message';
 import './Game.css';
@@ -11,33 +11,13 @@ import './Game.css';
 export type GameType = 'human-vs-ai' | 'ai-vs-ai';
 
 /**
- * Creates and populates a chess board.
+ * Creates a new chess board from JSON.
  * 
- * @param pieces The pieces on the board
- * @returns The newly created chess board
+ * @param boardJson The JSON representation of the board
+ * @returns A new board representation
  */
-function initializeBoard(pieces: PiecePayload[]) {
-    const board = [];
-
-    // Create board
-    for (let y = 0; y < BOARD_HEIGHT; y++) {
-        const row: (Piece | null)[] = [];
-        for (let y = 0; y < BOARD_WIDTH; y++) {
-            row.push(null);
-        }
-        board.push(row);
-    }
-
-    // Populate board
-    for (const piece of pieces) {
-        const position = piece.position;
-        board[position.y][position.x] = {
-            color: piece.color,
-            type: piece.type
-        };
-    }
-
-    return board;
+function getBoardFromJson(boardJson: string[][]): (Piece | null)[][] {
+    return boardJson.map(row => row.map(symbol => SYMBOL_TO_PIECE_MAP[symbol] || null));
 }
 
 /**
@@ -57,7 +37,7 @@ export default function Game() {
     const location = useLocation();
     const state = location.state;
 
-    const [board, setBoard] = useState<(Piece | null)[][]>(initializeBoard(state.pieces));
+    const [board, setBoard] = useState<(Piece | null)[][]>(getBoardFromJson(state.board));
     const [nextTurn, setNextTurn] = useState<Color>(state.nextTurn);
     const [winner, setWinner] = useState<Color>(state.winner);
 
@@ -92,7 +72,7 @@ export default function Game() {
 
     webSocketManager.setMessageListener(MessageType.UpdateClientRequest, (message) => {
         const request = message as UpdateClientRequest;
-        movePiece(request.source!, request.destination!);
+        setBoard(getBoardFromJson(request.board!));
         setNextTurn(request.nextTurn!);
         setWinner(request.winner!);
         webSocketManager.send(new UpdateClientResponse());
