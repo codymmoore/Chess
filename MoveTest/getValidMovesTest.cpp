@@ -202,13 +202,13 @@ namespace getValidMovesTest
 		}
 	}
 
-	namespace linear
-	{
-		TEST_F(GetValidMovesTest, )
-		{
+	//namespace linear
+	//{
+	//	TEST_F(GetValidMovesTest, )
+	//	{
 
-		}
-	}
+	//	}
+	//}
 
 	//TEST_F(GetValidMoveTest, invalidMove_outOfBoundsLeftUh) {
 	//	const Color COLOR = Color::WHITE;
