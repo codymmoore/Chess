@@ -1,0 +1,22 @@
+.square {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    border-width: 1px;
+    border-color: black;
+    border-style: solid;
+    margin: -2px;
+}
+
+.square.highlight,
+.square:hover {
+    box-shadow: inset 0 0 3px 3px yellow;
+}
+
+.square.white {
+    background-color: #EBECD0;
+}
+
+.square.black {
+    background-color: #779556;
+}

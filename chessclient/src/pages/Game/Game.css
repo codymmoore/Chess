@@ -1,0 +1,17 @@
+.game-container {
+    display: flex;
+    align-items: center;
+}
+
+.game-info h2 {
+    font-size: 48px;
+    margin: 10px 0;
+    transform: translateX(-100%);
+}
+
+.chessboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateX(-20%);
+}

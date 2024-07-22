@@ -74,7 +74,7 @@ void Move::getValidMovesPawn(const Color player, const PieceNode& piece, const C
 		/* ----- Check if en passant is possible ----- */
 		if (!game.m_moveHistory.empty())
 		{
-			MoveNode prevMove = game.m_moveHistory.back();
+			MoveHistoryNode prevMove = game.m_moveHistory.back();
 
 			// If previous move was made by an opposing pawn
 			if (prevMove.m_pieceType == PAWN && prevMove.m_color != player)
@@ -569,7 +569,7 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 				// En Passant
 				else if (!game.m_moveHistory.empty() && game.m_moveHistory.back().m_pieceType == PAWN)
 				{
-					MoveNode prevMove = game.m_moveHistory.back();
+					MoveHistoryNode prevMove = game.m_moveHistory.back();
 
 					return prevMove.m_prevPos == (destination + FORWARD) && prevMove.m_currPos == (destination - FORWARD);
 				}
@@ -752,8 +752,22 @@ bool Move::inCheck(const Color player, const ChessState& game)
 /// \note:  assumes move being made is valid
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////
-void Move::makeMove(const Color player, PieceNode& piece, const Position& destination, ChessState& game, const PieceType promotion)
+void Move::makeMove(const Color player, const PieceNode& piece, const Position& destination, ChessState& game, const PieceType promotion)
 {
+	std::vector<PieceNode>& pieces = player == WHITE ? game.m_whitePieces : game.m_blackPieces;
+	std::vector<PieceNode>::iterator pieceIt = std::find(pieces.begin(), pieces.end(), piece);
+
+	if (pieceIt == pieces.end())
+	{
+		std::string errorMessage = "Piece not found: {Color: " + toString(player) +
+			", PieceType: " + toString(piece.m_pieceType) +
+			", Position: {x: " + std::to_string(piece.m_position.m_x) +
+			", y: " + std::to_string(piece.m_position.m_y) + "}}";
+		throw std::exception(errorMessage.c_str());
+	}
+
+	PieceNode& pieceRef = *pieceIt;
+
 	if (piece.m_pieceType == PAWN)
 	{
 		// Pawn advancement resets half turns to 0
@@ -796,7 +810,7 @@ void Move::makeMove(const Color player, PieceNode& piece, const Position& destin
 		// If a promotion can occur
 		if (destination.m_y == endOfBoard)
 		{
-			piece.m_pieceType = promotion;
+			pieceRef.m_pieceType = promotion;
 
 			// Update board
 			game.m_board.clearPos(piece.m_position, player, PAWN);
@@ -933,7 +947,7 @@ void Move::makeMove(const Color player, PieceNode& piece, const Position& destin
 	game.m_numHalfTurns += 1;
 
 	/* ----- Update move history ----- */
-	game.m_moveHistory.push_back(MoveNode(player, piece, destination));
+	game.m_moveHistory.push_back(MoveHistoryNode(player, piece, destination));
 	// Only last 8 moves need to be kept in move history
 	if (game.m_moveHistory.size() > 8)
 	{
@@ -965,8 +979,9 @@ void Move::makeMove(const Color player, PieceNode& piece, const Position& destin
 	// Update board
 	game.m_board.clearPos(piece.m_position, player, piece.m_pieceType);
 	game.m_board.addPiece(destination, player, piece.m_pieceType);
+
 	// Update piece's position
-	piece.m_position = destination;
+	pieceRef.m_position = destination;
 
 	// Update turn
 	if (game.m_nextTurn != NEUTRAL)
