@@ -217,31 +217,6 @@ void Move::getValidMovesLinear(const Color player, const PieceNode& piece, const
 /////////////////////////////////////////////////////////////////////////////////////////////
 void Move::getValidMovesKing(const Color player, const PieceNode& piece, const ChessState& game, std::vector<Position>& moves)
 {
-	// // Add all possible king moves to vector
-	// std::vector<Position> destinations = {
-	//     piece.m_position + UP,
-	//     piece.m_position + DOWN,
-	//     piece.m_position + LEFT,
-	//     piece.m_position + RIGHT,
-	//     piece.m_position + UP + RIGHT,
-	//     piece.m_position + UP + LEFT,
-	//     piece.m_position + DOWN + RIGHT,
-	//     piece.m_position + DOWN + LEFT
-	// };
-
-	// // Loop through each possible move
-	// for(const Position& newPos : destinations)
-	// {
-	//     bool inBounds = newPos.m_x >= 0 && newPos.m_x < NUM_FILES &&
-	//                     newPos.m_y >= 0 && newPos.m_y < NUM_RANKS;
-
-	//     // If position exists on board and does not contain piece of same color
-	//     if(inBounds && !game.m_board.posIsOccupiedByColor(newPos, player))
-	//     {
-	//         moves.push_back(newPos);
-	//     }
-	// }
-	// Add all possible king moves to vector
 	static const std::vector<Position> kingMoves = {
 		UP,
 		DOWN,
@@ -268,36 +243,6 @@ void Move::getValidMovesKing(const Color player, const PieceNode& piece, const C
 		}
 	}
 
-	/* ----- CHECK IF CASTLING IS POSSIBLE ----- */
-	// static auto castlingCheck = [&player, &piece, &game, &moves](const Position& direction)
-	// {
-	//     bool blocked = false;
-	//     Position pos = piece.m_position + direction;
-
-	//     // Set block to true if there are any pieces between king and rook
-	//     while(!blocked && pos.m_x < NUM_FILES - 1 && pos.m_x > 0)
-	//     {
-	//         blocked = game.m_board.posIsOccupied(pos);
-	//         pos += direction;
-	//     }
-
-	//     if(!blocked)
-	//     {
-	//         if(!inCheck(player, game))
-	//         {
-	//             // Set safePath to false if any position the king would pass over could be attacked
-	//             //      (this include the position the king lands on)
-	//             bool safePath = !(isUnderAttack(player, game, piece.m_position + direction)
-	//                 || isUnderAttack(player, game, piece.m_position + direction * 2));
-
-	//             if(safePath)
-	//             {
-	//                 moves.push_back(piece.m_position + direction * 2);
-	//             }
-	//         }
-	//     }
-	// };
-
 	// If king can kind-side castle
 	if (canCastle(player, piece, game, true))
 	{
@@ -309,20 +254,6 @@ void Move::getValidMovesKing(const Color player, const PieceNode& piece, const C
 	{
 		moves.push_back(piece.m_position + LEFT * 2);
 	}
-
-	// bool kingSideCastling = (player == WHITE ? game.m_wKingSideCastle : game.m_bKingSideCastle);
-
-	// if(kingSideCastling)
-	// {
-	//     castlingCheck(RIGHT);
-	// }
-
-	// bool queenSideCastling = (player == WHITE ? game.m_wQueenSideCastle : game.m_bQueenSideCastle);
-
-	// if(queenSideCastling)
-	// {
-	//     castlingCheck(LEFT);
-	// }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
