@@ -8,6 +8,7 @@
 
 /* ---------- GLOBAL CONSTANTS ---------- */
 const double TOTAL_PLAYER_TURN_TIME = 15.0 * 60.0 * 1000000000.0; // 15 minutes converted to nanoseconds
+const unsigned int MAX_MOVE_HISTORY_SIZE = 8;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \struct: PieceNode

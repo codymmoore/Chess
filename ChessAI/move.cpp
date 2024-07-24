@@ -914,15 +914,15 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 	// Update piece's position
 	pieceRef.m_position = destination;
 
-	// Update turn
-	if (game.m_nextTurn != NEUTRAL)
-	{
-		game.m_nextTurn = ~player;
-	}
-
 	// Increment full turns if black moved
 	if (game.m_nextTurn == Color::BLACK)
 	{
 		game.m_numFullTurns += 1;
+	}
+
+	// Update turn
+	if (game.m_nextTurn != NEUTRAL)
+	{
+		game.m_nextTurn = ~player;
 	}
 }

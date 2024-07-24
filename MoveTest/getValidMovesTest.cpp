@@ -15,6 +15,26 @@ namespace getValidMovesTest
 		ChessState chessState;
 	};
 
+	TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_white)
+	{
+		const Color COLOR = Color::WHITE;
+		const Position SOURCE = Position(4, 7);
+		const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
+		chessState.setState("4k3/8/8/8/8/8/6p1/4K3 w - - 0 1");
+		const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+		EXPECT_THAT(validMoves, Not(Contains(Position(5, 7))));
+	}
+
+	TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_black)
+	{
+		const Color COLOR = Color::BLACK;
+		const Position SOURCE = Position(4, 0);
+		const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
+		chessState.setState("4k3/6P1/8/8/8/8/8/4K3 b - - 0 1");
+		const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+		EXPECT_THAT(validMoves, Not(Contains(Position(5, 0))));
+	}
+
 	namespace pawn
 	{
 		TEST_F(GetValidMovesTest, pawnMoveForward_white)
