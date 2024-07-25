@@ -781,7 +781,7 @@ MoveNode Agent::prunedDepthLimitedMinimax(PieceNode& pieceToMove, Position& piec
 
 				Move::makeMove(m_player, *pieceCopy, destination, gameCopy);
 
-				int tmp = getMaxValue(gameCopy, depthLimit, INT_MIN, INT_MAX);
+				int tmp = getMinValue(gameCopy, depthLimit, INT_MIN, INT_MAX);
 
 				if (tmp > maxValue)
 				{
