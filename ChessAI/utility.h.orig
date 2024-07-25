@@ -24,6 +24,20 @@ struct Position
 {
 	int m_x, m_y;
 
+<<<<<<< HEAD
+    Position() = default;
+    Position(const int x, const int y) : m_x(x), m_y(y) {}
+    Position& operator=(const Position& rightOperand);
+    Position& operator+=(const Position& rightOperand);
+    Position operator+(const Position& rightOperand) const;
+    Position& operator-=(const Position& rightOperand);
+    Position operator-(const Position& rightOperand) const;
+    Position& operator*=(const int multiplier);
+    Position operator*(const int multiplier) const;
+    Position operator~() const;
+    bool operator==(const Position& rightOperand) const;
+    bool operator!=(const Position& rightOperand) const;
+=======
 	Position() = default;
 	Position(const int x, const int y) : m_x(x), m_y(y) {}
 	Position& operator=(const Position& rightOperand);
@@ -33,9 +47,9 @@ struct Position
 	Position operator-(const Position& rightOperand) const;
 	Position& operator*=(const int multiplier);
 	Position operator*(const int multiplier) const;
-	Position operator-() const;
 	bool operator==(const Position& rightOperand) const;
 	bool operator!=(const Position& rightOperand) const;
+>>>>>>> main
 };
 
 // Used to output Position objects

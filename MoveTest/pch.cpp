@@ -11,7 +11,7 @@ Position forward(const Color color)
 
 Position backward(const Color color)
 {
-	return ~forward(color);
+	return -forward(color);
 }
 
 Position right(const Color color)
@@ -21,5 +21,5 @@ Position right(const Color color)
 
 Position left(const Color color)
 {
-	return ~right(color);
+	return -right(color);
 }

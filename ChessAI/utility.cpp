@@ -70,11 +70,11 @@ Position Position::operator*(const int multiplier) const
 	return result;
 }
 
-Position Position::operator~() const
+Position Position::operator-() const
 {
-    Position result(*this);
+	Position result(*this);
 
-    return result *= -1;
+	return result *= -1;
 }
 
 bool Position::operator==(const Position& rightOperand) const
