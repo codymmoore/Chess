@@ -1,6 +1,6 @@
 # Chess
 
-Chess game made up of a server-side engine and a client-side user interface.
+Chess game made up of a server-side engine and a client-side user interface that communicate via WebSocket.
 
 ![image](https://github.com/user-attachments/assets/cc3ac2d6-b34b-488a-8b1b-81346be4dae6)
 
