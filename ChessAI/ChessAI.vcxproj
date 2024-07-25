@@ -97,7 +97,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib</LibraryPath>
+    <LibraryPath>C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <LibraryPath>C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib</LibraryPath>
