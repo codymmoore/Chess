@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dto/message.h"
+#include "message/message.h"
 #include <boost/beast/websocket.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
@@ -30,14 +30,14 @@ namespace websocket
 		 *
 		 * \return The client-sent message
 		 */
-		std::unique_ptr<dto::Message> read();
+		std::unique_ptr<message::Message> read();
 
 		/**
 		 * Send a message to the client.
 		 *
 		 * \param message The message to be sent to the client
 		 */
-		void write(const dto::Message& message);
+		void write(const message::Message& message);
 
 	private:
 		boost::asio::ip::tcp::endpoint _endpoint;

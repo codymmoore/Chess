@@ -12,21 +12,24 @@ namespace boost
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
-		 * Message used to respond to a end game request.
+		 * Message used to respond to the request of a start of a new game.
 		 */
-		struct EndGameResponse : Message
+		struct StartGameResponse : Message
 		{
-			EndGameResponse() = default;
+			std::unique_ptr<const BitBoard> board;
+			Color nextTurn, winner;
+
+			StartGameResponse() = default;
 
 			/**
-			 * Creates a new instance EndGameResponse and populates it using a JSON object.
+			 * Creates a new instance StartGameResponse and populates it using a JSON object.
 			 *
 			 * \param json The JSON object used to populate the new instance
 			 */
-			EndGameResponse(const boost::json::object& json);
+			StartGameResponse(const boost::json::object& json);
 
 			MessageType getMessageType() const override;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "message.h"
-#include "../../utility.h"
 
 namespace boost
 {
@@ -13,25 +12,21 @@ namespace boost
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
-		 * Message used to respond to a make move request.
+		 * Message used to respond to a request to update the client.
 		 */
-		struct MakeMoveResponse : Message
+		struct UpdateClientResponse : Message
 		{
-			bool success;
-			std::unique_ptr<const BitBoard> board;
-			Color nextTurn, winner;
-
-			MakeMoveResponse() = default;
+			UpdateClientResponse() = default;
 
 			/**
-			 * Creates a new instance MakeMoveResponse and populates it using a JSON object.
+			 * Creates a new instance UpdateClientResponse and populates it using a JSON object.
 			 *
 			 * \param json The JSON object used to populate the new instance
 			 */
-			MakeMoveResponse(const boost::json::object& json);
+			UpdateClientResponse(const boost::json::object& json);
 
 			MessageType getMessageType() const override;
 

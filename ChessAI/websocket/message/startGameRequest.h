@@ -10,26 +10,27 @@ namespace boost
 	}
 }
 
+enum GameType;
+
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
-		 * Message used to respond to the request of a start of a new game.
+		 * Message used to request the start of a new game.
 		 */
-		struct StartGameResponse : Message
+		struct StartGameRequest : Message
 		{
-			std::unique_ptr<const BitBoard> board;
-			Color nextTurn, winner;
+			GameType gameType;
 
-			StartGameResponse() = default;
+			StartGameRequest() = default;
 
 			/**
-			 * Creates a new instance StartGameResponse and populates it using a JSON object.
+			 * Creates a new instance StartGameRequest and populates it using a JSON object.
 			 *
 			 * \param json The JSON object used to populate the new instance
 			 */
-			StartGameResponse(const boost::json::object& json);
+			StartGameRequest(const boost::json::object& json);
 
 			MessageType getMessageType() const override;
 

@@ -5,7 +5,7 @@ using namespace boost;
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		MakeMoveRequest::MakeMoveRequest(const json::object& json)
 		{

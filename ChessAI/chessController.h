@@ -2,7 +2,7 @@
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		struct StartGameRequest;
 		struct StartGameResponse;
@@ -39,7 +39,7 @@ public:
 	 * \param request The request object containing game information
 	 * \return The response object containing new game information
 	 */
-	websocket::dto::StartGameResponse startGame(const websocket::dto::StartGameRequest& request);
+	websocket::message::StartGameResponse startGame(const websocket::message::StartGameRequest& request);
 
 	/**
 	 * Retrieves valid moves for a piece.
@@ -47,7 +47,7 @@ public:
 	 * \param request The request object containing piece data
 	 * \return The response object containing valid moves
 	 */
-	websocket::dto::GetValidMovesResponse getValidMoves(const websocket::dto::GetValidMovesRequest& request);
+	websocket::message::GetValidMovesResponse getValidMoves(const websocket::message::GetValidMovesRequest& request);
 
 	/**
 	 * Moves a piece.
@@ -55,7 +55,7 @@ public:
 	 * \param request The request object containing move data
 	 * \return The response object containing updated game information
 	 */
-	websocket::dto::MakeMoveResponse makeMove(const websocket::dto::MakeMoveRequest& request);
+	websocket::message::MakeMoveResponse makeMove(const websocket::message::MakeMoveRequest& request);
 
 	/**
 	 * Ends the current game.
@@ -63,7 +63,7 @@ public:
 	 * \param request The request object containing end game information
 	 * \return The response object containing post-game information
 	 */
-	websocket::dto::EndGameResponse endGame(const websocket::dto::EndGameRequest& request);
+	websocket::message::EndGameResponse endGame(const websocket::message::EndGameRequest& request);
 
 private:
 	ChessState& _chessState;

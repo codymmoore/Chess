@@ -1,20 +1,20 @@
 #include "chessServer.h"
 #include "agent.h"
 
-#include "websocket/dto/startGameRequest.h"
-#include "websocket/dto/startGameResponse.h"
-#include "websocket/dto/getValidMovesRequest.h"
-#include "websocket/dto/getValidMovesResponse.h"
-#include "websocket/dto/makeMoveRequest.h"
-#include "websocket/dto/makeMoveResponse.h"
-#include "websocket/dto/updateClientRequest.h"
-#include "websocket/dto/updateClientResponse.h"
-#include "websocket/dto/endGameRequest.h"
-#include "websocket/dto/endGameResponse.h"
+#include "websocket/message/startGameRequest.h"
+#include "websocket/message/startGameResponse.h"
+#include "websocket/message/getValidMovesRequest.h"
+#include "websocket/message/getValidMovesResponse.h"
+#include "websocket/message/makeMoveRequest.h"
+#include "websocket/message/makeMoveResponse.h"
+#include "websocket/message/updateClientRequest.h"
+#include "websocket/message/updateClientResponse.h"
+#include "websocket/message/endGameRequest.h"
+#include "websocket/message/endGameResponse.h"
 
 #include <boost/asio/ip/tcp.hpp>
 
-using namespace websocket::dto;
+using namespace websocket::message;
 using tcp = boost::asio::ip::tcp;
 
 const unsigned int NUMBER_OF_GAME_TYPES = 3;

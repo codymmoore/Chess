@@ -6,7 +6,7 @@ using namespace boost;
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		StartGameResponse::StartGameResponse(const json::object& json)
 		{

@@ -203,17 +203,17 @@
     <ClInclude Include="chessController.h" />
     <ClInclude Include="move.h" />
     <ClInclude Include="utility.h" />
-    <ClInclude Include="websocket\dto\endGameRequest.h" />
-    <ClInclude Include="websocket\dto\endGameResponse.h" />
-    <ClInclude Include="websocket\dto\getValidMovesRequest.h" />
-    <ClInclude Include="websocket\dto\getValidMovesResponse.h" />
-    <ClInclude Include="websocket\dto\makeMoveRequest.h" />
-    <ClInclude Include="websocket\dto\makeMoveResponse.h" />
-    <ClInclude Include="websocket\dto\message.h" />
-    <ClInclude Include="websocket\dto\startGameRequest.h" />
-    <ClInclude Include="websocket\dto\startGameResponse.h" />
-    <ClInclude Include="websocket\dto\updateClientRequest.h" />
-    <ClInclude Include="websocket\dto\updateClientResponse.h" />
+    <ClInclude Include="websocket\message\endGameRequest.h" />
+    <ClInclude Include="websocket\message\endGameResponse.h" />
+    <ClInclude Include="websocket\message\getValidMovesRequest.h" />
+    <ClInclude Include="websocket\message\getValidMovesResponse.h" />
+    <ClInclude Include="websocket\message\makeMoveRequest.h" />
+    <ClInclude Include="websocket\message\makeMoveResponse.h" />
+    <ClInclude Include="websocket\message\message.h" />
+    <ClInclude Include="websocket\message\startGameRequest.h" />
+    <ClInclude Include="websocket\message\startGameResponse.h" />
+    <ClInclude Include="websocket\message\updateClientRequest.h" />
+    <ClInclude Include="websocket\message\updateClientResponse.h" />
     <ClInclude Include="websocket\webSocketManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -225,17 +225,17 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="move.cpp" />
     <ClCompile Include="utility.cpp" />
-    <ClCompile Include="websocket\dto\endGameRequest.cpp" />
-    <ClCompile Include="websocket\dto\endGameResponse.cpp" />
-    <ClCompile Include="websocket\dto\getValidMovesRequest.cpp" />
-    <ClCompile Include="websocket\dto\getValidMovesResponse.cpp" />
-    <ClCompile Include="websocket\dto\makeMoveRequest.cpp" />
-    <ClCompile Include="websocket\dto\makeMoveResponse.cpp" />
-    <ClCompile Include="websocket\dto\message.cpp" />
-    <ClCompile Include="websocket\dto\startGameRequest.cpp" />
-    <ClCompile Include="websocket\dto\startGameResponse.cpp" />
-    <ClCompile Include="websocket\dto\updateClientRequest.cpp" />
-    <ClCompile Include="websocket\dto\updateClientResponse.cpp" />
+    <ClCompile Include="websocket\message\endGameRequest.cpp" />
+    <ClCompile Include="websocket\message\endGameResponse.cpp" />
+    <ClCompile Include="websocket\message\getValidMovesRequest.cpp" />
+    <ClCompile Include="websocket\message\getValidMovesResponse.cpp" />
+    <ClCompile Include="websocket\message\makeMoveRequest.cpp" />
+    <ClCompile Include="websocket\message\makeMoveResponse.cpp" />
+    <ClCompile Include="websocket\message\message.cpp" />
+    <ClCompile Include="websocket\message\startGameRequest.cpp" />
+    <ClCompile Include="websocket\message\startGameResponse.cpp" />
+    <ClCompile Include="websocket\message\updateClientRequest.cpp" />
+    <ClCompile Include="websocket\message\updateClientResponse.cpp" />
     <ClCompile Include="websocket\webSocketManager.cpp" />
   </ItemGroup>
   <ItemGroup>

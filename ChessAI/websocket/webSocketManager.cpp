@@ -24,7 +24,7 @@ namespace websocket
 		_webSocketStream.close(beast::websocket::normal);
 	}
 
-	std::unique_ptr<dto::Message> WebSocketManager::read()
+	std::unique_ptr<message::Message> WebSocketManager::read()
 	{
 		beast::flat_buffer buffer;
 		_webSocketStream.read(buffer);
@@ -32,10 +32,10 @@ namespace websocket
 		const std::string messageString = beast::buffers_to_string(buffer.data());
 		const json::object messageJson = json::parse(messageString).as_object();
 
-		return dto::Message::createMessage(messageJson);
+		return message::Message::createMessage(messageJson);
 	}
 
-	void WebSocketManager::write(const dto::Message& message)
+	void WebSocketManager::write(const message::Message& message)
 	{
 		const std::string messageString = json::serialize(message.toJson());
 		_webSocketStream.write(net::buffer(messageString));

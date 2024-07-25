@@ -12,7 +12,7 @@ namespace boost
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
 		 * Message used to request the end of a game.

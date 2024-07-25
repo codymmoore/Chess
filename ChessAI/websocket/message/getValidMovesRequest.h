@@ -1,6 +1,7 @@
 #pragma once
 
 #include "message.h"
+#include "../../chess.h"
 
 namespace boost
 {
@@ -12,21 +13,23 @@ namespace boost
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
-		 * Message used to respond to a request to update the client.
+		 * Message used to request valid moves for a piece.
 		 */
-		struct UpdateClientResponse : Message
+		struct GetValidMovesRequest : Message
 		{
-			UpdateClientResponse() = default;
+			PiecePayload piece;
+
+			GetValidMovesRequest() = default;
 
 			/**
-			 * Creates a new instance UpdateClientResponse and populates it using a JSON object.
+			 * Creates a new instance of GetValidMovesRequest and populates it using the provided JSON object.
 			 *
 			 * \param json The JSON object used to populate the new instance
 			 */
-			UpdateClientResponse(const boost::json::object& json);
+			GetValidMovesRequest(const boost::json::object& json);
 
 			MessageType getMessageType() const override;
 

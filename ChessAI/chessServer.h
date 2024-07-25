@@ -2,7 +2,7 @@
 
 #include "chessController.h"
 #include "websocket/webSocketManager.h"
-#include "websocket/dto/message.h"
+#include "websocket/message/message.h"
 #include "chess.h"
 #include <memory>
 
@@ -96,7 +96,7 @@ private:
 	 * \param request The message received from the client
 	 * \return The response object to be sent back to the client
 	 */
-	std::unique_ptr<websocket::dto::Message> handleRequest(const websocket::dto::Message& request);
+	std::unique_ptr<websocket::message::Message> handleRequest(const websocket::message::Message& request);
 
 	websocket::WebSocketManager _webSocketManager;
 	ChessState _chessState;

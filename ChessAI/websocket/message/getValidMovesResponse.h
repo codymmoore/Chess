@@ -1,6 +1,9 @@
 #pragma once
 
 #include "message.h"
+#include <vector>
+
+struct Position;
 
 namespace boost
 {
@@ -10,27 +13,25 @@ namespace boost
 	}
 }
 
-enum GameType;
-
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
-		 * Message used to request the start of a new game.
+		 * Messge used to respond to a valid moves request.
 		 */
-		struct StartGameRequest : Message
+		struct GetValidMovesResponse : Message
 		{
-			GameType gameType;
+			std::vector<Position> moves;
 
-			StartGameRequest() = default;
+			GetValidMovesResponse() = default;
 
 			/**
-			 * Creates a new instance StartGameRequest and populates it using a JSON object.
+			 * Creates a new instance of GetValidMovesResponse and populates it using a JSON object.
 			 *
 			 * \param json The JSON object used to populate the new instance
 			 */
-			StartGameRequest(const boost::json::object& json);
+			GetValidMovesResponse(const boost::json::object& json);
 
 			MessageType getMessageType() const override;
 

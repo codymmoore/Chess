@@ -5,7 +5,7 @@ using namespace boost;
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		EndGameRequest::EndGameRequest(const json::object& json)
 		{

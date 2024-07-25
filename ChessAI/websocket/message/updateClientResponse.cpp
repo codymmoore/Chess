@@ -5,7 +5,7 @@ using namespace boost;
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		UpdateClientResponse::UpdateClientResponse(const json::object& json)
 		{

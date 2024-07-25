@@ -15,7 +15,7 @@ namespace boost
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		/**
 		 * Stores piece information to be sent via WebSocket.

@@ -32,7 +32,7 @@ constexpr const char* MESSAGE_TYPE_STRINGS[NUMBER_OF_MESSAGE_TYPES] = {
 
 namespace websocket
 {
-	namespace dto
+	namespace message
 	{
 		MessageType getMessageTypeFromString(const std::string& messageTypeString)
 		{
