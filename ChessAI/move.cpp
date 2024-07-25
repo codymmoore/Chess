@@ -908,8 +908,8 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 
 	/* ----- Move Piece ----- */
 	// Update board
-	game.m_board.clearPos(piece.m_position, player, piece.m_pieceType);
-	game.m_board.addPiece(destination, player, piece.m_pieceType);
+	game.m_board.clearPos(piece.m_position, player, pieceRef.m_pieceType);
+	game.m_board.addPiece(destination, player, pieceRef.m_pieceType);
 
 	// Update piece's position
 	pieceRef.m_position = destination;
