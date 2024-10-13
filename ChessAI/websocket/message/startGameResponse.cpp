@@ -22,9 +22,9 @@ namespace websocket
 		void StartGameResponse::fromJson(const json::object& json)
 		{
 			const json::array boardJson = json.at("board").as_array();
-			board = std::make_unique<const BitBoard>(getBoardFromJson(boardJson));
-			nextTurn = getColorFromString(json.at("nextTurn").as_string().c_str());
-			winner = getColorFromString(json.at("winner").as_string().c_str());
+			board = std::make_unique<const util::Bitboard>(util::getBoardFromJson(boardJson));
+			nextTurn = util::getColorFromString(json.at("nextTurn").as_string().c_str());
+			winner = util::getColorFromString(json.at("winner").as_string().c_str());
 		}
 
 		json::object StartGameResponse::toJson() const
@@ -33,9 +33,9 @@ namespace websocket
 
 			json::object data;
 
-			data["board"] = getJsonFromBoard(*board);
-			data["nextTurn"] = toString(nextTurn);
-			data["winner"] = toString(winner);
+			data["board"] = util::getJsonFromBoard(*board);
+			data["nextTurn"] = util::toString(nextTurn);
+			data["winner"] = util::toString(winner);
 
 			result["data"] = data;
 

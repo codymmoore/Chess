@@ -22,7 +22,7 @@ namespace websocket
 		 */
 		struct GetValidMovesResponse : Message
 		{
-			std::vector<Position> moves;
+			std::vector<util::Position> moves;
 
 			GetValidMovesResponse() = default;
 

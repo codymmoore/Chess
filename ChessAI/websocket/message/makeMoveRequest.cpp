@@ -21,18 +21,18 @@ namespace websocket
 		void MakeMoveRequest::fromJson(const json::object& json)
 		{
 			json::object pieceJson = json.at("piece").as_object();
-			piece.color = getColorFromString(pieceJson.at("color").as_string().c_str());
-			piece.type = getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
+			piece.color = util::getColorFromString(pieceJson.at("color").as_string().c_str());
+			piece.type = util::getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
 
 			json::object positionJson = pieceJson.at("position").as_object();
-			piece.position.m_x = positionJson.at("x").as_int64();
-			piece.position.m_y = positionJson.at("y").as_int64();
+			piece.position.x = positionJson.at("x").as_int64();
+			piece.position.y = positionJson.at("y").as_int64();
 
 			json::object destinationJson = json.at("destination").as_object();
-			destination.m_x = destinationJson["x"].as_int64();
-			destination.m_y = destinationJson["y"].as_int64();
+			destination.x = destinationJson["x"].as_int64();
+			destination.y = destinationJson["y"].as_int64();
 
-			promotion = getPieceTypeFromString(json.at("promotion").as_string().c_str());
+			promotion = util::getPieceTypeFromString(json.at("promotion").as_string().c_str());
 		}
 
 		json::object MakeMoveRequest::toJson() const
@@ -42,22 +42,22 @@ namespace websocket
 			json::object data;
 
 			json::object pieceJson;
-			pieceJson["color"] = toString(piece.color);
-			pieceJson["type"] = toString(piece.type);
+			pieceJson["color"] = util::toString(piece.color);
+			pieceJson["type"] = util::toString(piece.type);
 
 			json::object positionJson;
-			positionJson["x"] = piece.position.m_x;
-			positionJson["y"] = piece.position.m_y;
+			positionJson["x"] = piece.position.x;
+			positionJson["y"] = piece.position.y;
 			pieceJson["position"] = positionJson;
 
 			data["piece"] = pieceJson;
 
 			json::object destinationJson;
-			destinationJson["x"] = destination.m_x;
-			destinationJson["y"] = destination.m_y;
+			destinationJson["x"] = destination.x;
+			destinationJson["y"] = destination.y;
 			data["destination"] = destinationJson;
 
-			data["promotion"] = toString(promotion);
+			data["promotion"] = util::toString(promotion);
 
 			result["data"] = data;
 

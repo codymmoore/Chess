@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "../ChessAI/move.h"
+
+using namespace util;
 
 namespace isValidMoveTest
 {

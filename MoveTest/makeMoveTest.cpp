@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "../ChessAI/move.h"
 
 using namespace testing;
+using namespace util;
 
 namespace makeMoveTest
 {
@@ -25,7 +25,7 @@ namespace makeMoveTest
 		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
 
 		EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
-		EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PIECE.m_pieceType));
+		EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PIECE.m_pieceType));
 	}
 
 	TEST_F(MakeMoveTest, move_updateTurn)
@@ -164,9 +164,9 @@ namespace makeMoveTest
 			const Position DESTINATION = SOURCE + RIGHT + UP * 2;
 			chessState.setState("4k3/8/8/8/5p2/8/4N3/4K3 w - - 0 1");
 
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(DESTINATION, ~COLOR));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
-			EXPECT_FALSE(chessState.m_board.posIsOccupiedByColor(DESTINATION, ~COLOR));
+			EXPECT_FALSE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
 		}
 
 		TEST_F(MakeMoveTest, capture_updatePieces)
@@ -270,7 +270,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/3Pp3/8/8/8/4K3 w - d6 0 1");
 
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
-			EXPECT_FALSE(chessState.m_board.posIsOccupiedByColor(4, 3, ~COLOR));
+			EXPECT_FALSE(chessState.m_board.posIsOccupied(4, 3, ~COLOR));
 		}
 
 		TEST_F(MakeMoveTest, enPassant_updateBoard_black)
@@ -282,7 +282,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/8/3pP3/8/8/4K3 b - d3 0 1");
 
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
-			EXPECT_FALSE(chessState.m_board.posIsOccupiedByColor(4, 4, ~COLOR));
+			EXPECT_FALSE(chessState.m_board.posIsOccupied(4, 4, ~COLOR));
 		}
 
 		TEST_F(MakeMoveTest, enPassant_updatePieces_white)
@@ -321,8 +321,8 @@ namespace makeMoveTest
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState, PROMOTION);
 
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
-			EXPECT_FALSE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PieceType::PAWN));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PROMOTION));
+			EXPECT_FALSE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::PAWN));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PROMOTION));
 		}
 
 		TEST_F(MakeMoveTest, promotion_updatePieces_white)
@@ -349,8 +349,8 @@ namespace makeMoveTest
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
 
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
-			EXPECT_FALSE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PieceType::PAWN));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PROMOTION));
+			EXPECT_FALSE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::PAWN));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PROMOTION));
 		}
 
 		TEST_F(MakeMoveTest, promotion_updatePieces_black)
@@ -410,8 +410,8 @@ namespace makeMoveTest
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(0, 7));
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PieceType::KING));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION + RIGHT, COLOR, PieceType::ROOK));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::KING));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION + RIGHT, COLOR, PieceType::ROOK));
 		}
 
 		TEST_F(MakeMoveTest, castle_queenSide_updatePieces)
@@ -438,8 +438,8 @@ namespace makeMoveTest
 			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(7, 7));
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION, COLOR, PieceType::KING));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColorPiece(DESTINATION + LEFT, COLOR, PieceType::ROOK));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::KING));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION + LEFT, COLOR, PieceType::ROOK));
 		}
 
 		TEST_F(MakeMoveTest, castle_kingSide_updatePieces)

@@ -1,5 +1,10 @@
 #include "agent.h"
 
+#include "enum.h"
+#include "util/utility.h"
+
+using namespace util;
+
 // Typedefs
 typedef std::chrono::high_resolution_clock::time_point chronoTime;
 typedef std::chrono::duration<std::chrono::nanoseconds> chronoDuration;
@@ -88,7 +93,7 @@ bool Agent::timeHeuristic(const double timeElapsed, const double timeRemaining) 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  bool Agent::isQuiescent(const ChessState& game, const std::unordered_map<Position, std::vector<Position>, 
-///         PositionHasher>& validMoves) const
+///         Position::PositionHasher>& validMoves) const
 ///
 /// \brief:  Indicate whether a state is likely to exhibit a large change in value
 ///
@@ -98,10 +103,10 @@ bool Agent::timeHeuristic(const double timeElapsed, const double timeRemaining) 
 /// \return:  bool : true if game state is quiescent, false otherwise
 ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool Agent::isQuiescent(const ChessState& game, const std::unordered_map<Position, std::vector<Position>, PositionHasher>& validMoves) const
+bool Agent::isQuiescent(const ChessState& game, const std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>& validMoves) const
 {
 	bool result = true;
-	std::unordered_map<Position, std::vector<Position>, PositionHasher>::const_iterator pieceMoves = validMoves.begin(),
+	std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>::const_iterator pieceMoves = validMoves.begin(),
 		pieceMovesEnd = validMoves.end();
 	// Loops through each piece with valid moves
 	while (pieceMoves != pieceMovesEnd && result)
@@ -145,7 +150,7 @@ double Agent::getMoveValue(const Color& player, const Position& prevPos, const P
 	// Determine if a capture occurs
 	while (pieceType < KING && !occupied)
 	{
-		occupied = game.m_board.posIsOccupiedByColorPiece(newPos, ~player, (PieceType)pieceType);
+		occupied = game.m_board.posIsOccupied(newPos, ~player, (PieceType)pieceType);
 
 		pieceType += 1;
 	}
@@ -157,7 +162,7 @@ double Agent::getMoveValue(const Color& player, const Position& prevPos, const P
 	}
 	else // if no capture occurs
 	{
-		int deltaY = newPos.m_y - prevPos.m_y;
+		int deltaY = newPos.y - prevPos.y;
 
 		// Subtract one from result if piece is moving backwards
 		result -= ((deltaY > 0 && player == WHITE) || (deltaY < 0 && player == BLACK));
@@ -168,7 +173,7 @@ double Agent::getMoveValue(const Color& player, const Position& prevPos, const P
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  std::vector<std::pair<Position, Position>> Agent::orderMoves(const Color& player, 
-///         const std::unordered_map<Position, std::vector<Position>, PositionHasher>& validMoves, 
+///         const std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>& validMoves, 
 ///         const ChessState& game) const
 ///
 /// \brief:  Order list of moves according to values assigned by getMoveValue()
@@ -181,10 +186,10 @@ double Agent::getMoveValue(const Color& player, const Position& prevPos, const P
 /// \return:  vector<pair<Position, Position>> : reordered moves
 ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector<std::pair<Position, Position>> Agent::orderMoves(const Color& player, const std::unordered_map<Position, std::vector<Position>, PositionHasher>& validMoves, const ChessState& game) const
+std::vector<std::pair<Position, Position>> Agent::orderMoves(const Color& player, const std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>& validMoves, const ChessState& game) const
 {
 	std::multimap<double, std::pair<Position, Position>, std::greater<double>> moveSorter;
-	const std::unordered_map<Position, std::unordered_map<Position, int, PositionHasher>, PositionHasher>&
+	const std::unordered_map<Position, std::unordered_map<Position, int, Position::PositionHasher>, Position::PositionHasher>&
 		historyTable = (player == m_player ? m_allyHistoryTable : m_enemyHistoryTable);
 	std::vector<std::pair<Position, Position>> result;
 
@@ -200,12 +205,12 @@ std::vector<std::pair<Position, Position>> Agent::orderMoves(const Color& player
 			double historyTableValue = 0.0;
 
 			// Set history table value if move exists in history table
-			const std::unordered_map<Position, std::unordered_map<Position, int, PositionHasher>, PositionHasher>::const_iterator
+			const std::unordered_map<Position, std::unordered_map<Position, int, Position::PositionHasher>, Position::PositionHasher>::const_iterator
 				prevPosIt = historyTable.find(prevPos);
 
 			if (prevPosIt != historyTable.end())
 			{
-				std::unordered_map<Position, int, PositionHasher>::const_iterator
+				std::unordered_map<Position, int, Position::PositionHasher>::const_iterator
 					newPosIt = prevPosIt->second.find(destination);
 
 				if (newPosIt != prevPosIt->second.end())
@@ -359,7 +364,7 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit, int alpha, 
 
 	if (enemyCanMove)
 	{
-		std::unordered_map<Position, std::vector<Position>, PositionHasher> allyMoves;
+		std::unordered_map<Position, std::vector<Position>, Position::PositionHasher> allyMoves;
 
 		// Get all valid moves for player-controlled pieces
 		for (const PieceNode& allyPiece : allies)
@@ -422,7 +427,7 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit, int alpha, 
 			}
 
 			// Increment optimal move in ally history table if a capture does not occur
-			if (!game.m_board.posIsOccupiedByColor(optimalMove.second, enemyPlayer))
+			if (!game.m_board.posIsOccupied(optimalMove.second, enemyPlayer))
 			{
 				m_allyHistoryTable[optimalMove.first][optimalMove.second] += depthLimit * depthLimit;
 			}
@@ -566,7 +571,7 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 
 	if (playerCanMove)
 	{
-		std::unordered_map<Position, std::vector<Position>, PositionHasher> enemyMoves;
+		std::unordered_map<Position, std::vector<Position>, Position::PositionHasher> enemyMoves;
 
 		for (const PieceNode& enemyPiece : enemies)
 		{
@@ -627,7 +632,7 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 				move++;
 			}
 			// Increment optimal move in enemy history table if move is not a capture
-			if (!game.m_board.posIsOccupiedByColor(optimalMove.second, m_player))
+			if (!game.m_board.posIsOccupied(optimalMove.second, m_player))
 			{
 				m_enemyHistoryTable[optimalMove.first][optimalMove.second] += depthLimit * depthLimit;
 			}
@@ -714,7 +719,7 @@ std::string Agent::depthLimitedMinimax(PieceNode& pieceToMove, Position& pieceDe
 		if (pieceToMove.m_pieceType == PAWN)
 		{
 			// If pawn is to be promoted
-			if (pieceDestination.m_y == NUM_RANKS - 1 || pieceDestination.m_y == 0)
+			if (pieceDestination.y == RANK_COUNT - 1 || pieceDestination.y == 0)
 			{
 				// Make promotion "q"; Will always promote to queen
 				promotion = "q";
@@ -797,7 +802,7 @@ MoveNode Agent::prunedDepthLimitedMinimax(PieceNode& pieceToMove, Position& piec
 		if (pieceToMove.m_pieceType == PAWN)
 		{
 			// If pawn is to be promoted
-			if (pieceDestination.m_y == NUM_RANKS - 1 || pieceDestination.m_y == 0)
+			if (pieceDestination.y == RANK_COUNT - 1 || pieceDestination.y == 0)
 			{
 				// Make promotion "q"; Will always promote to queen
 				promotion = PieceType::QUEEN;
@@ -899,7 +904,7 @@ std::string Agent::makeRandomMove()
 		if (randPiece->m_pieceType == PAWN)
 		{
 			// If pawn is to be promoted
-			if (randMove.m_y == NUM_RANKS - 1 || randMove.m_y == 0)
+			if (randMove.y == RANK_COUNT - 1 || randMove.y == 0)
 			{
 				// Select a random promotion (Knight, Bishop, Rook, Queen)
 				promotion = static_cast<PieceType>((rand() % 4) + 2);

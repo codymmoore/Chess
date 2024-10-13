@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../../utility.h"
-
 #include <string>
 #include <memory>
+
+#include "../../util/utility.h"
+#include "../../util/position.h"
 
 namespace boost
 {
@@ -24,7 +25,7 @@ namespace websocket
 		{
 			Color color;
 			PieceType type;
-			Position position;
+			util::Position position;
 		};
 
 		/**

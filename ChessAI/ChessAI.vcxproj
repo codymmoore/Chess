@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -197,12 +197,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="agent.h" />
-    <ClInclude Include="BitBoard.h" />
     <ClInclude Include="chess.h" />
     <ClInclude Include="chessServer.h" />
     <ClInclude Include="chessController.h" />
+    <ClInclude Include="constants.h" />
+    <ClInclude Include="enum.h" />
     <ClInclude Include="move.h" />
-    <ClInclude Include="utility.h" />
+    <ClInclude Include="util\bitboard.h" />
+    <ClInclude Include="util\position.h" />
+    <ClInclude Include="util\utility.h" />
     <ClInclude Include="websocket\message\endGameRequest.h" />
     <ClInclude Include="websocket\message\endGameResponse.h" />
     <ClInclude Include="websocket\message\getValidMovesRequest.h" />
@@ -218,13 +221,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="agent.cpp" />
-    <ClCompile Include="BitBoard.cpp" />
     <ClCompile Include="chess.cpp" />
     <ClCompile Include="chessServer.cpp" />
     <ClCompile Include="chessController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="move.cpp" />
-    <ClCompile Include="utility.cpp" />
+    <ClCompile Include="util\bitboard.cpp" />
+    <ClCompile Include="util\position.cpp" />
+    <ClCompile Include="util\utility.cpp" />
     <ClCompile Include="websocket\message\endGameRequest.cpp" />
     <ClCompile Include="websocket\message\endGameResponse.cpp" />
     <ClCompile Include="websocket\message\getValidMovesRequest.cpp" />

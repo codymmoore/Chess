@@ -2,9 +2,12 @@
 #define CHESS_H
 
 #include <deque>
-#include <map>
 #include <string>
-#include "BitBoard.h"
+#include <vector>
+
+#include "constants.h"
+#include "util/position.h"
+#include "util/bitboard.h"
 
 /* ---------- GLOBAL CONSTANTS ---------- */
 const double TOTAL_PLAYER_TURN_TIME = 15.0 * 60.0 * 1000000000.0; // 15 minutes converted to nanoseconds
@@ -18,13 +21,13 @@ const unsigned int MAX_MOVE_HISTORY_SIZE = 8;
 /////////////////////////////////////////////////////////////////////////////////////////////
 struct PieceNode
 {
-	Position m_position;
+	util::Position m_position;
 	PieceType m_pieceType;
 
 	PieceNode();
 	PieceNode(const PieceNode& source) = default;
 	PieceNode(const int xCoord, const int yCoord, const PieceType pieceType);
-	PieceNode(const Position& position, const PieceType pieceType);
+	PieceNode(const util::Position& position, const PieceType pieceType);
 
 	PieceNode& operator=(const PieceNode& rightOperand);
 
@@ -43,16 +46,16 @@ std::ostream& operator<<(std::ostream& out, const PieceNode& piece);
 /////////////////////////////////////////////////////////////////////////////////////////////
 struct MoveHistoryNode
 {
-	Position m_prevPos;
-	Position m_currPos;
+	util::Position m_prevPos;
+	util::Position m_currPos;
 	Color m_color;
 	PieceType m_pieceType;
 
 	MoveHistoryNode() = default;
 	MoveHistoryNode(const MoveHistoryNode& source) = default;
-	MoveHistoryNode(const Color color, const PieceNode& piece, const Position& currPos);
-	MoveHistoryNode(const Position& prevPos,
-		const Position& currPos,
+	MoveHistoryNode(const Color color, const PieceNode& piece, const util::Position& currPos);
+	MoveHistoryNode(const util::Position& prevPos,
+		const util::Position& currPos,
 		const Color color,
 		const PieceType pieceType);
 
@@ -73,14 +76,14 @@ std::ostream& operator<<(std::ostream& out, const MoveHistoryNode& move);
 /////////////////////////////////////////////////////////////////////////////////////////////
 struct MoveNode
 {
-	Position m_source;
-	Position m_destination;
+	util::Position m_source;
+	util::Position m_destination;
 	PieceType m_promotion;
 
 	MoveNode() = default;
 	MoveNode(const MoveNode& source) = default;
-	MoveNode(const Position& source,
-		const Position& destination,
+	MoveNode(const util::Position& source,
+		const util::Position& destination,
 		const PieceType promotion);
 
 	MoveNode& operator=(const MoveNode& rightOperand);
@@ -105,7 +108,7 @@ class ChessState
 #ifdef _DEBUG
 public:
 #endif
-	BitBoard m_board;
+	util::Bitboard m_board;
 	std::vector<PieceNode> m_whitePieces; // List of white pieces present on board
 	std::vector<PieceNode> m_blackPieces; // List of black pieces present on board
 	std::deque<MoveHistoryNode>  m_moveHistory;  // Contains previous 8 moves
@@ -122,7 +125,7 @@ public:
 	void initialize();
 
 public:
-	static constexpr int PAWN_START_ROW[NUM_COLORS] = { NUM_RANKS - 2, 1 };
+	static constexpr int PAWN_START_ROW[COLOR_COUNT] = { RANK_COUNT - 2, 1 };
 
 	// Constructors
 	ChessState();
@@ -136,7 +139,7 @@ public:
 	const std::vector<PieceNode>& getWhitePieces() const;
 	const std::vector<PieceNode>& getBlackPieces() const;
 	std::string getFenString() const;
-	const BitBoard& getBoard() const;
+	const util::Bitboard& getBoard() const;
 
 	// Modifiers
 	void setState(const std::string& gameState);

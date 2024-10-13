@@ -1,6 +1,7 @@
 #pragma once
 
 #include "message.h"
+#include "../../util/bitboard.h"
 
 namespace boost
 {
@@ -19,7 +20,7 @@ namespace websocket
 		 */
 		struct StartGameResponse : Message
 		{
-			std::unique_ptr<const BitBoard> board;
+			std::unique_ptr<const util::Bitboard> board;
 			Color nextTurn, winner;
 
 			StartGameResponse() = default;

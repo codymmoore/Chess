@@ -1,5 +1,11 @@
 #include "move.h"
 
+#include "constants.h"
+#include "enum.h"
+#include "util/utility.h"
+
+using namespace util;
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  void Move::getValidMovesPawn(const Color player, const PieceNode& piece, 
 ///         const ChessState& game, std::vector<Position>& moves)
@@ -21,7 +27,7 @@ void Move::getValidMovesPawn(const Color player, const PieceNode& piece, const C
 	if (player == WHITE)
 	{
 		forward = UP;
-		originalRow = NUM_RANKS - 2;
+		originalRow = RANK_COUNT - 2;
 	}
 	else // player == BLACK
 	{
@@ -32,14 +38,14 @@ void Move::getValidMovesPawn(const Color player, const PieceNode& piece, const C
 	Position newPos = piece.m_position + forward;
 
 	// If new position exists on board
-	if (newPos.m_y >= 0 && newPos.m_y < NUM_RANKS)
+	if (newPos.y >= 0 && newPos.y < RANK_COUNT)
 	{
 		/* ----- Check if pawn can move forward ----- */
 		if (!game.m_board.posIsOccupied(newPos))
 		{
 			moves.push_back(newPos);
 
-			if (piece.m_position.m_y == originalRow)
+			if (piece.m_position.y == originalRow)
 			{
 				newPos += forward;
 
@@ -51,21 +57,21 @@ void Move::getValidMovesPawn(const Color player, const PieceNode& piece, const C
 		}
 
 		/* ----- Check if capture is possible ----- */
-		if (piece.m_position.m_x + 1 < NUM_FILES)
+		if (piece.m_position.x + 1 < FILE_COUNT)
 		{
 			newPos = piece.m_position + forward + RIGHT;
 
-			if (game.m_board.posIsOccupiedByColor(newPos, ~player))
+			if (game.m_board.posIsOccupied(newPos, ~player))
 			{
 				moves.push_back(newPos);
 			}
 		}
 
-		if (piece.m_position.m_x - 1 >= 0)
+		if (piece.m_position.x - 1 >= 0)
 		{
 			newPos = piece.m_position + forward + LEFT;
 
-			if (game.m_board.posIsOccupiedByColor(newPos, ~player))
+			if (game.m_board.posIsOccupied(newPos, ~player))
 			{
 				moves.push_back(newPos);
 			}
@@ -137,30 +143,16 @@ void Move::getValidMovesKnight(const Color player, const PieceNode& piece, const
 		Position newPos = piece.m_position + move;
 
 		// If position exists on board
-		if (newPos.m_x >= 0 && newPos.m_x < NUM_FILES
-			&& newPos.m_y >= 0 && newPos.m_y < NUM_RANKS)
+		if (newPos.x >= 0 && newPos.x < FILE_COUNT
+			&& newPos.y >= 0 && newPos.y < RANK_COUNT)
 		{
 			// If piece of same color is not in new position
-			if (!game.m_board.posIsOccupiedByColor(newPos, player))
+			if (!game.m_board.posIsOccupied(newPos, player))
 			{
 				moves.push_back(newPos);
 			}
 		}
 	}
-
-	// for(const Position& newPos : destinations)
-	// {
-	//     // If position exists on board
-	//     if(newPos.m_x >= 0 && newPos.m_x < NUM_FILES
-	//         && newPos.m_y >= 0 && newPos.m_y < NUM_RANKS)
-	//     {
-	//         // If piece of same color is not in new position
-	//         if(!game.m_board.posIsOccupiedByColor(newPos, player))
-	//         {
-	//             moves.push_back(newPos);
-	//         }
-	//     }
-	// }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,20 +175,20 @@ void Move::getValidMovesLinear(const Color player, const PieceNode& piece, const
 	for (const Position& direction : directions)
 	{
 		Position newPos = piece.m_position + direction;
-		bool inBounds = newPos.m_x >= 0 && newPos.m_x < NUM_FILES &&
-			newPos.m_y >= 0 && newPos.m_y < NUM_RANKS;
+		bool inBounds = newPos.x >= 0 && newPos.x < FILE_COUNT &&
+			newPos.y >= 0 && newPos.y < RANK_COUNT;
 
 		while (inBounds && !game.m_board.posIsOccupied(newPos))
 		{
 			moves.push_back(newPos);
 
 			newPos += direction;
-			inBounds = newPos.m_x >= 0 && newPos.m_x < NUM_FILES &&
-				newPos.m_y >= 0 && newPos.m_y < NUM_RANKS;
+			inBounds = newPos.x >= 0 && newPos.x < FILE_COUNT &&
+				newPos.y >= 0 && newPos.y < RANK_COUNT;
 		}
 
 		// If a capture at new position is possible
-		if (inBounds && game.m_board.posIsOccupiedByColor(newPos, ~player))
+		if (inBounds && game.m_board.posIsOccupied(newPos, ~player))
 		{
 			moves.push_back(newPos);
 		}
@@ -233,11 +225,11 @@ void Move::getValidMovesKing(const Color player, const PieceNode& piece, const C
 	{
 		Position newPos = piece.m_position + move;
 
-		bool inBounds = newPos.m_x >= 0 && newPos.m_x < NUM_FILES &&
-			newPos.m_y >= 0 && newPos.m_y < NUM_RANKS;
+		bool inBounds = newPos.x >= 0 && newPos.x < FILE_COUNT &&
+			newPos.y >= 0 && newPos.y < RANK_COUNT;
 
 		// If position exists on board and does not contain piece of same color
-		if (inBounds && !game.m_board.posIsOccupiedByColor(newPos, player))
+		if (inBounds && !game.m_board.posIsOccupied(newPos, player))
 		{
 			moves.push_back(newPos);
 		}
@@ -331,7 +323,7 @@ bool Move::canCastle(const Color player, const PieceNode& piece, const ChessStat
 		Position pos = piece.m_position + direction;
 
 		// Set block to true if there are any pieces between king and rook
-		while (!blocked && pos.m_x < NUM_FILES - 1 && pos.m_x > 0)
+		while (!blocked && pos.x < FILE_COUNT - 1 && pos.x > 0)
 		{
 			blocked = game.m_board.posIsOccupied(pos);
 			pos += direction;
@@ -467,8 +459,8 @@ std::vector<Position> Move::getValidMoves(const Color player, const PieceNode& p
 bool Move::isValidMove(const Color player, const PieceNode& piece, const Position& destination, const ChessState& game)
 {
 	// If piece has moved and is in bounds
-	if (destination.m_x >= 0 && destination.m_x < NUM_FILES &&
-		destination.m_y >= 0 && destination.m_y < NUM_RANKS &&
+	if (destination.x >= 0 && destination.x < FILE_COUNT &&
+		destination.y >= 0 && destination.y < RANK_COUNT &&
 		destination != piece.m_position)
 	{
 		switch (piece.m_pieceType)
@@ -477,7 +469,7 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 		case PAWN:
 		{
 			const Position FORWARD = (player == WHITE ? UP : DOWN);
-			const int ORIGINAL_ROW = (player == WHITE ? NUM_RANKS - 2 : 1);
+			const int ORIGINAL_ROW = (player == WHITE ? RANK_COUNT - 2 : 1);
 
 			// If pawn is moving one space forward
 			if (destination == (piece.m_position + FORWARD))
@@ -487,13 +479,14 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 			// If pawn is moving two spaces forward
 			else if (destination == (piece.m_position + FORWARD * 2))
 			{
-				return !game.m_board.posIsOccupied(piece.m_position + FORWARD) && !game.m_board.posIsOccupied(destination)
-					&& piece.m_position.m_y == ORIGINAL_ROW;
+				return !game.m_board.posIsOccupied(destination)
+					&& !game.m_board.posIsOccupied(piece.m_position + FORWARD)
+					&& piece.m_position.y == ORIGINAL_ROW;
 			}
 			// If pawn is moving diagonal
 			else if (destination == (piece.m_position + FORWARD + LEFT) || destination == (piece.m_position + FORWARD + RIGHT))
 			{
-				if (game.m_board.posIsOccupiedByColor(destination, ~player))
+				if (game.m_board.posIsOccupied(destination, ~player))
 				{
 					return true;
 				}
@@ -512,14 +505,14 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 		/* ---------- KNIGHT ---------- */
 		case KNIGHT:
 		{
-			int deltaXsq = destination.m_x - piece.m_position.m_x,
-				deltaYsq = destination.m_y - piece.m_position.m_y;
+			int deltaXsq = destination.x - piece.m_position.x,
+				deltaYsq = destination.y - piece.m_position.y;
 
 			deltaXsq = deltaXsq * deltaXsq;
 			deltaYsq = deltaYsq * deltaYsq;
 
 			if (((deltaXsq == 4 && deltaYsq == 1) || (deltaXsq == 1 && deltaYsq == 4))
-				&& !game.m_board.posIsOccupiedByColor(destination, player))
+				&& !game.m_board.posIsOccupied(destination, player))
 			{
 				return true;
 			}
@@ -530,16 +523,16 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 		/* ---------- BISHOP ---------- */
 		case BISHOP:
 		{
-			int deltaX = destination.m_x - piece.m_position.m_x;
+			int deltaX = destination.x - piece.m_position.x;
 			Position direction(0, 0);
 
 			// If piece is moving in an up right or down left diagonal
-			if ((destination.m_y + deltaX) == piece.m_position.m_y)
+			if ((destination.y + deltaX) == piece.m_position.y)
 			{
 				direction = (deltaX < 0 ? DOWN + LEFT : UP + RIGHT);
 			}
 			// If piece is moving in an up left or down right diagonal
-			else if ((destination.m_y - deltaX) == piece.m_position.m_y)
+			else if ((destination.y - deltaX) == piece.m_position.y)
 			{
 				direction = (deltaX < 0 ? UP + LEFT : DOWN + RIGHT);
 			}
@@ -557,7 +550,7 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 			}
 
 			// Return true if destination is not occupied by same color
-			return !game.m_board.posIsOccupiedByColor(destination, player);
+			return !game.m_board.posIsOccupied(destination, player);
 		}
 
 		/* ---------- ROOK ---------- */
@@ -566,14 +559,14 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 			Position direction(0, 0);
 
 			// If piece is moving horizontally
-			if (destination.m_y == piece.m_position.m_y)
+			if (destination.y == piece.m_position.y)
 			{
-				direction = (destination.m_x < piece.m_position.m_x ? LEFT : RIGHT);
+				direction = (destination.x < piece.m_position.x ? LEFT : RIGHT);
 			}
 			// If piece is moving vertically
-			else if (destination.m_x == piece.m_position.m_x)
+			else if (destination.x == piece.m_position.x)
 			{
-				direction = (destination.m_y < piece.m_position.m_y ? UP : DOWN);
+				direction = (destination.y < piece.m_position.y ? UP : DOWN);
 			}
 			else
 			{
@@ -588,7 +581,7 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 				}
 			}
 
-			return !game.m_board.posIsOccupiedByColor(destination, player);
+			return !game.m_board.posIsOccupied(destination, player);
 		}
 
 		/* ---------- QUEEN ---------- */
@@ -605,12 +598,12 @@ bool Move::isValidMove(const Color player, const PieceNode& piece, const Positio
 		/* ---------- KING ---------- */
 		case KING:
 		{
-			int deltaX = destination.m_x - piece.m_position.m_x,
-				deltaY = destination.m_y - piece.m_position.m_y;
+			int deltaX = destination.x - piece.m_position.x,
+				deltaY = destination.y - piece.m_position.y;
 
 			if (deltaX * deltaX <= 1 && deltaY * deltaY <= 1)
 			{
-				return !game.m_board.posIsOccupiedByColor(destination, player);
+				return !game.m_board.posIsOccupied(destination, player);
 			}
 			else if (deltaY == 0)
 			{
@@ -692,8 +685,8 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 	{
 		std::string errorMessage = "Piece not found: {Color: " + toString(player) +
 			", PieceType: " + toString(piece.m_pieceType) +
-			", Position: {x: " + std::to_string(piece.m_position.m_x) +
-			", y: " + std::to_string(piece.m_position.m_y) + "}}";
+			", Position: {x: " + std::to_string(piece.m_position.x) +
+			", y: " + std::to_string(piece.m_position.y) + "}}";
 		throw std::exception(errorMessage.c_str());
 	}
 
@@ -705,7 +698,7 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 		game.m_numHalfTurns = -1; // (half turns are incremented at end of function)
 
 		// If an en passant occurs
-		if ((destination.m_x - piece.m_position.m_x) != 0 && !game.m_board.posIsOccupied(destination))
+		if ((destination.x - piece.m_position.x) != 0 && !game.m_board.posIsOccupied(destination))
 		{
 			Position backward;
 			std::vector<PieceNode>* enemies;
@@ -736,10 +729,10 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 			enemies->erase(enemyPiece);
 		}
 
-		int endOfBoard = (player == WHITE ? 0 : NUM_RANKS - 1);
+		int endOfBoard = (player == WHITE ? 0 : RANK_COUNT - 1);
 
 		// If a promotion can occur
-		if (destination.m_y == endOfBoard)
+		if (destination.y == endOfBoard)
 		{
 			pieceRef.m_pieceType = promotion;
 
@@ -751,25 +744,25 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 
 	else if (piece.m_pieceType == KING)
 	{
-		int deltaX = destination.m_x - piece.m_position.m_x;
+		int deltaX = destination.x - piece.m_position.x;
 
 		// If castling occurs
 		if (deltaX * deltaX > 1)
 		{
 			Position oldRookPosition, newRookPosition;
 
-			oldRookPosition.m_y = piece.m_position.m_y;
+			oldRookPosition.y = piece.m_position.y;
 
 			// If kingside castling occurs
 			if (deltaX > 1)
 			{
-				oldRookPosition.m_x = NUM_FILES - 1;
+				oldRookPosition.x = FILE_COUNT - 1;
 				newRookPosition = destination + LEFT;
 			}
 			// If queenside castling occurs
 			else
 			{
-				oldRookPosition.m_x = 0;
+				oldRookPosition.x = 0;
 				newRookPosition = destination + RIGHT;
 			}
 
@@ -820,36 +813,36 @@ void Move::makeMove(const Color player, const PieceNode& piece, const Position& 
 			game.m_bQueenSideCastle = false;
 		}
 		// If black king side rook is moved
-		else if (piece.m_position == Position(NUM_FILES - 1, 0))
+		else if (piece.m_position == Position(FILE_COUNT - 1, 0))
 		{
 			game.m_bKingSideCastle = false;
 		}
 		// If white queen side rook is moved
-		else if (piece.m_position == Position(0, NUM_RANKS - 1))
+		else if (piece.m_position == Position(0, RANK_COUNT - 1))
 		{
 			game.m_wQueenSideCastle = false;
 		}
 		// If white king side rook is moved
-		else if (piece.m_position == Position(NUM_FILES - 1, NUM_RANKS - 1))
+		else if (piece.m_position == Position(FILE_COUNT - 1, RANK_COUNT - 1))
 		{
 			game.m_wKingSideCastle = false;
 		}
 	}
 
 	// If a capture occura
-	if (game.m_board.posIsOccupiedByColor(destination, ~player))
+	if (game.m_board.posIsOccupied(destination, ~player))
 	{
 		// If a rook is captured
-		if (game.m_board.posIsOccupiedByColorPiece(destination, ~player, ROOK))
+		if (game.m_board.posIsOccupied(destination, ~player, ROOK))
 		{
-			if (destination.m_x == 0)
+			if (destination.x == 0)
 			{
 				bool* queenSideCastle = (player == WHITE ? &game.m_bQueenSideCastle : &game.m_wQueenSideCastle);
 
 				// Opponent cannot queen side castle if queen side rook has been captured
 				*queenSideCastle = false;
 			}
-			else if (destination.m_x == NUM_FILES - 1)
+			else if (destination.x == FILE_COUNT - 1)
 			{
 				bool* kingSideCastle = (player == WHITE ? &game.m_bKingSideCastle : &game.m_wKingSideCastle);
 

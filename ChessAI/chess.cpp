@@ -1,12 +1,16 @@
 #include "chess.h"
 
+#include "util/utility.h"
+
+using namespace util;
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  PieceNode::PieceNode()
 ///
 /// \brief:  Create default PieceNode object
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////
-PieceNode::PieceNode() : m_position(0, 0) {}
+PieceNode::PieceNode() : m_position(0, 0), m_pieceType(NONE) {}
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  PieceNode::PieceNode(const int xCoord, const int yCoord, const PieceType pieceType)
@@ -414,21 +418,21 @@ std::string ChessState::getFenString() const
 	/* ----- Convert board ----- */
 	int numZeros = 0;
 
-	for (int y = 0; y < NUM_RANKS; y++)
+	for (int y = 0; y < RANK_COUNT; y++)
 	{
-		for (int x = 0; x < NUM_FILES; x++)
+		for (int x = 0; x < FILE_COUNT; x++)
 		{
 			bool occupied = false;
 			char output;
 			int color = WHITE;
 
-			while (color < NUM_COLORS && !occupied)
+			while (color < COLOR_COUNT && !occupied)
 			{
 				int pieceType = PAWN;
 
-				while (pieceType < NUM_PIECE_TYPES && !occupied)
+				while (pieceType < PIECE_TYPE_COUNT && !occupied)
 				{
-					if (m_board.posIsOccupiedByColorPiece(x, y, (Color)color, (PieceType)pieceType))
+					if (m_board.posIsOccupied(x, y, (Color)color, (PieceType)pieceType))
 					{
 						output = PIECE_SYMBOLS[color][pieceType];
 						occupied = true;
@@ -452,7 +456,7 @@ std::string ChessState::getFenString() const
 			{
 				numZeros += 1;
 
-				if (x == NUM_FILES - 1 && numZeros != 0)
+				if (x == FILE_COUNT - 1 && numZeros != 0)
 				{
 					fenString += std::to_string(numZeros);
 					numZeros = 0;
@@ -460,7 +464,7 @@ std::string ChessState::getFenString() const
 			}
 		}
 
-		if (y != NUM_RANKS - 1)
+		if (y != RANK_COUNT - 1)
 		{
 			fenString += '/';
 		}
@@ -492,15 +496,15 @@ std::string ChessState::getFenString() const
 	{
 		if (m_moveHistory.back().m_pieceType == PieceType::PAWN)
 		{
-			int deltaY = m_moveHistory.back().m_prevPos.m_y - m_moveHistory.back().m_currPos.m_y;
+			int deltaY = m_moveHistory.back().m_prevPos.y - m_moveHistory.back().m_currPos.y;
 
 			if (deltaY * deltaY > 1)
 			{
 				// Add file to en passant string
-				enPassantStr += (char)(m_moveHistory.back().m_currPos.m_x + 97);
+				enPassantStr += (char)(m_moveHistory.back().m_currPos.x + 97);
 
 				// Add rank to en passant string
-				enPassantStr += std::to_string(NUM_RANKS - m_moveHistory.back().m_currPos.m_y - (int)(deltaY / 2));
+				enPassantStr += std::to_string(RANK_COUNT - m_moveHistory.back().m_currPos.y - (int)(deltaY / 2));
 			}
 		}
 	}
@@ -521,7 +525,7 @@ std::string ChessState::getFenString() const
  *
  * \return The BitBoard instance representing the board state
  */
-const BitBoard& ChessState::getBoard() const
+const Bitboard& ChessState::getBoard() const
 {
 	return m_board;
 }
@@ -554,10 +558,10 @@ void ChessState::setState(const std::string& gameState)
 	std::vector<std::string> boardStrings = stringSplit(substrings[0], '/');
 
 	// Fill board
-	for (int y = 0; y < NUM_RANKS; y++)
+	for (int y = 0; y < RANK_COUNT; y++)
 	{
 		int stringIndex = 0;
-		for (int x = 0; x < NUM_FILES; x++)
+		for (int x = 0; x < FILE_COUNT; x++)
 		{
 			// If current char is capital (white piece)
 			if (boardStrings[y][stringIndex] >= 'A' && boardStrings[y][stringIndex] <= 'Z')
@@ -681,10 +685,10 @@ void ChessState::setState(const std::string& gameState)
 	if (substrings[3] != "-")
 	{
 		int x = (int)substrings[3][0] - 97, // Convert file to x-coordinate
-			y = NUM_RANKS - ((int)substrings[3][1] - 48); // Convert rank to y-coordinate
+			y = RANK_COUNT - ((int)substrings[3][1] - 48); // Convert rank to y-coordinate
 
 		// If last pawn to move was colorled by white
-		if (m_board.posIsOccupiedByColorPiece(x, y - 1, WHITE, PAWN))
+		if (m_board.posIsOccupied(x, y - 1, WHITE, PAWN))
 		{
 			// Add pawn move to move history
 			Position prevPos(x, y + 1),
@@ -693,7 +697,7 @@ void ChessState::setState(const std::string& gameState)
 			m_moveHistory.push_back(MoveHistoryNode(prevPos, currPos, Color::WHITE, PieceType::PAWN));
 		}
 		// If last pawn to move was colorled by black
-		else if (m_board.posIsOccupiedByColorPiece(x, y + 1, BLACK, PAWN))
+		else if (m_board.posIsOccupied(x, y + 1, BLACK, PAWN))
 		{
 			// Add pawn move to move history
 			Position prevPos(x, y - 1),
@@ -772,40 +776,40 @@ void ChessState::initialize()
 	/* -- Rooks -- */
 	// Add to piece vectors
 	m_blackPieces.push_back(PieceNode(0, 0, PieceType::ROOK));
-	m_blackPieces.push_back(PieceNode(NUM_FILES - 1, 0, PieceType::ROOK));
-	m_whitePieces.push_back(PieceNode(0, NUM_RANKS - 1, PieceType::ROOK));
-	m_whitePieces.push_back(PieceNode(NUM_FILES - 1, NUM_RANKS - 1, PieceType::ROOK));
+	m_blackPieces.push_back(PieceNode(FILE_COUNT - 1, 0, PieceType::ROOK));
+	m_whitePieces.push_back(PieceNode(0, RANK_COUNT - 1, PieceType::ROOK));
+	m_whitePieces.push_back(PieceNode(FILE_COUNT - 1, RANK_COUNT - 1, PieceType::ROOK));
 
 	/* -- Knights -- */
 	// Add to piece vectors
 	m_blackPieces.push_back(PieceNode(1, 0, PieceType::KNIGHT));
-	m_blackPieces.push_back(PieceNode(NUM_FILES - 2, 0, PieceType::KNIGHT));
-	m_whitePieces.push_back(PieceNode(1, NUM_RANKS - 1, PieceType::KNIGHT));
-	m_whitePieces.push_back(PieceNode(NUM_FILES - 2, NUM_RANKS - 1, PieceType::KNIGHT));
+	m_blackPieces.push_back(PieceNode(FILE_COUNT - 2, 0, PieceType::KNIGHT));
+	m_whitePieces.push_back(PieceNode(1, RANK_COUNT - 1, PieceType::KNIGHT));
+	m_whitePieces.push_back(PieceNode(FILE_COUNT - 2, RANK_COUNT - 1, PieceType::KNIGHT));
 
 	/* -- Bishops -- */
 	// Add to piece vectors
 	m_blackPieces.push_back(PieceNode(2, 0, PieceType::BISHOP));
-	m_blackPieces.push_back(PieceNode(NUM_FILES - 3, 0, PieceType::BISHOP));
-	m_whitePieces.push_back(PieceNode(2, NUM_RANKS - 1, PieceType::BISHOP));
-	m_whitePieces.push_back(PieceNode(NUM_FILES - 3, NUM_RANKS - 1, PieceType::BISHOP));
+	m_blackPieces.push_back(PieceNode(FILE_COUNT - 3, 0, PieceType::BISHOP));
+	m_whitePieces.push_back(PieceNode(2, RANK_COUNT - 1, PieceType::BISHOP));
+	m_whitePieces.push_back(PieceNode(FILE_COUNT - 3, RANK_COUNT - 1, PieceType::BISHOP));
 
 	/* -- Queens -- */
 	// Add to piece vectors
 	m_blackPieces.push_back(PieceNode(3, 0, PieceType::QUEEN));
-	m_whitePieces.push_back(PieceNode(3, NUM_RANKS - 1, PieceType::QUEEN));
+	m_whitePieces.push_back(PieceNode(3, RANK_COUNT - 1, PieceType::QUEEN));
 
 	/* -- Kings -- */
 	// Add to piece vectors
 	m_blackPieces.push_back(PieceNode(4, 0, PieceType::KING));
-	m_whitePieces.push_back(PieceNode(4, NUM_RANKS - 1, PieceType::KING));
+	m_whitePieces.push_back(PieceNode(4, RANK_COUNT - 1, PieceType::KING));
 
 	/* -- Pawns -- */
-	for (int i = 0; i < NUM_FILES; i++)
+	for (int i = 0; i < FILE_COUNT; i++)
 	{
 		// Add to piece vectors
 		m_blackPieces.push_back(PieceNode(i, 1, PieceType::PAWN));
-		m_whitePieces.push_back(PieceNode(i, NUM_RANKS - 2, PieceType::PAWN));
+		m_whitePieces.push_back(PieceNode(i, RANK_COUNT - 2, PieceType::PAWN));
 	}
 }
 
