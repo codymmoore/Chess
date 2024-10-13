@@ -4,22 +4,24 @@
 
 #include "pch.h"
 
-Position forward(const Color color)
+#include "../ChessAI/constants.h"
+
+util::Position forward(const Color color)
 {
-	return color == Color::WHITE ? UP : DOWN;
+	return color == Color::WHITE ? util::UP : util::DOWN;
 }
 
-Position backward(const Color color)
+util::Position backward(const Color color)
 {
 	return -forward(color);
 }
 
-Position right(const Color color)
+util::Position right(const Color color)
 {
-	return color == Color::WHITE ? RIGHT : LEFT;
+	return color == Color::WHITE ? util::RIGHT : util::LEFT;
 }
 
-Position left(const Color color)
+util::Position left(const Color color)
 {
 	return -right(color);
 }

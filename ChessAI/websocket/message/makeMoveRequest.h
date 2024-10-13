@@ -1,6 +1,7 @@
 #pragma once
 
 #include "message.h"
+#include "../../util/position.h"
 #include "../../chess.h"
 
 namespace boost
@@ -21,7 +22,7 @@ namespace websocket
 		struct MakeMoveRequest : Message
 		{
 			PiecePayload piece;
-			Position destination;
+			util::Position destination;
 			PieceType promotion;
 
 			MakeMoveRequest() = default;

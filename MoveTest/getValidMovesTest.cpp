@@ -1,8 +1,8 @@
 #include "pch.h"
 #include <vector>
-#include "../ChessAI/move.h"
 
 using namespace testing;
+using namespace util;
 
 namespace getValidMovesTest
 {
@@ -92,9 +92,9 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::PAWN);
 			chessState.setState("4k3/8/8/8/8/2p1p3/3P4/RNBQKBNR w - - 0 1");
 			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(SOURCE + forward(COLOR) + RIGHT, ~COLOR));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(SOURCE + forward(COLOR) + RIGHT, ~COLOR));
 			EXPECT_THAT(validMoves, Contains(SOURCE + forward(COLOR) + RIGHT));
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(SOURCE + forward(COLOR) + LEFT, ~COLOR));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(SOURCE + forward(COLOR) + LEFT, ~COLOR));
 			EXPECT_THAT(validMoves, Contains(SOURCE + forward(COLOR) + LEFT));
 		}
 
@@ -158,7 +158,7 @@ namespace getValidMovesTest
 			const Position SOURCE = Position(3, 3);
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KNIGHT);
 			chessState.setState("4k3/8/8/3N4/8/8/8/4K3 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			const std::vector<Position> expectedMoves = {
 				SOURCE + UP * 2 + RIGHT,
 				SOURCE + UP * 2 + LEFT,
@@ -208,7 +208,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KNIGHT);
 			chessState.setState("4k3/8/5p2/3N4/8/8/8/4K3 w - - 0 1");
 			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(DESTINATION, ~COLOR));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
 
@@ -220,7 +220,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KNIGHT);
 			chessState.setState("4k3/8/5P2/3N4/8/8/8/4K3 w - - 0 1");
 			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(DESTINATION, COLOR));
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR));
 			EXPECT_THAT(validMoves, Not(Contains(DESTINATION)));
 		}
 	}
@@ -233,7 +233,7 @@ namespace getValidMovesTest
 			const Position SOURCE = Position(3, 3);
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::ROOK);
 			chessState.setState("4k3/8/8/3R4/8/8/8/4K3 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			const std::vector<Position> expectedMoves = {
 				Position(4, 3),
 				Position(5, 3),
@@ -259,7 +259,7 @@ namespace getValidMovesTest
 			const Position SOURCE = Position(3, 3);
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::BISHOP);
 			chessState.setState("4k3/8/8/3B4/8/8/8/4K3 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			const std::vector<Position> expectedMoves = {
 				Position(4, 4),
 				Position(5, 5),
@@ -284,7 +284,7 @@ namespace getValidMovesTest
 			const Position SOURCE = Position(3, 3);
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::QUEEN);
 			chessState.setState("4k3/8/8/3Q4/8/8/8/4K3 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			const std::vector<Position> expectedMoves = {
 				Position(4, 4),
 				Position(5, 5),
@@ -324,8 +324,8 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::QUEEN);
 			const Position DESTINATION = Position(5, 3);
 			chessState.setState("4k3/8/8/3Q1p2/8/8/8/4K3 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(DESTINATION, ~COLOR));
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
 			EXPECT_THAT(validMoves, Contains(Position(4, 3)));
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
@@ -336,8 +336,8 @@ namespace getValidMovesTest
 			const Position SOURCE = Position(3, 3);
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::QUEEN);
 			chessState.setState("4k3/8/8/3QP3/8/8/8/4K3 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(Position(4, 3), COLOR));
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(Position(4, 3), COLOR));
 			EXPECT_THAT(validMoves, Not(Contains(Position(4, 3))));
 			EXPECT_THAT(validMoves, Not(Contains(Position(5, 3))));
 		}
@@ -351,7 +351,7 @@ namespace getValidMovesTest
 			const Position SOURCE = Position(3, 3);
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			chessState.setState("4k3/8/8/3K4/8/8/8/8 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			const std::vector<Position> expectedMoves = {
 				Position(2, 2),
 				Position(3, 2),
@@ -372,8 +372,8 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			const Position DESTINATION = Position(4, 3);
 			chessState.setState("4k3/8/8/3Kp3/8/8/8/8 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(DESTINATION, ~COLOR));
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
 
@@ -384,8 +384,8 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			const Position DESTINATION = Position(4, 3);
 			chessState.setState("4k3/8/8/3KP3/8/8/8/8 w - - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
-			EXPECT_TRUE(chessState.m_board.posIsOccupiedByColor(DESTINATION, COLOR));
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR));
 			EXPECT_THAT(validMoves, Not(Contains(DESTINATION)));
 		}
 
@@ -396,7 +396,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			const Position DESTINATION = SOURCE + LEFT * 2;
 			chessState.setState("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
 
@@ -407,7 +407,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			const Position DESTINATION = SOURCE + LEFT * 2;
 			chessState.setState("r3k3/8/8/8/8/8/8/4K3 w q - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
 
@@ -418,7 +418,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			const Position DESTINATION = SOURCE + RIGHT * 2;
 			chessState.setState("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
 
@@ -429,7 +429,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KING);
 			const Position DESTINATION = SOURCE + RIGHT * 2;
 			chessState.setState("4k2r/8/8/8/8/8/8/4K3 w k - 0 1");
-			const const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
+			const std::vector<Position> validMoves = Move::getValidMoves(COLOR, PIECE, chessState);
 			EXPECT_THAT(validMoves, Contains(DESTINATION));
 		}
 	}
