@@ -108,7 +108,7 @@ class ChessState
 #ifdef _DEBUG
 public:
 #endif
-	util::Bitboard m_board;
+	util::BitboardSet m_board;
 	std::vector<PieceNode> m_whitePieces; // List of white pieces present on board
 	std::vector<PieceNode> m_blackPieces; // List of black pieces present on board
 	std::deque<MoveHistoryNode>  m_moveHistory;  // Contains previous 8 moves
@@ -139,7 +139,7 @@ public:
 	const std::vector<PieceNode>& getWhitePieces() const;
 	const std::vector<PieceNode>& getBlackPieces() const;
 	std::string getFenString() const;
-	const util::Bitboard& getBoard() const;
+	const util::BitboardSet& getBoard() const;
 
 	// Modifiers
 	void setState(const std::string& gameState);

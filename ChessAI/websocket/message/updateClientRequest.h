@@ -21,7 +21,7 @@ namespace websocket
 		 */
 		struct UpdateClientRequest : Message
 		{
-			std::unique_ptr<const util::Bitboard> board;
+			std::unique_ptr<const util::BitboardSet> board;
 			Color nextTurn, winner;
 
 			UpdateClientRequest() = default;

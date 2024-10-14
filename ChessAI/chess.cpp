@@ -525,7 +525,7 @@ std::string ChessState::getFenString() const
  *
  * \return The BitBoard instance representing the board state
  */
-const Bitboard& ChessState::getBoard() const
+const BitboardSet& ChessState::getBoard() const
 {
 	return m_board;
 }

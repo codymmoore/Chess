@@ -23,12 +23,12 @@ namespace util
 		return substrings;
 	}
 
-	uint64_t positionToBitboard(const int x, const int y)
+	Bitboard positionToBitboard(const int x, const int y)
 	{
-		return uint64_t(1) << (y * FILE_COUNT + x);
+		return Bitboard(1) << (y * FILE_COUNT + x);
 	}
 
-	uint64_t positionToBitboard(const Position& position)
+	Bitboard positionToBitboard(const Position& position)
 	{
 		return positionToBitboard(position.x, position.y);
 	}
@@ -51,7 +51,7 @@ namespace util
 		return toFileAndRank(position.x, position.y);
 	}
 
-	json::array getJsonFromBoard(const Bitboard& board)
+	json::array getJsonFromBoard(const BitboardSet& board)
 	{
 		json::array result = json::array(RANK_COUNT, json::array(FILE_COUNT));
 		for (int y = 0; y < RANK_COUNT; y++)
@@ -83,9 +83,9 @@ namespace util
 		return result;
 	}
 
-	Bitboard getBoardFromJson(const json::array& boardJson)
+	BitboardSet getBoardFromJson(const json::array& boardJson)
 	{
-		Bitboard result;
+		BitboardSet result;
 		for (int y = 0; y < RANK_COUNT; y++)
 		{
 			const json::array rowJson = boardJson[y].as_array();

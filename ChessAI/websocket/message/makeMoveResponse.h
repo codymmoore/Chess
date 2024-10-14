@@ -22,7 +22,7 @@ namespace websocket
 		struct MakeMoveResponse : Message
 		{
 			bool success;
-			std::unique_ptr<const util::Bitboard> board;
+			std::unique_ptr<const util::BitboardSet> board;
 			Color nextTurn, winner;
 
 			MakeMoveResponse() = default;

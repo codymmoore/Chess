@@ -5,10 +5,12 @@
 
 #include "../enum.h"
 
+using Bitboard = uint64_t;
+
 namespace util
 {
 	struct Position;
-	class Bitboard;
+	class BitboardSet;
 
 	/**
 	 * Splits a string into substrings based on a delimeter.
@@ -26,7 +28,7 @@ namespace util
 	 * \param y The y-coordinate of the position
 	 * \return The bitboard representation of the position
 	 */
-	uint64_t positionToBitboard(const int x, const int y);
+	Bitboard positionToBitboard(const int x, const int y);
 
 	/**
 	 * Converts a Position to its bitboard representation.
@@ -34,7 +36,7 @@ namespace util
 	 * \param position The Position to be converted
 	 * \return The bitboard representation of the Position
 	 */
-	uint64_t positionToBitboard(const Position& position);
+	Bitboard positionToBitboard(const Position& position);
 
 	/**
 	 * Converts a position to a string containing the file and rank for a chess board.
@@ -59,7 +61,7 @@ namespace util
 	 * \param board The BitBoard to be converted
 	 * \return The JSON representation of the board
 	 */
-	boost::json::array getJsonFromBoard(const Bitboard& board);
+	boost::json::array getJsonFromBoard(const BitboardSet& board);
 
 	/**
 	 * Converts a JSON array to a BitBoard.
@@ -67,7 +69,7 @@ namespace util
 	 * \param boardJson The JSON representation of a board
 	 * \return A new BitBoard instance
 	 */
-	Bitboard getBoardFromJson(const boost::json::array& boardJson);
+	BitboardSet getBoardFromJson(const boost::json::array& boardJson);
 
 	/**
 	 * Get the opposite Color.

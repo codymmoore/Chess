@@ -22,7 +22,7 @@ namespace websocket
 		void StartGameResponse::fromJson(const json::object& json)
 		{
 			const json::array boardJson = json.at("board").as_array();
-			board = std::make_unique<const util::Bitboard>(util::getBoardFromJson(boardJson));
+			board = std::make_unique<const util::BitboardSet>(util::getBoardFromJson(boardJson));
 			nextTurn = util::getColorFromString(json.at("nextTurn").as_string().c_str());
 			winner = util::getColorFromString(json.at("winner").as_string().c_str());
 		}

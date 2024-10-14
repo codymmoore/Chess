@@ -5,26 +5,28 @@
 #include "position.h"
 #include "../enum.h"
 
+using Bitboard = uint64_t;
+
 namespace util
 {
 	/**
 	 * Contains the bitboard representations of a chess board.
 	 */
-	class Bitboard
+	class BitboardSet
 	{
 	public:
 		/**
 		 * Creates a new BitBoard instance with an empty board.
 		 *
 		 */
-		Bitboard();
+		BitboardSet();
 
 		/**
 		 * Creates a new BitBoard instance from an existing instance.
 		 *
 		 * \param source The BitBoard instance being copied
 		 */
-		Bitboard(const Bitboard& source);
+		BitboardSet(const BitboardSet& source);
 
 		/* ----- Accessors ----- */
 		/**
@@ -104,38 +106,6 @@ namespace util
 		bool posIsOccupied(const Position& pos, const Color color, const PieceType pieceType) const;
 
 		/**
-		 * Get 64-bit integer representation of occupied positions.
-		 *
-		 * \return 64-bit integer representation of occupied spaces
-		 */
-		uint64_t getOccupiedSpaces() const;
-
-		/**
-		 * Get 64-bit integer representation of positions occupied by a color.
-		 *
-		 * \param color The color being checked for
-		 * \return 64-bit integer representation of spaces occupied by a color
-		 */
-		uint64_t getColorBoard(const Color color) const;
-
-		/**
-		 * Get 64-bit integer representation of positions occupied by a piece type.
-		 *
-		 * \param pieceType The piece type being checked for
-		 * \return 64-bit integer representation of spaces occupied by a piece type
-		 */
-		uint64_t getPieceBoard(const PieceType pieceType) const;
-
-		/**
-		 * Get 64-bit integer representation of positions occupied by a piece of the specified type and color.
-		 *
-		 * \param color The color being checked for
-		 * \param pieceType The piece type being checked for
-		 * \return 64-bit integer representation of spaces occupied by the piece of the specified type and color
-		 */
-		uint64_t getColorPieceBoard(const Color color, const PieceType pieceType) const;
-
-		/**
 		 * Print ASCII representation of board to stdout.
 		 *
 		 */
@@ -183,23 +153,6 @@ namespace util
 		/**
 		 * Clear a position on the board.
 		 *
-		 * \param x The x-coordinate of the position to be cleared
-		 * \param y The y-coordinate of the position to be cleared
-		 * \param pieceType The type of piece being cleared
-		 */
-		void clearPos(const int x, const int y, const PieceType pieceType);
-
-		/**
-		 * Clear a position on the board.
-		 *
-		 * \param pos The position being cleared
-		 * \param pieceType The type of piece being cleared
-		 */
-		void clearPos(const Position& pos, const PieceType pieceType);
-
-		/**
-		 * Clear a position on the board.
-		 *
 		 * \param x The x-coordinate of the position being cleared
 		 * \param y The y-coordinate of the position being cleared
 		 * \param color The color of the piece being cleared
@@ -215,20 +168,6 @@ namespace util
 		 * \param pieceType The type of piece being cleared
 		 */
 		void clearPos(const Position& pos, const Color color, const PieceType pieceType);
-
-		/**
-		 * Clear all pieces of a color off the board.
-		 *
-		 * \param color The color of pieces being cleared
-		 */
-		void clearColor(const Color color);
-
-		/**
-		 * Clear all pieces of a type off the board.
-		 *
-		 * \param pieceType The type of pieces being cleared
-		 */
-		void clearPieceType(const PieceType pieceType);
 
 		/**
 		 * Clear all positions on the board.
@@ -262,7 +201,7 @@ namespace util
 		 * \param rightOperand The BitBoard instance the calling object is being assigned to
 		 * \return A reference to the calling object
 		 */
-		Bitboard& operator=(const Bitboard& rightOperand);
+		BitboardSet& operator=(const BitboardSet& rightOperand);
 
 		/**
 		 * Determines if two bitboards are equivalent.
@@ -270,7 +209,7 @@ namespace util
 		 * \param rightOperand The bitboard the calling object is being compared to
 		 * \return True if the bitboards are equivalent, false otherwise
 		 */
-		bool operator==(const Bitboard& rightOperand) const;
+		bool operator==(const BitboardSet& rightOperand) const;
 
 		/**
 		 * Determines if two bitboards are not equivalent.
@@ -278,9 +217,24 @@ namespace util
 		 * \param rightOperand The bitboard the calling object is being compared to
 		 * \return True if the bitboards are equivalent, false otherwise
 		 */
-		bool operator!=(const Bitboard& rightOperand) const;
+		bool operator!=(const BitboardSet& rightOperand) const;
 
 	private:
-		uint64_t m_board[COLOR_COUNT][PIECE_TYPE_COUNT];
+		/**
+		 * Update all occupancy boards.
+		 *
+		 */
+		void updateOccupancyBoards();
+
+		/**
+		 * Update occupancy board for a color.
+		 *
+		 * \param color the color of the occupancy board being updated
+		 */
+		void updateOccupancyBoards(const Color color);
+
+		Bitboard _bitboards[COLOR_COUNT][PIECE_TYPE_COUNT];
+		Bitboard _allOccupancyBoard;
+		Bitboard _colorOccupancyBoards[COLOR_COUNT];
 	};
 }
