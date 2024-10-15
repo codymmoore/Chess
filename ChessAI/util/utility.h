@@ -10,7 +10,6 @@ using Bitboard = uint64_t;
 namespace util
 {
 	struct Position;
-	class BitboardSet;
 
 	/**
 	 * Splits a string into substrings based on a delimeter.
@@ -20,23 +19,6 @@ namespace util
 	 * \return A vector containing the substrings
 	 */
 	std::vector<std::string> stringSplit(const std::string& originalString, const char delim);
-
-	/**
-	 * Converts a position to its bitboard representation.
-	 *
-	 * \param x The x-coordinate of the position
-	 * \param y The y-coordinate of the position
-	 * \return The bitboard representation of the position
-	 */
-	Bitboard positionToBitboard(const int x, const int y);
-
-	/**
-	 * Converts a Position to its bitboard representation.
-	 *
-	 * \param position The Position to be converted
-	 * \return The bitboard representation of the Position
-	 */
-	Bitboard positionToBitboard(const Position& position);
 
 	/**
 	 * Converts a position to a string containing the file and rank for a chess board.
@@ -56,27 +38,11 @@ namespace util
 	std::string toFileAndRank(const Position& position);
 
 	/**
-	 * Converts a BitBoard to a JSON array.
-	 *
-	 * \param board The BitBoard to be converted
-	 * \return The JSON representation of the board
-	 */
-	boost::json::array getJsonFromBoard(const BitboardSet& board);
-
-	/**
-	 * Converts a JSON array to a BitBoard.
-	 *
-	 * \param boardJson The JSON representation of a board
-	 * \return A new BitBoard instance
-	 */
-	BitboardSet getBoardFromJson(const boost::json::array& boardJson);
-
-	/**
-	 * Get the opposite Color.
-	 *
-	 * \param color
-	 * \return BLACK if color is WHITE, WHITE otherwise
-	 */
+	* Get the opposite Color.
+	*
+	* \param color
+	* \return BLACK if color is WHITE, WHITE otherwise
+	*/
 	Color operator~(const Color color);
 
 	/**

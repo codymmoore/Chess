@@ -1,6 +1,9 @@
 #include "startGameResponse.h"
-#include "../../chess.h"
+
 #include <boost/json.hpp>
+
+#include "../../chess.h"
+#include "../../util/bitboard/bitboardUtil.h"
 
 using namespace boost;
 
@@ -22,7 +25,7 @@ namespace websocket
 		void StartGameResponse::fromJson(const json::object& json)
 		{
 			const json::array boardJson = json.at("board").as_array();
-			board = std::make_unique<const util::BitboardSet>(util::getBoardFromJson(boardJson));
+			board = std::make_unique<const util::bitboard::BitboardSet>(util::bitboard::getBoardFromJson(boardJson));
 			nextTurn = util::getColorFromString(json.at("nextTurn").as_string().c_str());
 			winner = util::getColorFromString(json.at("winner").as_string().c_str());
 		}
@@ -33,7 +36,7 @@ namespace websocket
 
 			json::object data;
 
-			data["board"] = util::getJsonFromBoard(*board);
+			data["board"] = util::bitboard::getJsonFromBoard(*board);
 			data["nextTurn"] = util::toString(nextTurn);
 			data["winner"] = util::toString(winner);
 

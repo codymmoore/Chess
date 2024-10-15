@@ -2,7 +2,7 @@
 
 #include "message.h"
 #include "../../util/utility.h"
-#include "../../util/bitboard.h"
+#include "../../util/bitboard/bitboard.h"
 
 namespace boost
 {
@@ -22,7 +22,7 @@ namespace websocket
 		struct MakeMoveResponse : Message
 		{
 			bool success;
-			std::unique_ptr<const util::BitboardSet> board;
+			std::unique_ptr<const util::bitboard::BitboardSet> board;
 			Color nextTurn, winner;
 
 			MakeMoveResponse() = default;

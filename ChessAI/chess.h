@@ -7,7 +7,7 @@
 
 #include "constants.h"
 #include "util/position.h"
-#include "util/bitboard.h"
+#include "util/bitboard/bitboard.h"
 
 /* ---------- GLOBAL CONSTANTS ---------- */
 const double TOTAL_PLAYER_TURN_TIME = 15.0 * 60.0 * 1000000000.0; // 15 minutes converted to nanoseconds
@@ -108,7 +108,7 @@ class ChessState
 #ifdef _DEBUG
 public:
 #endif
-	util::BitboardSet m_board;
+	util::bitboard::BitboardSet m_board;
 	std::vector<PieceNode> m_whitePieces; // List of white pieces present on board
 	std::vector<PieceNode> m_blackPieces; // List of black pieces present on board
 	std::deque<MoveHistoryNode>  m_moveHistory;  // Contains previous 8 moves
@@ -139,7 +139,7 @@ public:
 	const std::vector<PieceNode>& getWhitePieces() const;
 	const std::vector<PieceNode>& getBlackPieces() const;
 	std::string getFenString() const;
-	const util::BitboardSet& getBoard() const;
+	const util::bitboard::BitboardSet& getBoard() const;
 
 	// Modifiers
 	void setState(const std::string& gameState);

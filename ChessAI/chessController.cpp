@@ -24,7 +24,7 @@ StartGameResponse ChessController::startGame(const StartGameRequest& request)
 	_chessState.reset();
 
 	StartGameResponse response;
-	response.board = std::make_unique<const util::BitboardSet>(_chessState.getBoard());
+	response.board = std::make_unique<const util::bitboard::BitboardSet>(_chessState.getBoard());
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
 
@@ -57,7 +57,7 @@ MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 	{
 		response.success = false;
 	}
-	response.board = std::make_unique<const util::BitboardSet>(_chessState.getBoard());
+	response.board = std::make_unique<const util::bitboard::BitboardSet>(_chessState.getBoard());
 	response.nextTurn = _chessState.getNextTurn();
 	response.winner = _chessState.getWinner();
 
