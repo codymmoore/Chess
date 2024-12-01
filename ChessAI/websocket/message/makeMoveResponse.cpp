@@ -2,7 +2,7 @@
 
 #include <boost/json.hpp>
 
-#include "../../util/bitboard/bitboard.h"
+#include "../../util/bitboard/bitboardSet.h"
 #include "../../util/bitboard/bitboardUtil.h"
 
 using namespace boost;

@@ -32,6 +32,30 @@ namespace util
 
 			/* ----- Accessors ----- */
 			/**
+			 * Get bitboard for specified piece type and color.
+			 *
+			 * \param color
+			 * \param pieceType
+			 * \return Bitboard containing pieces of specified type and color
+			 */
+			Bitboard getBitboard(const Color color, const PieceType pieceType) const;
+
+			/**
+			 * Get bitboard containing all pieces.
+			 *
+			 * \return Bitboard containing all pieces
+			 */
+			Bitboard getOccupancyBoard() const;
+
+			/**
+			 * Get bitboard containing all pieces of the specified color.
+			 *
+			 * \param color
+			 * \return Bitboard containing pieces of the specified color
+			 */
+			Bitboard getOccupancyBoard(const Color color) const;
+
+			/**
 			 * Determines if a position is occupied.
 			 *
 			 * \param x The x-coordinate of the position

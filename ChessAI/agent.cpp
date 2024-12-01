@@ -2,8 +2,11 @@
 
 #include "enum.h"
 #include "util/utility.h"
+#include "move/moveGeneration.h"
 
 using namespace util;
+
+using move::Move;
 
 // Typedefs
 typedef std::chrono::high_resolution_clock::time_point chronoTime;
@@ -66,8 +69,8 @@ int Agent::pieceValueHeuristic(const ChessState& game) const
 
 	result += capturePoints;
 
-	result += Move::inCheck(~m_player, game) * CHECK_VALUE;
-	result -= Move::inCheck(m_player, game) * CHECK_VALUE;
+	result += move::inCheck(~m_player, game) * CHECK_VALUE;
+	result -= move::inCheck(m_player, game) * CHECK_VALUE;
 
 	return result;
 }
@@ -103,28 +106,17 @@ bool Agent::timeHeuristic(const double timeElapsed, const double timeRemaining) 
 /// \return:  bool : true if game state is quiescent, false otherwise
 ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool Agent::isQuiescent(const ChessState& game, const std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>& validMoves) const
+bool Agent::isQuiescent(const ChessState& game, const std::vector<Move>& validMoves) const
 {
-	bool result = true;
-	std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>::const_iterator pieceMoves = validMoves.begin(),
-		pieceMovesEnd = validMoves.end();
-	// Loops through each piece with valid moves
-	while (pieceMoves != pieceMovesEnd && result)
+	for (const Move& move : validMoves)
 	{
-		std::vector<Position>::const_iterator move = pieceMoves->second.begin(),
-			movesEnd = pieceMoves->second.end();
-
-		// Loops through each valid move for current piece
-		while (move != movesEnd && result)
+		if (game.m_board.posIsOccupied(move.destination))
 		{
-			// Set result to true if a capture occurs
-			result = !game.m_board.posIsOccupied(*move);
-			move++;
+			return false;
 		}
-		pieceMoves++;
 	}
 
-	return result;
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,49 +178,45 @@ double Agent::getMoveValue(const Color& player, const Position& prevPos, const P
 /// \return:  vector<pair<Position, Position>> : reordered moves
 ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector<std::pair<Position, Position>> Agent::orderMoves(const Color& player, const std::unordered_map<Position, std::vector<Position>, Position::PositionHasher>& validMoves, const ChessState& game) const
+std::vector<Move> Agent::orderMoves(const Color& player, const std::vector<Move>& validMoves, const ChessState& game) const
 {
 	std::multimap<double, std::pair<Position, Position>, std::greater<double>> moveSorter;
-	const std::unordered_map<Position, std::unordered_map<Position, int, Position::PositionHasher>, Position::PositionHasher>&
-		historyTable = (player == m_player ? m_allyHistoryTable : m_enemyHistoryTable);
-	std::vector<std::pair<Position, Position>> result;
+	const std::unordered_map<
+		util::Position,
+		std::unordered_map<util::Position, int, util::Position::PositionHasher>,
+		util::Position::PositionHasher
+	>& historyTable = (player == m_player ? m_allyHistoryTable : m_enemyHistoryTable);
+	std::vector<Move> result;
 
 	// Loop through each piece with valid moves
-	for (const std::pair<Position, std::vector<Position>>& pieceMoves : validMoves)
+	for (const Move& move : validMoves)
 	{
-		Position prevPos = pieceMoves.first;
+		double moveValue = getMoveValue(player, move.source, move.destination, game);
+		double historyTableValue = 0.0;
 
-		// Loop through each valid move for current piece
-		for (const Position& destination : pieceMoves.second)
+		const std::unordered_map<Position, std::unordered_map<Position, int, Position::PositionHasher>, Position::PositionHasher>::const_iterator
+			prevPosIt = historyTable.find(move.source);
+
+		if (prevPosIt != historyTable.end())
 		{
-			double moveValue = getMoveValue(player, prevPos, destination, game);
-			double historyTableValue = 0.0;
+			std::unordered_map<Position, int, Position::PositionHasher>::const_iterator
+				newPosIt = prevPosIt->second.find(move.destination);
 
-			// Set history table value if move exists in history table
-			const std::unordered_map<Position, std::unordered_map<Position, int, Position::PositionHasher>, Position::PositionHasher>::const_iterator
-				prevPosIt = historyTable.find(prevPos);
-
-			if (prevPosIt != historyTable.end())
+			if (newPosIt != prevPosIt->second.end())
 			{
-				std::unordered_map<Position, int, Position::PositionHasher>::const_iterator
-					newPosIt = prevPosIt->second.find(destination);
-
-				if (newPosIt != prevPosIt->second.end())
-				{
-					// Squash function is used to ensure captures are prioritized
-					historyTableValue = 1 + squash_function(newPosIt->second);
-				}
+				// Squash function is used to ensure captures are prioritized
+				historyTableValue = 1 + squash_function(newPosIt->second);
 			}
-
-			moveValue = (historyTableValue > moveValue ? historyTableValue : moveValue);
-
-			moveSorter.insert({ moveValue, std::pair<Position, Position>(prevPos, destination) });
 		}
+
+		moveValue = (historyTableValue > moveValue ? historyTableValue : moveValue);
+
+		moveSorter.insert({ moveValue, std::pair<Position, Position>(move.source, move.destination) });
 	}
 
 	for (std::pair<const double, std::pair<Position, Position>>& movePair : moveSorter)
 	{
-		result.push_back(movePair.second);
+		result.emplace_back(movePair.second.first, movePair.second.second);
 	}
 
 	return result;
@@ -253,15 +241,7 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit)
 	Color enemyPlayer = ~m_player;
 	int maxValue = INT_MIN;
 
-	std::vector<PieceNode>::const_iterator enemy = enemies.begin(),
-		end = enemies.end();
-	bool enemyCanMove = false;
-
-	while (enemy != end && !enemyCanMove)
-	{
-		enemyCanMove = !Move::getValidMoves(enemyPlayer, *enemy, game).empty();
-		enemy++;
-	}
+	const bool enemyCanMove = !move::getValidMoves(game, enemyPlayer).empty();
 
 	if (enemyCanMove)
 	{
@@ -269,17 +249,7 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit)
 		std::vector<std::vector<Position>> allyMoves;
 		int alliesSize = (int)allies.size();
 
-		// Get all valid moves for player-controlled pieces
-		for (int i = 0; i < alliesSize; i++)
-		{
-			std::vector<Position> validMoves = Move::getValidMoves(m_player, allies[i], game);
-
-			if (!validMoves.empty())
-			{
-				indeces.push_back(i);
-				allyMoves.push_back(validMoves);
-			}
-		}
+		const std::vector<Move> validMoves = move::getValidMoves(game, m_player);
 
 		if (allyMoves.empty())
 		{
@@ -295,29 +265,24 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit)
 		{
 			int indecesSize = (int)indeces.size();
 
-			// Loops through every piece with valid moves
-			for (int i = 0; i < indecesSize; i++)
+			for (const Move& move : validMoves)
 			{
-				// Loops through every valid move for current piece
-				for (const Position& destination : allyMoves[i])
+				ChessState gameCopy(game);
+				std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_whitePieces.begin() : gameCopy.m_blackPieces.begin()),
+					end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
+
+				// Find piece in gameCopy                                                          
+				while (pieceCopy != end && pieceCopy->m_position != move.source)
 				{
-					ChessState gameCopy(game);
-					std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_whitePieces.begin() : gameCopy.m_blackPieces.begin()),
-						end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
+					pieceCopy++;
+				}
 
-					// Find piece in gameCopy                                                          
-					while (pieceCopy != end && pieceCopy->m_position != allies[indeces[i]].m_position)
-					{
-						pieceCopy++;
-					}
+				move::makeMove(m_player, *pieceCopy, move.destination, gameCopy);
+				int minValue = getMinValue(gameCopy, depthLimit - 1);
 
-					Move::makeMove(m_player, *pieceCopy, destination, gameCopy);
-					int minValue = getMinValue(gameCopy, depthLimit - 1);
-
-					if (minValue > maxValue)
-					{
-						maxValue = minValue;
-					}
+				if (minValue > maxValue)
+				{
+					maxValue = minValue;
 				}
 			}
 		}
@@ -349,33 +314,14 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit, int alpha, 
 {
 	const std::vector<PieceNode>& allies = (m_player == WHITE ? game.m_whitePieces : game.m_blackPieces);
 	const std::vector<PieceNode>& enemies = (m_player == WHITE ? game.m_blackPieces : game.m_whitePieces);
-	Color enemyPlayer = ~m_player;
+	Color enemy = ~m_player;
 	int maxValue = INT_MIN;
 
-	std::vector<PieceNode>::const_iterator enemy = enemies.begin(),
-		end = enemies.end();
-	bool enemyCanMove = false;
-
-	while (enemy != end && !enemyCanMove)
-	{
-		enemyCanMove = !Move::getValidMoves(enemyPlayer, *enemy, game).empty();
-		enemy++;
-	}
+	const bool enemyCanMove = !move::getValidMoves(game, enemy).empty();
 
 	if (enemyCanMove)
 	{
-		std::unordered_map<Position, std::vector<Position>, Position::PositionHasher> allyMoves;
-
-		// Get all valid moves for player-controlled pieces
-		for (const PieceNode& allyPiece : allies)
-		{
-			std::vector<Position> validMoves = Move::getValidMoves(m_player, allyPiece, game);
-
-			if (!validMoves.empty())
-			{
-				allyMoves[allyPiece.m_position] = validMoves;
-			}
-		}
+		const std::vector<Move> allyMoves = move::getValidMoves(game, m_player);
 
 		if (allyMoves.empty())
 		{
@@ -389,10 +335,10 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit, int alpha, 
 		// If player can make a valid move and cut off condition has not been met
 		else
 		{
-			std::pair<Position, Position> optimalMove; // Stores best move for current state
-			std::vector<std::pair<Position, Position>> orderedMoves = orderMoves(m_player, allyMoves, game);
+			Move optimalMove; // Stores best move for current state
+			std::vector<Move> orderedMoves = orderMoves(m_player, allyMoves, game);
 			bool prune = false; // Determines whether or not to keep searching
-			std::vector<std::pair<Position, Position>>::const_iterator move = orderedMoves.begin(),
+			std::vector<Move>::const_iterator move = orderedMoves.begin(),
 				movesEnd = orderedMoves.end();
 			// Loops through each valid move for player
 			while (move != movesEnd && !prune)
@@ -402,12 +348,12 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit, int alpha, 
 					end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
 
 				// Find piece in gameCopy
-				while (pieceCopy != end && pieceCopy->m_position != move->first)
+				while (pieceCopy != end && pieceCopy->m_position != move->source)
 				{
 					pieceCopy++;
 				}
 
-				Move::makeMove(m_player, *pieceCopy, move->second, gameCopy);
+				move::makeMove(m_player, *pieceCopy, move->destination, gameCopy);
 
 				int minValue = getMinValue(gameCopy, depthLimit - 1, alpha, beta);
 
@@ -427,9 +373,9 @@ int Agent::getMaxValue(const ChessState& game, const int depthLimit, int alpha, 
 			}
 
 			// Increment optimal move in ally history table if a capture does not occur
-			if (!game.m_board.posIsOccupied(optimalMove.second, enemyPlayer))
+			if (!game.m_board.posIsOccupied(optimalMove.destination, enemy))
 			{
-				m_allyHistoryTable[optimalMove.first][optimalMove.second] += depthLimit * depthLimit;
+				m_allyHistoryTable[optimalMove.source][optimalMove.destination] += depthLimit * depthLimit;
 			}
 		}
 	}
@@ -466,27 +412,13 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit)
 
 	while (ally != end && !playerCanMove)
 	{
-		playerCanMove = !Move::getValidMoves(m_player, *ally, game).empty();
+		playerCanMove = !move::getValidMoves(game, m_player).empty();
 		ally++;
 	}
 
 	if (playerCanMove)
 	{
-		std::vector<int> indeces;
-		std::vector<std::vector<Position>> enemyMoves;
-		int enemiesSize = (int)enemies.size();
-
-		// Get all valid moves for opposing player's pieces
-		for (int i = 0; i < enemiesSize; i++)
-		{
-			std::vector<Position> validMoves = Move::getValidMoves(enemyPlayer, enemies[i], game);
-
-			if (!validMoves.empty())
-			{
-				indeces.push_back(i);
-				enemyMoves.push_back(validMoves);
-			}
-		}
+		std::vector<Move> enemyMoves = move::getValidMoves(game, enemyPlayer);
 
 		if (enemyMoves.empty())
 		{
@@ -500,32 +432,25 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit)
 		// If opposing player can move and depth limit has not been reached
 		else
 		{
-			int indecesSize = (int)indeces.size();
-
-			// Loops through each piece with valid moves
-			for (int i = 0; i < indecesSize; i++)
+			for (const Move& move : enemyMoves)
 			{
-				// Loop through each valid move for a piece
-				for (const Position& destination : enemyMoves[i])
+				ChessState gameCopy(game);
+				std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_blackPieces.begin() : gameCopy.m_whitePieces.begin()),
+					end = (m_player == WHITE ? gameCopy.m_blackPieces.end() : gameCopy.m_whitePieces.end());
+
+				// Find piece in gameCopy
+				while (pieceCopy != end && pieceCopy->m_position != move.source)
 				{
-					ChessState gameCopy(game);
-					std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_blackPieces.begin() : gameCopy.m_whitePieces.begin()),
-						end = (m_player == WHITE ? gameCopy.m_blackPieces.end() : gameCopy.m_whitePieces.end());
+					pieceCopy++;
+				}
 
-					// Find piece in gameCopy
-					while (pieceCopy != end && pieceCopy->m_position != enemies[indeces[i]].m_position)
-					{
-						pieceCopy++;
-					}
+				move::makeMove(enemyPlayer, *pieceCopy, move.destination, gameCopy);
 
-					Move::makeMove(enemyPlayer, *pieceCopy, destination, gameCopy);
+				int maxValue = getMaxValue(gameCopy, depthLimit - 1);
 
-					int maxValue = getMaxValue(gameCopy, depthLimit - 1);
-
-					if (maxValue < minValue)
-					{
-						minValue = maxValue;
-					}
+				if (maxValue < minValue)
+				{
+					minValue = maxValue;
 				}
 			}
 		}
@@ -565,23 +490,13 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 	bool playerCanMove = false;
 	while (ally != end && !playerCanMove)
 	{
-		playerCanMove = !Move::getValidMoves(m_player, *ally, game).empty();
+		playerCanMove = !move::getValidMoves(game, m_player).empty();
 		ally++;
 	}
 
 	if (playerCanMove)
 	{
-		std::unordered_map<Position, std::vector<Position>, Position::PositionHasher> enemyMoves;
-
-		for (const PieceNode& enemyPiece : enemies)
-		{
-			std::vector<Position> validMoves = Move::getValidMoves(enemyPlayer, enemyPiece, game);
-
-			if (!validMoves.empty())
-			{
-				enemyMoves[enemyPiece.m_position] = validMoves;
-			}
-		}
+		std::vector<Move> enemyMoves = move::getValidMoves(game, enemyPlayer);
 
 		if (enemyMoves.empty())
 		{
@@ -595,10 +510,10 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 		// If opposing player can move and depth limit has not been reached
 		else
 		{
-			std::pair<Position, Position> optimalMove; // Stores best move for current state
-			std::vector<std::pair<Position, Position>> orderedMoves = orderMoves(enemyPlayer, enemyMoves, game);
+			Move optimalMove; // Stores best move for current state
+			std::vector<Move> orderedMoves = orderMoves(enemyPlayer, enemyMoves, game);
 			bool prune = false; // Determines whether or not to keep searching
-			std::vector<std::pair<Position, Position>>::const_iterator move = orderedMoves.begin(),
+			std::vector<Move>::const_iterator move = orderedMoves.begin(),
 				movesEnd = orderedMoves.end();
 
 			while (move != movesEnd && !prune)
@@ -608,12 +523,12 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 					end = (enemyPlayer == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
 
 				// Find piece in game copy
-				while (pieceCopy != end && pieceCopy->m_position != move->first)
+				while (pieceCopy != end && pieceCopy->m_position != move->source)
 				{
 					pieceCopy++;
 				}
 
-				Move::makeMove(enemyPlayer, *pieceCopy, move->second, gameCopy);
+				move::makeMove(enemyPlayer, *pieceCopy, move->destination, gameCopy);
 
 				int maxValue = getMaxValue(gameCopy, depthLimit - 1, alpha, beta);
 
@@ -632,9 +547,9 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 				move++;
 			}
 			// Increment optimal move in enemy history table if move is not a capture
-			if (!game.m_board.posIsOccupied(optimalMove.second, m_player))
+			if (!game.m_board.posIsOccupied(optimalMove.destination, m_player))
 			{
-				m_enemyHistoryTable[optimalMove.first][optimalMove.second] += depthLimit * depthLimit;
+				m_enemyHistoryTable[optimalMove.source][optimalMove.destination] += depthLimit * depthLimit;
 			}
 		}
 	}
@@ -661,20 +576,7 @@ int Agent::getMinValue(const ChessState& game, const int depthLimit, int alpha, 
 std::string Agent::depthLimitedMinimax(PieceNode& pieceToMove, Position& pieceDestination, const int depthLimit)
 {
 	std::string result = "";
-	std::vector<int> indeces;
-	std::vector<std::vector<Position>> allyMoves;
-	int alliesSize = (int)m_allies.size();
-
-	for (int i = 0; i < alliesSize; i++)
-	{
-		std::vector<Position> validMoves = Move::getValidMoves(m_player, m_allies[i], m_game);
-
-		if (!validMoves.empty())
-		{
-			indeces.push_back(i);
-			allyMoves.push_back(validMoves);
-		}
-	}
+	std::vector<Move> allyMoves = move::getValidMoves(m_game, m_player);
 
 	// If no valid moves are possible, opposing player wins
 	if (allyMoves.empty())
@@ -684,39 +586,42 @@ std::string Agent::depthLimitedMinimax(PieceNode& pieceToMove, Position& pieceDe
 	else // if player can move
 	{
 		int maxValue = INT_MIN;
-		int indecesSize = (int)indeces.size();
 
-		// Loop through each piece with valid moves
-		for (int i = 0; i < indecesSize; i++)
+		for (const Move& move : allyMoves)
 		{
-			for (Position& newPos : allyMoves[i])
+			ChessState gameCopy(m_game);
+			std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_whitePieces.begin() : gameCopy.m_blackPieces.begin()),
+				end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
+
+			// Find piece in gameCopy
+			while (pieceCopy != end && pieceCopy->m_position != move.source)
 			{
-				ChessState gameCopy(m_game);
-				std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_whitePieces.begin() : gameCopy.m_blackPieces.begin()),
-					end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
+				pieceCopy++;
+			}
 
-				// Find piece in gameCopy
-				while (pieceCopy != end && pieceCopy->m_position != m_allies[indeces[i]].m_position)
+			move::makeMove(m_player, *pieceCopy, move.destination, gameCopy);
+
+			int tmp = getMaxValue(gameCopy, depthLimit);
+
+			if (tmp > maxValue)
+			{
+				maxValue = tmp;
+
+				for (const PieceNode& piece : m_allies)
 				{
-					pieceCopy++;
+					if (piece.m_position == move.source)
+					{
+						pieceToMove = piece;
+						break;
+					}
 				}
-
-				Move::makeMove(m_player, *pieceCopy, newPos, gameCopy);
-
-				int tmp = getMaxValue(gameCopy, depthLimit);
-
-				if (tmp > maxValue)
-				{
-					maxValue = tmp;
-					pieceToMove = m_allies[indeces[i]];
-					pieceDestination = newPos;
-				}
+				pieceDestination = move.destination;
 			}
 		}
 
 		std::string promotion = "";
 
-		if (pieceToMove.m_pieceType == PAWN)
+		if (pieceToMove.m_pieceType == PieceType::PAWN)
 		{
 			// If pawn is to be promoted
 			if (pieceDestination.y == RANK_COUNT - 1 || pieceDestination.y == 0)
@@ -748,17 +653,7 @@ std::string Agent::depthLimitedMinimax(PieceNode& pieceToMove, Position& pieceDe
 MoveNode Agent::prunedDepthLimitedMinimax(PieceNode& pieceToMove, Position& pieceDestination, const int depthLimit)
 {
 	MoveNode result;
-	std::unordered_map<PieceNode*, std::vector<Position>> allyMoves;
-
-	for (PieceNode& allyPiece : m_allies)
-	{
-		std::vector<Position> validMoves = Move::getValidMoves(m_player, allyPiece, m_game);
-
-		if (!validMoves.empty())
-		{
-			allyMoves[&allyPiece] = validMoves;
-		}
-	}
+	std::vector<Move> allyMoves = move::getValidMoves(m_game, m_player);
 
 	// If no valid moves are possible, opposing player wins
 	if (allyMoves.empty())
@@ -770,30 +665,34 @@ MoveNode Agent::prunedDepthLimitedMinimax(PieceNode& pieceToMove, Position& piec
 		int maxValue = INT_MIN;
 
 		// Loop through each ally piece with valid moves
-		for (const std::pair<PieceNode*, std::vector<Position>>& pieceMoves : allyMoves)
+		for (const Move& move : allyMoves)
 		{
-			for (const Position& destination : pieceMoves.second)
+			ChessState gameCopy(m_game);
+			std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_whitePieces.begin() : gameCopy.m_blackPieces.begin()),
+				end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
+
+			// Find piece in gameCopy
+			while (pieceCopy != end && pieceCopy->m_position != move.source)
 			{
-				ChessState gameCopy(m_game);
-				std::vector<PieceNode>::iterator pieceCopy = (m_player == WHITE ? gameCopy.m_whitePieces.begin() : gameCopy.m_blackPieces.begin()),
-					end = (m_player == WHITE ? gameCopy.m_whitePieces.end() : gameCopy.m_blackPieces.end());
+				pieceCopy++;
+			}
 
-				// Find piece in gameCopy
-				while (pieceCopy != end && pieceCopy->m_position != (pieceMoves.first)->m_position)
+			move::makeMove(m_player, *pieceCopy, move.destination, gameCopy);
+
+			int tmp = getMinValue(gameCopy, depthLimit, INT_MIN, INT_MAX);
+
+			if (tmp > maxValue)
+			{
+				maxValue = tmp;
+
+				for (const PieceNode& piece : m_allies)
 				{
-					pieceCopy++;
+					if (piece.m_position == move.source)
+					{
+						pieceToMove = piece;
+					}
 				}
-
-				Move::makeMove(m_player, *pieceCopy, destination, gameCopy);
-
-				int tmp = getMinValue(gameCopy, depthLimit, INT_MIN, INT_MAX);
-
-				if (tmp > maxValue)
-				{
-					maxValue = tmp;
-					pieceToMove = *(pieceMoves.first);
-					pieceDestination = destination;
-				}
+				pieceDestination = move.destination;
 			}
 		}
 
@@ -866,78 +765,78 @@ void Agent::clear()
 /// \return:  std::string : contains random move (<file><rank><file><rank>)
 ///
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::string Agent::makeRandomMove()
-{
-	std::string result = "";
-	std::vector<int> indeces;
-	std::vector<std::vector<Position>> validMoves;
-	int alliesSize = (int)m_allies.size();
-
-	for (int i = 0; i < alliesSize; i++)
-	{
-		std::vector<Position> moves = Move::getValidMoves(m_player, m_allies[i], m_game);
-
-		if (!moves.empty())
-		{
-			indeces.push_back(i);
-			validMoves.push_back(moves);
-		}
-	}
-
-	if (validMoves.empty())
-	{
-		m_game.m_winner = ~m_player;
-	}
-	else // if player can move
-	{
-		// Pick random piece with valid moves
-		int permIndex = rand() % (int)indeces.size();
-		PieceNode* randPiece = &m_allies[indeces[permIndex]];
-		result += toFileAndRank(randPiece->m_position);
-
-		// Pick random move from piece's valid moves
-		int moveIndex = rand() % (int)validMoves[permIndex].size();
-		Position randMove = validMoves[permIndex][moveIndex];
-
-		PieceType promotion = NONE;
-
-		if (randPiece->m_pieceType == PAWN)
-		{
-			// If pawn is to be promoted
-			if (randMove.y == RANK_COUNT - 1 || randMove.y == 0)
-			{
-				// Select a random promotion (Knight, Bishop, Rook, Queen)
-				promotion = static_cast<PieceType>((rand() % 4) + 2);
-			}
-		}
-
-		Move::makeMove(m_player, *randPiece, randMove, m_game, promotion);
-		result += toFileAndRank(randMove);
-
-		if (promotion != NONE)
-		{
-			switch (promotion)
-			{
-			case KNIGHT:
-				result += 'n';
-				break;
-			case BISHOP:
-				result += 'b';
-				break;
-			case ROOK:
-				result += 'r';
-				break;
-			case QUEEN:
-				result += 'q';
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	return result;
-}
+//std::string Agent::makeRandomMove()
+//{
+//	std::string result = "";
+//	std::vector<int> indeces;
+//	std::vector<std::vector<Position>> validMoves;
+//	int alliesSize = (int)m_allies.size();
+//
+//	for (int i = 0; i < alliesSize; i++)
+//	{
+//		std::vector<Position> moves = MoveUtil::move::getValidMoves(m_player, m_allies[i], m_game);
+//
+//		if (!moves.empty())
+//		{
+//			indeces.push_back(i);
+//			validMoves.push_back(moves);
+//		}
+//	}
+//
+//	if (validMoves.empty())
+//	{
+//		m_game.m_winner = ~m_player;
+//	}
+//	else // if player can move
+//	{
+//		// Pick random piece with valid moves
+//		int permIndex = rand() % (int)indeces.size();
+//		PieceNode* randPiece = &m_allies[indeces[permIndex]];
+//		result += toFileAndRank(randPiece->m_position);
+//
+//		// Pick random move from piece's valid moves
+//		int moveIndex = rand() % (int)validMoves[permIndex].size();
+//		Position randMove = validMoves[permIndex][moveIndex];
+//
+//		PieceType promotion = NONE;
+//
+//		if (randPiece->m_pieceType == PAWN)
+//		{
+//			// If pawn is to be promoted
+//			if (randMove.y == RANK_COUNT - 1 || randMove.y == 0)
+//			{
+//				// Select a random promotion (Knight, Bishop, Rook, Queen)
+//				promotion = static_cast<PieceType>((rand() % 4) + 2);
+//			}
+//		}
+//
+//		MoveUtil::move::makeMove(m_player, *randPiece, randMove, m_game, promotion);
+//		result += toFileAndRank(randMove);
+//
+//		if (promotion != NONE)
+//		{
+//			switch (promotion)
+//			{
+//			case KNIGHT:
+//				result += 'n';
+//				break;
+//			case BISHOP:
+//				result += 'b';
+//				break;
+//			case ROOK:
+//				result += 'r';
+//				break;
+//			case QUEEN:
+//				result += 'q';
+//				break;
+//			default:
+//				break;
+//			}
+//		}
+//	}
+//
+//	return result;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  std::string Agent::iterDepthLimitedMinimax()
@@ -967,7 +866,7 @@ std::string Agent::iterDepthLimitedMinimax()
 		piece++;
 	}
 
-	Move::makeMove(m_player, *piece, destination, m_game);
+	move::makeMove(m_player, *piece, destination, m_game);
 
 	return result;
 }
@@ -1002,7 +901,7 @@ MoveNode Agent::prunedIterDepthLimitedMinimax()
 	}
 
 
-	Move::makeMove(m_player, *piece, destination, m_game);
+	move::makeMove(m_player, *piece, destination, m_game);
 
 	return result;
 }
@@ -1045,7 +944,7 @@ MoveNode Agent::iterTimeLimitedMinimax(const double timeRemaining)
 		piece++;
 	}
 
-	Move::makeMove(m_player, *piece, destination, m_game);
+	move::makeMove(m_player, *piece, destination, m_game);
 
 	return result;
 }

@@ -2,6 +2,8 @@
 
 #include <inttypes.h>
 
+#include "../../constants.h"
+
 namespace boost
 {
 	namespace json
@@ -19,6 +21,17 @@ namespace util
 	namespace bitboard
 	{
 		class BitboardSet;
+
+		/**
+		 * Enum used to shift bitboards.
+		 */
+		enum Shift
+		{
+			UP = FILE_COUNT,
+			DOWN = -FILE_COUNT,
+			LEFT = -1,
+			RIGHT = 1
+		};
 
 		/**
 		 * Shift a bitboard using the specified direction.

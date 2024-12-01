@@ -531,6 +531,11 @@ const BitboardSet& ChessState::getBoard() const
 	return m_board;
 }
 
+const std::deque<MoveHistoryNode>& ChessState::getMoveHistory() const
+{
+	return m_moveHistory;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  void setState(const std::string& gameState)
 ///

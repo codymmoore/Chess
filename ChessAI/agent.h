@@ -1,7 +1,7 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#include "move.h"
+#include "move/move.h"
 #include "constants.h"
 #include "util/position.h"
 #include <unordered_map>
@@ -61,10 +61,10 @@ public:
 #endif
 	int pieceValueHeuristic(const ChessState& game) const;
 	bool timeHeuristic(const double timeElapsed, const double timeRemaining) const;
-	bool isQuiescent(const ChessState& game, const std::unordered_map<util::Position, std::vector<util::Position>, util::Position::PositionHasher>& validMoves) const;
+	bool isQuiescent(const ChessState& game, const std::vector<move::Move>& validMoves) const;
 	double getMoveValue(const Color& player, const util::Position& prevPos, const util::Position& newPos, const ChessState& game) const;
-	std::vector<std::pair<util::Position, util::Position>> orderMoves(const Color& player,
-		const std::unordered_map<util::Position, std::vector<util::Position>, util::Position::PositionHasher>& validMoves, const ChessState& game) const;
+	std::vector<move::Move> orderMoves(const Color& player,
+		const std::vector<move::Move>& validMoves, const ChessState& game) const;
 	int getMaxValue(const ChessState& game, const int depthLimit);
 	int getMaxValue(const ChessState& game, const int depthLimit, int alpha, int beta);
 	int getMinValue(const ChessState& game, const int depthLimit);

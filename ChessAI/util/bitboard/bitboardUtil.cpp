@@ -4,7 +4,7 @@
 
 #include "../../constants.h"
 #include "../position.h"
-#include "bitboard.h"
+#include "bitboardSet.h"
 
 using namespace boost;
 

@@ -1,4 +1,4 @@
-#include "bitboard.h"
+#include "bitboardSet.h"
 
 #include "../../constants.h"
 #include "bitboardUtil.h"
@@ -35,6 +35,21 @@ namespace util
 				_colorOccupancyBoards[color] = source._colorOccupancyBoards[color];
 			}
 			_allOccupancyBoard = source._allOccupancyBoard;
+		}
+
+		Bitboard BitboardSet::getBitboard(const Color color, const PieceType pieceType) const
+		{
+			return _bitboards[color][pieceType];
+		}
+
+		Bitboard BitboardSet::getOccupancyBoard() const
+		{
+			return _allOccupancyBoard;
+		}
+
+		Bitboard BitboardSet::getOccupancyBoard(const Color color) const
+		{
+			return _colorOccupancyBoards[color];
 		}
 
 		bool BitboardSet::posIsOccupied(const int x, const int y) const
