@@ -1,49 +1,78 @@
 #pragma once
 
-#include "../chess.h"
+#include "../enum.h"
 #include "../util/position.h"
 
 namespace move
 {
-	struct Move;
-
 	/**
-	 * Get all valid moves for the specified player.
-	 *
-	 * \param chessState game state
-	 * \param player player whose moves are being generated
-	 * \return vector of valid moves
+	 * Contains information for a move in a game of chess.
 	 */
-	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player);
+	struct Move
+	{
+		util::Position source;
+		util::Position destination;
+		PieceType promotion;
 
-	/**
-	 * Determines if a move is valid.
-	 *
-	 * \param player owner of the piece being move
-	 * \param piece the piece being moved
-	 * \param destination the end position of the move
-	 * \param chessState game state
-	 * \return true if move is valid, false otherwise
-	 */
-	bool isValidMove(const Color player, const PieceNode& piece, const util::Position& destination, const ChessState& chessState);
+		Move() = default;
 
-	/**
-	 * Determines if a player is in chech.
-	 *
-	 * \param player player being evaluated
-	 * \param chessState game state
-	 * \return true if player is in check, false otherwise
-	 */
-	bool inCheck(const Color player, const ChessState& chessState);
+		/**
+		 * Creates a new Move instance.
+		 *
+		 * \param source the position of the piece before the move
+		 * \param destination the position of the piece after the move
+		 */
+		Move(const util::Position& source, const util::Position& destination);
 
-	/**
-	 * Moves a piece and updates the game state.
-	 *
-	 * \param player owner of the piece being move
-	 * \param piece the piece being moved
-	 * \param destination the position the piece is being moved to
-	 * \param chessState game state
-	 * \param promotion piece type to promote to; default is queen
-	 */
-	void makeMove(const Color player, const PieceNode& piece, const util::Position& destination, ChessState& chessState, const PieceType promotion = QUEEN);
+		/**
+		 * Creates a new Move instance.
+		 *
+		 * \param source the position of the piece before the move
+		 * \param destination the position of the piece after the move
+		 * \param promotion the piece a pawn will be promoted to
+		 */
+		Move(const util::Position& source, const util::Position& destination, const PieceType promotion);
+
+		/**
+		 * Creates a new Move instance copied from another.
+		 *
+		 * \param source the Move the new instance is copying from
+		 */
+		Move(const Move& source);
+
+		/**
+		 * Sets the calling object equal to the right operand.
+		 *
+		 * \param rightOperand the Move the calling object is being set equal to
+		 * \return a reference to the updated calling object
+		 */
+		Move& operator=(const Move& rightOperand);
+
+		/**
+		 * Determines if two Moves are equivalent.
+		 *
+		 * \param rightOperand the Move being compared to the calling object
+		 * \return true if the Moves are equivalent, false otherwise
+		 */
+		bool operator==(const Move& rightOperand) const;
+
+		/**
+		 * Determines if two Moves are not equivalent.
+		 *
+		 * \param rightOperand the Move being compared to the calling object
+		 * \return true if the Moves are not equivalent, false otherwise
+		 */
+		bool operator!=(const Move& rightOperand) const;
+
+		struct MoveHasher
+		{
+			/**
+			 * Generates a hash value for a Move.
+			 *
+			 * \param move the Move whose hash is being generated
+			 * \return hash value for the specified Move
+			 */
+			std::size_t operator()(const Move& move) const;
+		};
+	};
 }

@@ -7,10 +7,11 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock-matchers.h"
 #include "../ChessAI/move/move.h"
+#include "../ChessAI/move/moveGeneration.h"
+#include "../ChessAI/move/moveUtil.h"
 #include "../ChessAI/enum.h"
 #include "../ChessAI/util/position.h"
 #include "../ChessAI/util/utility.h"
-#include "../ChessAI/move/moveGeneration.h"
 
 util::Position forward(const Color color);
 

@@ -10,7 +10,7 @@
 #include "websocket/message/endGameResponse.h"
 
 #include "chess.h"
-#include "move/move.h"
+#include "move/moveUtil.h"
 #include <memory>
 
 using namespace websocket::message;
@@ -50,7 +50,7 @@ MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 
 	if (move::isValidMove(request.piece.color, piece, request.destination, _chessState))
 	{
-		move::makeMove(request.piece.color, piece, request.destination, _chessState, request.promotion);
+		move::makeMove(request.piece.color, request.piece.position, request.destination, _chessState, request.promotion);
 		response.success = true;
 	}
 	else

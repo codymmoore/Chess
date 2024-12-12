@@ -7,56 +7,20 @@
 #include "../enum.h"
 #include "../util/bitboard/bitboardSet.h"
 #include "../util/bitboard/bitboardUtil.h"
-#include "../chess.h"
 #include "../util/utility.h"
+#include "move.h"
 
 using namespace util;
 using namespace util::bitboard;
 
-namespace move
-{
-	Move::Move(const Position& source, const Position& destination) :
-		source(source),
-		destination(destination),
-		promotion(PieceType::NONE)
-	{
-	}
+using namespace std;
 
-	Move::Move(const Position& source, const Position& destination, const PieceType promotion) :
-		source(source),
-		destination(destination),
-		promotion(promotion)
-	{
-	}
-
-	Move::Move(const Move& source) :
-		source(source.source),
-		destination(source.destination),
-		promotion(source.promotion)
-	{
-	}
-
-	Move& Move::operator=(const Move& rightOperand)
-	{
-		source = rightOperand.source;
-		destination = rightOperand.destination;
-		promotion = rightOperand.promotion;
-
-		return *this;
-	}
-
-	bool Move::operator==(const Move& rightOperand) const
-	{
-		return source == rightOperand.source
-			&& destination == rightOperand.destination
-			&& promotion == rightOperand.promotion;
-	}
-
-	bool Move::operator!=(const Move& rightOperand) const
 	{
 		return !(*this == rightOperand);
 	}
 
+namespace move
+{
 	std::vector<Move> getMovesFromBitboard(Bitboard bitboard, const int deltaX, const int deltaY)
 	{
 		std::vector<Move> result;
@@ -79,7 +43,7 @@ namespace move
 		return result;
 	}
 
-	std::vector<Move> generatePawnMoves(const ChessState& game, const Color player)
+	std::vector<Move> generatePawnMoves(const ChessState& chessState, const Color player)
 	{
 		static const Bitboard WHITE_START_ROW = 0x00ff000000000000;
 		static const Bitboard BLACK_START_ROW = 0x000000000000ff00;
@@ -88,7 +52,7 @@ namespace move
 
 		const int COLOR_COEFFICIENT = player == Color::WHITE ? 1 : -1;
 		const Shift FORWARD = player == Color::WHITE ? Shift::UP : Shift::DOWN;
-		const BitboardSet& board = game.getBoard();
+		const BitboardSet& board = chessState.getBoard();
 		const Bitboard pawnBoard = board.getBitboard(player, PieceType::PAWN);
 		const Bitboard startRow = player == Color::WHITE ? WHITE_START_ROW : BLACK_START_ROW;
 
@@ -107,7 +71,7 @@ namespace move
 
 		Bitboard opponentOccupancyBoard = board.getOccupancyBoard(~player);
 
-		const std::deque<MoveHistoryNode> moveHistory = game.getMoveHistory();
+		const std::deque<MoveHistoryNode> moveHistory = chessState.getMoveHistory();
 		if (!moveHistory.empty()) {
 			const MoveHistoryNode& prevMove = moveHistory.back();
 			if (prevMove.m_pieceType == PieceType::PAWN)

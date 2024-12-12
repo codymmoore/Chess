@@ -114,10 +114,13 @@
     <ClInclude Include="util\bitboard\bitboardUtil.h">
       <Filter>Header Files\util\bitboard</Filter>
     </ClInclude>
-    <ClInclude Include="move\move.h">
+    <ClInclude Include="move\moveUtil.h">
       <Filter>Header Files\move</Filter>
     </ClInclude>
     <ClInclude Include="move\moveGeneration.h">
+      <Filter>Header Files\move</Filter>
+    </ClInclude>
+    <ClInclude Include="move\move.h">
       <Filter>Header Files\move</Filter>
     </ClInclude>
   </ItemGroup>
@@ -185,10 +188,13 @@
     <ClCompile Include="util\bitboard\bitboardUtil.cpp">
       <Filter>Source Files\util\bitboard</Filter>
     </ClCompile>
-    <ClCompile Include="move\move.cpp">
+    <ClCompile Include="move\moveUtil.cpp">
       <Filter>Source Files\move</Filter>
     </ClCompile>
     <ClCompile Include="move\moveGeneration.cpp">
+      <Filter>Source Files\move</Filter>
+    </ClCompile>
+    <ClCompile Include="move\move.cpp">
       <Filter>Source Files\move</Filter>
     </ClCompile>
   </ItemGroup>
