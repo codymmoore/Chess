@@ -8,7 +8,7 @@
 
 util::Position forward(const Color color)
 {
-	return color == Color::WHITE ? util::UP : util::DOWN;
+	return color == Color::WHITE ? util::Position::UP : util::Position::DOWN;
 }
 
 util::Position backward(const Color color)
@@ -18,7 +18,7 @@ util::Position backward(const Color color)
 
 util::Position right(const Color color)
 {
-	return color == Color::WHITE ? util::RIGHT : util::LEFT;
+	return color == Color::WHITE ? util::Position::RIGHT : util::Position::LEFT;
 }
 
 util::Position left(const Color color)

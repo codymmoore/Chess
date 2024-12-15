@@ -1,5 +1,8 @@
 #include "chessServer.h"
+
 #include "agent.h"
+#include "move/move.h"
+#include "move/moveUtil.h"
 
 #include "websocket/message/startGameRequest.h"
 #include "websocket/message/startGameResponse.h"
@@ -16,8 +19,10 @@
 
 using namespace websocket::message;
 using tcp = boost::asio::ip::tcp;
+using move::Move;
 
 const unsigned int NUMBER_OF_GAME_TYPES = 3;
+const int QUIESCENT_SEARCH_DEPTH = 3, DEPTH_LIMIT = 5;
 
 constexpr const char* GAME_TYPE_STRINGS[NUMBER_OF_GAME_TYPES] = {
 	"HUMAN_VS_HUMAN",
@@ -77,7 +82,7 @@ void ChessServer::run()
 void ChessServer::humanVsAi()
 {
 	bool gameInProgress = true;
-	Agent agent(Color::BLACK, _chessState);
+	Agent agent(_chessState, Color::BLACK, QUIESCENT_SEARCH_DEPTH, DEPTH_LIMIT);
 
 	while (gameInProgress)
 	{
@@ -91,8 +96,8 @@ void ChessServer::humanVsAi()
 void ChessServer::aiVsAi()
 {
 	bool gameInProgress = true;
-	Agent agentWhite(Color::WHITE, _chessState);
-	Agent agentBlack(Color::BLACK, _chessState);
+	Agent agentWhite(_chessState, Color::WHITE, QUIESCENT_SEARCH_DEPTH, DEPTH_LIMIT);
+	Agent agentBlack(_chessState, Color::BLACK, QUIESCENT_SEARCH_DEPTH, DEPTH_LIMIT);
 
 	while (gameInProgress)
 	{
@@ -121,7 +126,9 @@ bool ChessServer::handleHumanTurn()
 
 bool ChessServer::handleAiTurn(Agent& agent)
 {
-	MoveNode move = agent.prunedIterDepthLimitedMinimax();
+	Move move = agent.getMove();
+
+	move::makeMove(agent.getPlayer(), move, _chessState);
 
 	UpdateClientRequest updateClientRequest;
 	updateClientRequest.board = std::make_unique<const util::bitboard::BitboardSet>(_chessState.getBoard());

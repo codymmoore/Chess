@@ -1,7 +1,13 @@
 #include "pch.h"
 
+#define UP Position::UP
+#define DOWN Position::DOWN
+#define LEFT Position::LEFT
+#define RIGHT Position::RIGHT
+
 using namespace testing;
 using namespace util;
+using namespace move;
 
 namespace makeMoveTest
 {
@@ -22,7 +28,7 @@ namespace makeMoveTest
 		const Position DESTINATION = SOURCE + RIGHT + UP * 2;
 		chessState.setState("4k3/8/8/8/8/8/4N3/4K3 w - - 0 1");
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
 		EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PIECE.m_pieceType));
@@ -37,7 +43,7 @@ namespace makeMoveTest
 		chessState.setState("4k3/8/8/8/8/8/4N3/4K3 w - - 0 1");
 		const Color CURRENT_TURN = chessState.getNextTurn();
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_EQ(~CURRENT_TURN, chessState.getNextTurn());
 	}
@@ -50,7 +56,7 @@ namespace makeMoveTest
 		const Position DESTINATION = SOURCE + RIGHT + UP * 2;
 		chessState.setState("4k3/8/8/8/8/8/4N3/4K3 w - - 0 1");
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_THAT(chessState.getWhitePieces(), Not(Contains(PIECE)));
 		EXPECT_THAT(chessState.getWhitePieces(), Contains(PieceNode(DESTINATION, PIECE.m_pieceType)));
@@ -65,7 +71,7 @@ namespace makeMoveTest
 		chessState.setState("4k3/8/8/8/8/8/4NN3/4K3 w - - 0 1");
 		const int CURRENT_HALF_TURNS = chessState.m_numHalfTurns;
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_EQ(CURRENT_HALF_TURNS + 1, chessState.m_numHalfTurns);
 	}
@@ -79,7 +85,7 @@ namespace makeMoveTest
 		chessState.setState("4k3/8/8/8/8/8/4n3/4K3 b - - 0 1");
 		const int CURRENT_FULL_TURNS = chessState.m_numFullTurns;
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_EQ(CURRENT_FULL_TURNS + 1, chessState.m_numFullTurns);
 	}
@@ -93,7 +99,7 @@ namespace makeMoveTest
 		chessState.setState("4k3/8/8/8/8/8/4NN3/4K3 w - - 0 1");
 		chessState.m_moveHistory.resize(MAX_MOVE_HISTORY_SIZE, MoveHistoryNode());
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_EQ(MAX_MOVE_HISTORY_SIZE, chessState.m_moveHistory.size());
 		EXPECT_EQ(MoveHistoryNode(COLOR, PIECE, DESTINATION), chessState.m_moveHistory.back());
@@ -116,7 +122,7 @@ namespace makeMoveTest
 		}
 		chessState.m_moveHistory[(MAX_MOVE_HISTORY_SIZE / 2) - 1] = MoveHistoryNode(COLOR, PIECE, DESTINATION);
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_EQ(Color::NEUTRAL, chessState.getNextTurn());
 	}
@@ -138,7 +144,7 @@ namespace makeMoveTest
 		}
 		chessState.m_moveHistory[(MAX_MOVE_HISTORY_SIZE / 2) - 1] = MoveHistoryNode(COLOR, PIECE, DESTINATION + UP);
 
-		Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+		makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 		EXPECT_NE(Color::NEUTRAL, chessState.getNextTurn());
 	}
@@ -151,7 +157,7 @@ namespace makeMoveTest
 		const Position DESTINATION = SOURCE + RIGHT + UP * 2;
 		chessState.setState("4k3/8/8/8/8/8/8/4K3 w - - 0 1");
 
-		EXPECT_THROW(Move::makeMove(COLOR, PIECE, DESTINATION, chessState), std::exception);
+		EXPECT_THROW(makeMove(COLOR, SOURCE, DESTINATION, chessState), std::exception);
 	}
 
 	namespace capture
@@ -165,7 +171,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/8/5p2/8/4N3/4K3 w - - 0 1");
 
 			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(DESTINATION, ~COLOR));
 		}
 
@@ -178,7 +184,7 @@ namespace makeMoveTest
 			const PieceNode ENEMY = PieceNode(DESTINATION, PieceType::PAWN);
 			chessState.setState("4k3/8/8/8/5p2/8/4N3/4K3 w - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_THAT(chessState.getBlackPieces(), Not(Contains(ENEMY)));
 		}
 
@@ -190,7 +196,7 @@ namespace makeMoveTest
 			const Position DESTINATION = SOURCE + RIGHT + UP * 2;
 			chessState.setState("4k3/8/8/8/5p2/8/4N3/4K3 w - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_EQ(0, chessState.m_numHalfTurns);
 		}
 
@@ -203,7 +209,7 @@ namespace makeMoveTest
 			chessState.setState("r3k3/8/2N5/8/8/8/4N3/4K3 b q - 0 1");
 
 			EXPECT_TRUE(chessState.m_bQueenSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_bQueenSideCastle);
 		}
 
@@ -216,7 +222,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/8/8/1n6/8/R3K3 w Q - 0 1");
 
 			EXPECT_TRUE(chessState.m_wQueenSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_wQueenSideCastle);
 		}
 
@@ -229,7 +235,7 @@ namespace makeMoveTest
 			chessState.setState("4k2r/8/6N1/8/8/8/8/4K3 b k - 0 1");
 
 			EXPECT_TRUE(chessState.m_bKingSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_bKingSideCastle);
 		}
 
@@ -242,7 +248,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/8/8/6n1/8/4K2R w K - 0 1");
 
 			EXPECT_TRUE(chessState.m_wKingSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_wKingSideCastle);
 		}
 	}
@@ -257,7 +263,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(4, 5);
 			chessState.setState("4k3/8/8/8/8/8/4P3/4K3 w - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_EQ(0, chessState.m_numHalfTurns);
 		}
 
@@ -269,7 +275,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(4, 2);
 			chessState.setState("4k3/8/8/3Pp3/8/8/8/4K3 w - d6 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(4, 3, ~COLOR));
 		}
 
@@ -281,7 +287,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(4, 5);
 			chessState.setState("4k3/8/8/8/3pP3/8/8/4K3 b - d3 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(4, 4, ~COLOR));
 		}
 
@@ -293,7 +299,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(4, 2);
 			chessState.setState("4k3/8/8/3Pp3/8/8/8/4K3 w - d6 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_THAT(chessState.getBlackPieces(), Not(Contains(PieceNode(DESTINATION + UP, PieceType::PAWN))));
 		}
 
@@ -305,7 +311,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(4, 5);
 			chessState.setState("4k3/8/8/8/3pP3/8/8/4K3 b - d3 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_THAT(chessState.getWhitePieces(), Not(Contains(PieceNode(DESTINATION + DOWN, PieceType::PAWN))));
 		}
 
@@ -318,7 +324,7 @@ namespace makeMoveTest
 			const PieceType PROMOTION = PieceType::KNIGHT;
 			chessState.setState("4k3/7P/8/8/8/8/8/4K3 w - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState, PROMOTION);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState, PROMOTION);
 
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::PAWN));
@@ -333,7 +339,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(7, 0);
 			chessState.setState("4k3/7P/8/8/8/8/8/4K3 w - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState, PieceType::KNIGHT);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState, PieceType::KNIGHT);
 			EXPECT_THAT(chessState.getWhitePieces(), Not(Contains(PieceNode(DESTINATION + UP, PieceType::PAWN))));
 		}
 
@@ -346,7 +352,7 @@ namespace makeMoveTest
 			const PieceType PROMOTION = PieceType::QUEEN;
 			chessState.setState("4k3/8/8/8/8/8/7p/4K3 b - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::PAWN));
@@ -362,7 +368,7 @@ namespace makeMoveTest
 			const PieceType PROMOTION = PieceType::QUEEN;
 			chessState.setState("4k3/8/8/8/8/8/7p/4K3 b - - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_THAT(chessState.getBlackPieces(), Not(Contains(PieceNode(DESTINATION + DOWN, PieceType::PAWN))));
 		}
 	}
@@ -379,7 +385,7 @@ namespace makeMoveTest
 
 			EXPECT_TRUE(chessState.m_wKingSideCastle);
 			EXPECT_TRUE(chessState.m_wQueenSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState, PieceType::KNIGHT);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState, PieceType::KNIGHT);
 			EXPECT_FALSE(chessState.m_wKingSideCastle);
 			EXPECT_FALSE(chessState.m_wQueenSideCastle);
 		}
@@ -394,7 +400,7 @@ namespace makeMoveTest
 
 			EXPECT_TRUE(chessState.m_bKingSideCastle);
 			EXPECT_TRUE(chessState.m_bQueenSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_bKingSideCastle);
 			EXPECT_FALSE(chessState.m_bQueenSideCastle);
 		}
@@ -407,7 +413,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(2, 7);
 			chessState.setState("4k3/7P/8/8/8/8/8/R3K2R w KQ - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(0, 7));
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
 			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::KING));
@@ -422,7 +428,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(2, 7);
 			chessState.setState("4k3/7P/8/8/8/8/8/R3K2R w KQ - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_THAT(chessState.getWhitePieces(), Contains(PieceNode(DESTINATION, PieceType::KING)));
 			EXPECT_THAT(chessState.getWhitePieces(), Contains(PieceNode(DESTINATION + RIGHT, PieceType::ROOK)));
 		}
@@ -435,7 +441,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(6, 7);
 			chessState.setState("4k3/7P/8/8/8/8/8/R3K2R w KQ - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(7, 7));
 			EXPECT_FALSE(chessState.m_board.posIsOccupied(SOURCE));
 			EXPECT_TRUE(chessState.m_board.posIsOccupied(DESTINATION, COLOR, PieceType::KING));
@@ -450,7 +456,7 @@ namespace makeMoveTest
 			const Position DESTINATION = Position(6, 7);
 			chessState.setState("4k3/7P/8/8/8/8/8/R3K2R w KQ - 0 1");
 
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_THAT(chessState.getWhitePieces(), Contains(PieceNode(DESTINATION, PieceType::KING)));
 			EXPECT_THAT(chessState.getWhitePieces(), Contains(PieceNode(DESTINATION + LEFT, PieceType::ROOK)));
 		}
@@ -467,7 +473,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
 
 			EXPECT_TRUE(chessState.m_wQueenSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_wQueenSideCastle);
 		}
 
@@ -480,7 +486,7 @@ namespace makeMoveTest
 			chessState.setState("r3k3/8/8/8/8/8/8/4K3 b q - 0 1");
 
 			EXPECT_TRUE(chessState.m_bQueenSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_bQueenSideCastle);
 		}
 
@@ -493,7 +499,7 @@ namespace makeMoveTest
 			chessState.setState("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
 
 			EXPECT_TRUE(chessState.m_wKingSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_wKingSideCastle);
 		}
 
@@ -506,7 +512,7 @@ namespace makeMoveTest
 			chessState.setState("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
 
 			EXPECT_TRUE(chessState.m_bKingSideCastle);
-			Move::makeMove(COLOR, PIECE, DESTINATION, chessState);
+			makeMove(COLOR, SOURCE, DESTINATION, chessState);
 			EXPECT_FALSE(chessState.m_bKingSideCastle);
 		}
 	}

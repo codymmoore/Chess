@@ -97,4 +97,10 @@ namespace util
 
 		return out;
 	}
+
+	// Directions
+	const Position Position::UP(0, -1);
+	const Position Position::DOWN(0, 1);
+	const Position Position::LEFT(-1, 0);
+	const Position Position::RIGHT(1, 0);
 }

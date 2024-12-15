@@ -120,6 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,6 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +148,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,6 +163,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -172,6 +176,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,6 +191,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -202,8 +208,10 @@
     <ClInclude Include="chessController.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="enum.h" />
-    <ClInclude Include="move.h" />
-    <ClInclude Include="util\bitboard\bitboard.h" />
+    <ClInclude Include="move\move.h" />
+    <ClInclude Include="move\moveUtil.h" />
+    <ClInclude Include="move\moveGeneration.h" />
+    <ClInclude Include="util\bitboard\bitboardSet.h" />
     <ClInclude Include="util\bitboard\bitboardUtil.h" />
     <ClInclude Include="util\position.h" />
     <ClInclude Include="util\utility.h" />
@@ -226,8 +234,10 @@
     <ClCompile Include="chessServer.cpp" />
     <ClCompile Include="chessController.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="move.cpp" />
-    <ClCompile Include="util\bitboard\bitboard.cpp" />
+    <ClCompile Include="move\move.cpp" />
+    <ClCompile Include="move\moveUtil.cpp" />
+    <ClCompile Include="move\moveGeneration.cpp" />
+    <ClCompile Include="util\bitboard\bitboardSet.cpp" />
     <ClCompile Include="util\bitboard\bitboardUtil.cpp" />
     <ClCompile Include="util\position.cpp" />
     <ClCompile Include="util\utility.cpp" />

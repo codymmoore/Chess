@@ -115,10 +115,4 @@ namespace util
 	 * \param position The Position being written to the output stream
 	 */
 	std::ostream& operator<<(std::ostream& out, const Position& position);
-
-	// Directions
-	const static Position UP(0, -1),
-		DOWN(0, 1),
-		LEFT(-1, 0),
-		RIGHT(1, 0);
 }

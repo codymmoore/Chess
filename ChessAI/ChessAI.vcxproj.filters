@@ -34,15 +34,24 @@
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{5f3ecc9b-6e1a-4330-9678-0ac6dc5cd42a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\move">
+      <UniqueIdentifier>{e18b418b-67b8-43d0-92f4-0c04bfa2a447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\move">
+      <UniqueIdentifier>{3c0729c5-488b-4dc6-bcf8-0493a3ba2cc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util\bitboard">
+      <UniqueIdentifier>{1591e606-6a5a-438c-a0df-30a52269208f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util\bitboard">
+      <UniqueIdentifier>{ac65f4ac-7841-46e9-a92f-085d1e7cf74b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="agent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="chess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="move.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="chessController.h">
@@ -90,9 +99,6 @@
     <ClInclude Include="util\position.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="util\bitboard.h">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
     <ClInclude Include="util\utility.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
@@ -102,15 +108,27 @@
     <ClInclude Include="constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="util\bitboard\bitboardSet.h">
+      <Filter>Header Files\util\bitboard</Filter>
+    </ClInclude>
+    <ClInclude Include="util\bitboard\bitboardUtil.h">
+      <Filter>Header Files\util\bitboard</Filter>
+    </ClInclude>
+    <ClInclude Include="move\moveUtil.h">
+      <Filter>Header Files\move</Filter>
+    </ClInclude>
+    <ClInclude Include="move\moveGeneration.h">
+      <Filter>Header Files\move</Filter>
+    </ClInclude>
+    <ClInclude Include="move\move.h">
+      <Filter>Header Files\move</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="agent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="chess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="move.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -158,14 +176,26 @@
     <ClCompile Include="websocket\message\updateClientResponse.cpp">
       <Filter>Source Files\websocket\message</Filter>
     </ClCompile>
-    <ClCompile Include="util\bitboard.cpp">
-      <Filter>Source Files\util</Filter>
-    </ClCompile>
     <ClCompile Include="util\utility.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
     <ClCompile Include="util\position.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\bitboard\bitboardSet.cpp">
+      <Filter>Source Files\util\bitboard</Filter>
+    </ClCompile>
+    <ClCompile Include="util\bitboard\bitboardUtil.cpp">
+      <Filter>Source Files\util\bitboard</Filter>
+    </ClCompile>
+    <ClCompile Include="move\moveUtil.cpp">
+      <Filter>Source Files\move</Filter>
+    </ClCompile>
+    <ClCompile Include="move\moveGeneration.cpp">
+      <Filter>Source Files\move</Filter>
+    </ClCompile>
+    <ClCompile Include="move\move.cpp">
+      <Filter>Source Files\move</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

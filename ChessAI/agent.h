@@ -1,88 +1,117 @@
-#ifndef AGENT_H
-#define AGENT_H
+#pragma once
 
-#include "move.h"
+#include "move/move.h"
+#include "chess.h"
 #include "constants.h"
-#include "util/position.h"
 #include <unordered_map>
-#include <climits>
-#include <chrono>
 #include <map>
 
-// Typedefs
-typedef std::chrono::high_resolution_clock::time_point chronoTime;
-typedef std::chrono::duration<std::chrono::nanoseconds> chronoDuration;
+typedef std::multimap<double, int, std::greater<double>> MoveIndexMap;
 
-/* ----- GLOBAL CONSTANTS ----- */
-// Point values used for relative value heuristic
-const int PIECE_VALUES[PIECE_TYPE_COUNT] = { 2, 4, 4, 6, 10, 0 }, CHECK_VALUE = 1;
-const int FULL_TEAM_VALUE = PIECE_VALUES[PAWN] * FILE_COUNT
-+ PIECE_VALUES[KNIGHT] * 2
-+ PIECE_VALUES[BISHOP] * 2
-+ PIECE_VALUES[ROOK] * 2
-+ PIECE_VALUES[QUEEN];
-const int MAX_DEPTH = 3, MAX_QUIESCENCE_SEARCH_DEPTH = 4;
-const double SQUASH_COEFFICIENT = 1.05;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:     squash_function(int)
-///
-/// \brief:    Normalizes positive integers between 0 and 1
-///
-/// \param [in]:    value : positive integer to be normalized
-///
-/// \return:        double
-///
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double squash_function(const int value);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \class:   Agent
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///
-/// \brief:    Class used to contain chess-playing algorithms
-///
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Class used to determine optimal moves in a game of Chess.
+ */
 class Agent
 {
-	Color m_player;                    // Player color (Black/White)
-	ChessState& m_game;                // Reference to chess game
-	std::vector<PieceNode>& m_allies;  // Reference to vector of player-controlled pieces
-	std::vector<PieceNode>& m_enemies; // Reference to vector of opposing player's pieces
-	// History tables used for move ordering; m_historyTable[<previous position>][<new position>] = <move rating>
-	std::unordered_map<
-		util::Position,
-		std::unordered_map<util::Position, int, util::Position::PositionHasher>,
-		util::Position::PositionHasher
-	> m_allyHistoryTable, m_enemyHistoryTable;
-
-#ifdef TESTING
-public:
-#endif
-	int pieceValueHeuristic(const ChessState& game) const;
-	bool timeHeuristic(const double timeElapsed, const double timeRemaining) const;
-	bool isQuiescent(const ChessState& game, const std::unordered_map<util::Position, std::vector<util::Position>, util::Position::PositionHasher>& validMoves) const;
-	double getMoveValue(const Color& player, const util::Position& prevPos, const util::Position& newPos, const ChessState& game) const;
-	std::vector<std::pair<util::Position, util::Position>> orderMoves(const Color& player,
-		const std::unordered_map<util::Position, std::vector<util::Position>, util::Position::PositionHasher>& validMoves, const ChessState& game) const;
-	int getMaxValue(const ChessState& game, const int depthLimit);
-	int getMaxValue(const ChessState& game, const int depthLimit, int alpha, int beta);
-	int getMinValue(const ChessState& game, const int depthLimit);
-	int getMinValue(const ChessState& game, const int depthLimit, int alpha, int beta);
-	std::string depthLimitedMinimax(PieceNode& pieceToMove, util::Position& pieceDestination, const int depthLimit);
-	MoveNode prunedDepthLimitedMinimax(PieceNode& pieceToMove, util::Position& pieceDestination, const int depthLimit);
-
 public:
 	Agent() = delete;
 	Agent(const Agent& source) = delete;
 
-	Agent(const Color player, ChessState& game);
-	~Agent();
-	void clear();
-	std::string makeRandomMove();
-	std::string iterDepthLimitedMinimax();
-	MoveNode prunedIterDepthLimitedMinimax();
-	MoveNode iterTimeLimitedMinimax(const double timeRemaining);
-};
+	/**
+	 * Creates a new Agent.
+	 *
+	 * \param chessState game state
+	 * \param player the player the agent will be playing as
+	 * \param quiescentSearchDepth the search depth for "quiet" states
+	 * \param depthLimit the absolute limit for seach depth
+	 */
+	Agent(ChessState& chessState, const Color player, const int quiescentSearchDepth, const int depthLimit);
 
-#endif // AGENT_H
+	/**
+	 * Retrieves the player.
+	 *
+	 * \return the color the agent is playing for
+	 */
+	Color getPlayer() const;
+
+	/**
+	 * Determine the best move for the current game state.
+	 *
+	 * \return optimal move
+	 */
+	move::Move getMove();
+
+	/**
+	 * Determine the best move for the current game state.
+	 *
+	 * \param timeRemaining the time remaining for the player
+	 * \return optimal move
+	 */
+	move::Move getMove(const double timeRemaining);
+
+private:
+	/**
+	 * Calculates a score for the given game state based on how desirable it is for the given player.
+	 *
+	 * \param chessState the game state being scored
+	 * \param player the player the score is being calculated for
+	 * \return score of the game state
+	 */
+	double evaluateGameState(const ChessState& chessState, const Color player) const;
+
+	/**
+	 * Determines when to stop evaluating a game state for the best move.
+	 *
+	 * \param timeElapsed the time spent determining the current move
+	 * \param timeRemaining the total remaining time the player has to finish the game
+	 * \return true to continue evaluation, false otherwise
+	 */
+	bool timeHeuristic(const double timeElapsed, const double timeRemaining) const;
+
+	/**
+	 * Determines if a game state is "quiet" or unlikely to result in meaningful impacts to the player.
+	 *
+	 * \param game game state
+	 * \param validMoves all valid moves for the player in the given game state
+	 * \return true if game state is "quiet", false otherwise
+	 */
+	bool isQuiescent(const ChessState& game, const std::vector<move::Move>& validMoves) const;
+
+	/**
+	 * Scores a move based on how desireable it is for the given player.
+	 *
+	 * \param chessState game state
+	 * \param player the player the score is being calculated for
+	 * \param move the move being scored
+	 * \return score of the move
+	 */
+	double getMoveValue(const ChessState& chessState, const Color player, const move::Move& move) const;
+
+	/**
+	 * Scores each given move and places it in a map with its index to be sorted.
+	 *
+	 * \param chessState game state
+	 * \param player the player whose moves are being scored and sorted
+	 * \param moves the moves being scored and sorted
+	 * \return ordered map containing score and index for each move
+	 */
+	MoveIndexMap getOrderedMoveIndexMap(const ChessState& chessState, const Color player, const std::vector<move::Move>& moves) const;
+
+	/**
+	 * Calculates the score of a game state by recursively exploring possible moves.
+	 *
+	 * \param player the current turn's player
+	 * \param chessState game state
+	 * \param searchDepth te current search depth
+	 * \param alpha the greatest value that can be guaranteed by the player; used for pruning
+	 * \param beta the greatest value that can be guaranteed by the enemy; used for pruning
+	 * \return the score for the given game state
+	 */
+	double getNegaMaxValue(const Color player, const ChessState& chessState, const int searchDepth, double alpha, double beta);
+
+	const Color _player;
+	const ChessState& _chessState;
+	int _quiescentSearchDepth;
+	int _depthLimit;
+	std::unordered_map<move::Move, double, move::Move::MoveHasher> _allyHistoryTable, _enemyHistoryTable;
+};

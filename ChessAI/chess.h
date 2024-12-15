@@ -7,7 +7,12 @@
 
 #include "constants.h"
 #include "util/position.h"
-#include "util/bitboard/bitboard.h"
+#include "util/bitboard/bitboardSet.h"
+
+namespace move
+{
+	class MoveUtil;
+}
 
 /* ---------- GLOBAL CONSTANTS ---------- */
 const double TOTAL_PLAYER_TURN_TIME = 15.0 * 60.0 * 1000000000.0; // 15 minutes converted to nanoseconds
@@ -140,6 +145,7 @@ public:
 	const std::vector<PieceNode>& getBlackPieces() const;
 	std::string getFenString() const;
 	const util::bitboard::BitboardSet& getBoard() const;
+	const std::deque<MoveHistoryNode>& getMoveHistory() const;
 
 	// Modifiers
 	void setState(const std::string& gameState);
@@ -149,7 +155,7 @@ public:
 	void print() const;
 	void printDebug() const;
 
-	friend class Move;
+	friend class move::MoveUtil;
 	friend class Agent;
 };
 

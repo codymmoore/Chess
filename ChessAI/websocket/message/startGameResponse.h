@@ -1,7 +1,7 @@
 #pragma once
 
 #include "message.h"
-#include "../../util/bitboard/bitboard.h"
+#include "../../util/bitboard/bitboardSet.h"
 
 namespace boost
 {
