@@ -85,6 +85,59 @@ namespace util
 			return posIsOccupied(pos.x, pos.y, color, pieceType);
 		}
 
+		PieceType BitboardSet::getPieceType(const int x, const int y) const
+		{
+			const Bitboard posBitboard = positionToBitboard(x, y);
+
+			if ((_allOccupancyBoard & posBitboard) == 0)
+			{
+				return PieceType::NONE;
+			}
+
+			for (int color = Color::WHITE; color < COLOR_COUNT; color++)
+			{
+				for (int pieceType = PieceType::PAWN; pieceType < PIECE_TYPE_COUNT; pieceType++)
+				{
+					if (posBitboard & _bitboards[color][pieceType])
+					{
+						return (PieceType)pieceType;
+					}
+				}
+			}
+
+			return PieceType::NONE;
+		}
+
+		PieceType BitboardSet::getPieceType(const Position& pos) const
+		{
+			return getPieceType(pos.x, pos.y);
+		}
+
+		PieceType BitboardSet::getPieceType(const int x, const int y, const Color color) const
+		{
+			const Bitboard posBitboard = positionToBitboard(x, y);
+
+			if ((_colorOccupancyBoards[color] & posBitboard) == 0)
+			{
+				return PieceType::NONE;
+			}
+
+			for (int pieceType = PieceType::PAWN; pieceType < PIECE_TYPE_COUNT; pieceType++)
+			{
+				if (posBitboard & _bitboards[color][pieceType])
+				{
+					return (PieceType)pieceType;
+				}
+			}
+
+			return PieceType::NONE;
+		}
+
+		PieceType BitboardSet::getPieceType(const Position& pos, const Color color) const
+		{
+			return getPieceType(pos.x, pos.y, color);
+		}
+
 		void BitboardSet::print() const
 		{
 			for (int y = 0; y < RANK_COUNT; y++)

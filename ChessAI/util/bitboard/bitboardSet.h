@@ -132,6 +132,42 @@ namespace util
 			bool posIsOccupied(const Position& pos, const Color color, const PieceType pieceType) const;
 
 			/**
+			 * Retieves the PieceType at the specified position.
+			 *
+			 * \param x x-coordinate of the position
+			 * \param y y-coordinate of the position
+			 * \return the PieceType at the specified position
+			 */
+			PieceType getPieceType(const int x, const int y) const;
+
+			/**
+			 * Retieves the PieceType at the specified position..
+			 *
+			 * \param pos the position the piece type is being retrieved for
+			 * \return the PieceType at the specified position
+			 */
+			PieceType getPieceType(const Position& pos) const;
+
+			/**
+			 * Retieves the PieceType at the specified position for the specified player.
+			 *
+			 * \param x x-coordinate of the position
+			 * \param y y-coordinate of the position
+			 * \param color the color the player is playing for
+			 * \return the PieceType at the specified position for the specified player
+			 */
+			PieceType getPieceType(const int x, const int y, const Color color) const;
+
+			/**
+			 * Retieves the PieceType at the specified position for the specified player.
+			 *
+			 * \param pos the position the piece type is being retrieved for
+			 * \param color the color the player is playing for
+			 * \return the PieceType at the specified position for the specified player
+			 */
+			PieceType getPieceType(const Position& pos, const Color color) const;
+
+			/**
 			 * Print ASCII representation of board to stdout.
 			 *
 			 */
