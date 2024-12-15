@@ -102,7 +102,42 @@ namespace util
 			}
 		}
 
-		Bitboard shift(Bitboard bitboard, std::initializer_list<Shift> shifts)
+		Shift::Shift() :
+			horizontal(0),
+			vertical(0)
+		{
+		}
+
+		Shift::Shift(const int horizontal, const int vertical) :
+			horizontal(horizontal),
+			vertical(vertical)
+		{
+		}
+
+		Shift::Shift(const std::initializer_list<Shift> shifts) :
+			horizontal(0),
+			vertical(0)
+		{
+			for (const Shift& shift : shifts)
+			{
+				horizontal += shift.horizontal;
+				vertical += shift.vertical;
+			}
+		}
+
+		Shift& Shift::operator=(const std::initializer_list<Shift> shifts)
+		{
+			for (const Shift& shift : shifts)
+			{
+				horizontal += shift.horizontal;
+				vertical += shift.vertical;
+			}
+
+			return *this;
+		}
+
+
+		Bitboard shiftBitboard(Bitboard bitboard, const std::initializer_list<Shift> shifts)
 		{
 			int totalHorizontalShift = 0;
 			int totalVerticalShift = 0;
@@ -152,9 +187,9 @@ namespace util
 			return bitboard;
 		}
 
-		Bitboard shift(Bitboard bitboard, const Shift& shift1)
+		Bitboard shiftBitboard(Bitboard bitboard, const Shift& shift)
 		{
-			return shift(bitboard, { shift1 });
+			return shiftBitboard(bitboard, { shift });
 		}
 
 		Shift up(const int magnitude)
