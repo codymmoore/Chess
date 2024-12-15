@@ -15,10 +15,6 @@ using namespace util::bitboard;
 
 using namespace std;
 
-	{
-		return !(*this == rightOperand);
-	}
-
 namespace move
 {
 	std::vector<Move> getMovesFromBitboard(Bitboard bitboard, const int deltaX, const int deltaY)
@@ -51,19 +47,21 @@ namespace move
 		std::vector<Move> result;
 
 		const int COLOR_COEFFICIENT = player == Color::WHITE ? 1 : -1;
-		const Shift FORWARD = player == Color::WHITE ? Shift::UP : Shift::DOWN;
+		const auto forward = [player](const int magnitude) {
+			return player == Color::WHITE ? up(magnitude) : down(magnitude);
+			};
 		const BitboardSet& board = chessState.getBoard();
 		const Bitboard pawnBoard = board.getBitboard(player, PieceType::PAWN);
 		const Bitboard startRow = player == Color::WHITE ? WHITE_START_ROW : BLACK_START_ROW;
 
-		const Bitboard singlePushes = shift(pawnBoard, FORWARD) & ~board.getOccupancyBoard();
+		const Bitboard singlePushes = shift(pawnBoard, forward(1)) & ~board.getOccupancyBoard();
 		if (singlePushes != 0) {
 			std::vector<Move> moves = getMovesFromBitboard(singlePushes, 0, 1 * COLOR_COEFFICIENT);
 			result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));
 		}
 
-		Bitboard doublePushes = singlePushes & shift(startRow, FORWARD);
-		doublePushes = shift(doublePushes, FORWARD) & ~board.getOccupancyBoard();
+		Bitboard doublePushes = singlePushes & shift(startRow, forward(1));
+		doublePushes = shift(doublePushes, forward(1)) & ~board.getOccupancyBoard();
 		if (doublePushes != 0) {
 			std::vector<Move> moves = getMovesFromBitboard(doublePushes, 0, 2 * COLOR_COEFFICIENT);
 			result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));
@@ -87,15 +85,15 @@ namespace move
 			}
 		}
 
-		const Bitboard leftCaptures = shift(pawnBoard, FORWARD + Shift::LEFT) & opponentOccupancyBoard;
+		const Bitboard leftCaptures = shift(pawnBoard, { forward(1), left(1) }) & opponentOccupancyBoard;
 		if (leftCaptures != 0) {
-			std::vector<Move> moves = getMovesFromBitboard(leftCaptures, -1, 1 * COLOR_COEFFICIENT);
+			std::vector<Move> moves = getMovesFromBitboard(leftCaptures, 1, 1 * COLOR_COEFFICIENT);
 			result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));
 		}
 
-		const Bitboard rightCaptures = shift(pawnBoard, FORWARD + Shift::RIGHT) & opponentOccupancyBoard;
+		const Bitboard rightCaptures = shift(pawnBoard, { forward(1), right(1) }) & opponentOccupancyBoard;
 		if (rightCaptures != 0) {
-			std::vector<Move> moves = getMovesFromBitboard(rightCaptures, 1, 1 * COLOR_COEFFICIENT);
+			std::vector<Move> moves = getMovesFromBitboard(rightCaptures, -1, 1 * COLOR_COEFFICIENT);
 			result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));
 		}
 
