@@ -204,16 +204,14 @@ namespace move
 		const std::vector<PieceNode>& pieces = player == Color::WHITE ? chessState.getWhitePieces() : chessState.getBlackPieces();
 		std::vector<Move> result = generatePawnMoves(chessState, player);
 
+		std::vector<Move> knightMoves = generateKnightMoves(chessState, player);
+		result.insert(result.end(), std::make_move_iterator(knightMoves.begin()), std::make_move_iterator(knightMoves.end()));
+
 		for (const PieceNode& piece : pieces)
 		{
 			std::vector<Position> moves;
 			switch (piece.m_pieceType)
 			{
-			case PAWN:
-				break;
-			case KNIGHT:
-				getValidMovesKnight(player, piece, chessState, moves);
-				break;
 			case BISHOP:
 				getValidMovesLinear(player, piece, chessState, bishopDirections, moves);
 				break;

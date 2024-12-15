@@ -72,11 +72,36 @@ namespace util
 			int horizontal;
 			int vertical;
 
-			Shift(const int horizontal, const int vertical) :
-				horizontal(horizontal),
-				vertical(vertical)
-			{
-			}
+			/**
+			 * Create a default Shift instance.
+			 *
+			 */
+			Shift();
+
+			/**
+			 * Create a new Shift instance.
+			 *
+			 * \param horizontal the direction and magnitude of the horizontal shift
+			 *		(horizontal < 0 -> left, horizontal > 0 -> right)
+			 * \param vertical the direction and magnitude of the vertical shift
+			 *		(vertical < 0 -> up, vertical > 0 -> down)
+			 */
+			Shift(const int horizontal, const int vertical);
+
+			/**
+			 * Create a new Shift instance from a list of Shifts.
+			 *
+			 * \param shifts the list of Shifts to be combined into the new instance
+			 */
+			Shift(const std::initializer_list<Shift> shifts);
+
+			/**
+			 * Sets the calling object equal to a combined list of Shifts.
+			 *
+			 * \param shifts the list of Shifts to be combined into the current instance
+			 * \return a reference to the calling object
+			 */
+			Shift& operator=(const std::initializer_list<Shift> shifts);
 		};
 
 		/**
@@ -86,7 +111,7 @@ namespace util
 		 * \param shifts a list of shifts to apply to the bitboard
 		 * \return a shifted copy of the bitboad
 		 */
-		Bitboard shift(Bitboard bitboard, std::initializer_list<Shift> shifts);
+		Bitboard shiftBitboard(Bitboard bitboard, const std::initializer_list<Shift> shifts);
 
 		/**
 		 * Shifts a bitboard and applies a bit mask to account for pieces being moved off the board.
@@ -95,7 +120,7 @@ namespace util
 		 * \param shift shift to apply to the bitboard
 		 * \return a shifted copy of the bitboad
 		 */
-		Bitboard shift(Bitboard bitboard, const Shift& shift);
+		Bitboard shiftBitboard(Bitboard bitboard, const Shift& shift);
 
 		/**
 		 * Provides a Shift object to be used to shift a bitboard up.
