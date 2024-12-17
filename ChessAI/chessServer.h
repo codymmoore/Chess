@@ -42,7 +42,7 @@ GameType getGameTypeFromString(const std::string& string);
  * \param gameType The GameType value to be converted
  * \return The corresponding string
  */
-std::string toString(const GameType gamaeType);
+std::string toString(const GameType gameType);
 
 /**
  * Manages client-server communications and game flow.

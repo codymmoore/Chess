@@ -17,6 +17,13 @@ using namespace std;
 
 namespace move
 {
+	Bitboard knightLookupTable[FILE_COUNT * RANK_COUNT];
+
+	Position toPosition(const int index)
+	{
+		return Position(index % FILE_COUNT, index / FILE_COUNT);
+	}
+
 	std::vector<Move> getMovesFromBitboard(Bitboard bitboard, const int deltaX, const int deltaY)
 	{
 		std::vector<Move> result;
@@ -102,6 +109,35 @@ namespace move
 
 	std::vector<Move> generateKnightMoves(const ChessState& chessState, const Color player)
 	{
+		std::vector<Move> result;
+		const BitboardSet& board = chessState.getBoard();
+		Bitboard knightBoard = board.getBitboard(player, PieceType::KNIGHT);
+
+		if (knightBoard == 0)
+		{
+			return result;
+		}
+
+		const Bitboard playerOccupancyBoard = board.getOccupancyBoard(player);
+
+		while (knightBoard)
+		{
+			const int knightIndex = popLsb(knightBoard);
+			Bitboard moveBitboard = knightLookupTable[knightIndex] & ~playerOccupancyBoard;
+
+			const Position source = toPosition(knightIndex);
+			while (moveBitboard)
+			{
+				const int destinationIndex = popLsb(moveBitboard);
+				result.emplace_back(source, toPosition(destinationIndex));
+			}
+		}
+
+		return result;
+	}
+
+	void populateKnightLookupTable()
+	{
 		static std::vector<Shift> knightShifts = {
 			Shift({ up(2), left(1) }),
 			Shift({ up(1), left(2) }),
@@ -113,27 +149,23 @@ namespace move
 			Shift({ down(1), right(2) })
 		};
 
-		std::vector<Move> result;
-		const BitboardSet& board = chessState.getBoard();
-		const Bitboard knightBoard = board.getBitboard(player, PieceType::KNIGHT);
-
-		if (knightBoard == 0)
+		for (int i = 0; i < FILE_COUNT * RANK_COUNT; i++)
 		{
-			return result;
-		}
+			const Bitboard source = Bitboard(1) << i;
+			knightLookupTable[i] = 0;
 
-		const Bitboard playerOccupancyBoard = board.getOccupancyBoard(player);
-
-		for (const Shift& shift : knightShifts)
-		{
-			const Bitboard shiftedKnightBoard = shiftBitboard(knightBoard, shift) & ~playerOccupancyBoard;
-			if (shiftedKnightBoard != 0)
+			for (const Shift& shift : knightShifts)
 			{
-				std::vector<Move> moves = getMovesFromBitboard(shiftedKnightBoard, -shift.horizontal, -shift.vertical);
-				result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));
+				knightLookupTable[i] |= shiftBitboard(source, shift);
 			}
 		}
-
-		return result;
 	}
+
+	struct LookupTableInitializer
+	{
+		LookupTableInitializer()
+		{
+			populateKnightLookupTable();
+		}
+	} lookupTableInitializer;
 }
