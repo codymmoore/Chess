@@ -25,6 +25,14 @@ namespace util
 		struct Shift;
 
 		/**
+		 * Pop the least significant bit (LSB) and return its index.
+		 *
+		 * \param bitboard the bitboard whose LSB is being popped
+		 * \return index of LSB; -1 if no LSB exists
+		 */
+		int popLsb(Bitboard& bitboard);
+
+		/**
 		 * Converts a position to its bitboard representation.
 		 *
 		 * \param x The x-coordinate of the position

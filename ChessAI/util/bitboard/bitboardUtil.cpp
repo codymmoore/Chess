@@ -2,6 +2,7 @@
 
 #include <boost/json.hpp>
 #include <iostream>
+#include <bit>
 
 #include "../../constants.h"
 #include "../position.h"
@@ -13,6 +14,18 @@ namespace util
 {
 	namespace bitboard
 	{
+		int popLsb(Bitboard& bitboard)
+		{
+			if (!bitboard)
+			{
+				return -1;
+			}
+
+			const int lsbIndex = std::countr_zero(bitboard);
+			bitboard &= bitboard - 1;
+			return lsbIndex;
+		}
+
 		Bitboard positionToBitboard(const int x, const int y)
 		{
 			return Bitboard(1) << (y * FILE_COUNT + x);

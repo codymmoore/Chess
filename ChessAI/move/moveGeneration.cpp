@@ -21,19 +21,14 @@ namespace move
 	{
 		std::vector<Move> result;
 
-		int i = 0;
 		while (bitboard)
 		{
-			if (bitboard & 1)
-			{
-				const int x = i % 8;
-				const int y = i / 8;
-				const Position source(x + deltaX, y + deltaY);
-				const Position destination(x, y);
-				result.emplace_back(source, destination);
-			}
-			bitboard >>= 1;
-			i++;
+			const int lsbIndex = popLsb(bitboard);
+			const int x = lsbIndex % FILE_COUNT;
+			const int y = lsbIndex / FILE_COUNT;
+			const Position source(x + deltaX, y + deltaY);
+			const Position destination(x, y);
+			result.emplace_back(source, destination);
 		}
 
 		return result;
