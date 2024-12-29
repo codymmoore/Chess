@@ -123,6 +123,9 @@
     <ClInclude Include="move\move.h">
       <Filter>Header Files\move</Filter>
     </ClInclude>
+    <ClInclude Include="move\moveLookupTable.h">
+      <Filter>Header Files\move</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="agent.cpp">
@@ -195,6 +198,9 @@
       <Filter>Source Files\move</Filter>
     </ClCompile>
     <ClCompile Include="move\move.cpp">
+      <Filter>Source Files\move</Filter>
+    </ClCompile>
+    <ClCompile Include="move\moveLookupTable.cpp">
       <Filter>Source Files\move</Filter>
     </ClCompile>
   </ItemGroup>

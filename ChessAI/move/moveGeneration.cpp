@@ -8,6 +8,7 @@
 #include "../util/bitboard/bitboardSet.h"
 #include "../util/bitboard/bitboardUtil.h"
 #include "../util/utility.h"
+#include "moveLookupTable.h"
 #include "move.h"
 
 using namespace util;
@@ -17,8 +18,6 @@ using namespace std;
 
 namespace move
 {
-	Bitboard knightLookupTable[FILE_COUNT * RANK_COUNT];
-
 	Position toPosition(const int index)
 	{
 		return Position(index % FILE_COUNT, index / FILE_COUNT);
@@ -123,7 +122,7 @@ namespace move
 		while (knightBoard)
 		{
 			const int knightIndex = popLsb(knightBoard);
-			Bitboard moveBitboard = knightLookupTable[knightIndex] & ~playerOccupancyBoard;
+			Bitboard moveBitboard = getKnightMoveBoard(knightIndex) & ~playerOccupancyBoard;
 
 			const Position source = toPosition(knightIndex);
 			while (moveBitboard)
@@ -136,36 +135,33 @@ namespace move
 		return result;
 	}
 
-	void populateKnightLookupTable()
+	std::vector<Move> generateBishopMoves(const ChessState& chessState, const Color player)
 	{
-		static std::vector<Shift> knightShifts = {
-			Shift({ up(2), left(1) }),
-			Shift({ up(1), left(2) }),
-			Shift({ up(2), right(1) }),
-			Shift({ up(1), right(2) }),
-			Shift({ down(2), left(1) }),
-			Shift({ down(1), left(2) }),
-			Shift({ down(2), right(1) }),
-			Shift({ down(1), right(2) })
-		};
+		std::vector<Move> result;
+		const BitboardSet& board = chessState.getBoard();
+		Bitboard bishopBoard = board.getBitboard(player, PieceType::BISHOP);
 
-		for (int i = 0; i < FILE_COUNT * RANK_COUNT; i++)
+		if (bishopBoard == 0)
 		{
-			const Bitboard source = Bitboard(1) << i;
-			knightLookupTable[i] = 0;
+			return result;
+		}
 
-			for (const Shift& shift : knightShifts)
+		const Bitboard occupancyBoard = board.getOccupancyBoard();
+		const Bitboard playerOccupancyBoard = board.getOccupancyBoard(player);
+
+		while (bishopBoard)
+		{
+			const int bishopIndex = popLsb(bishopBoard);
+			Bitboard moveBoard = getBishopMoveBoard(bishopIndex, occupancyBoard) & ~playerOccupancyBoard;
+
+			const Position source = toPosition(bishopIndex);
+			while (moveBoard)
 			{
-				knightLookupTable[i] |= shiftBitboard(source, shift);
+				const int destinationIndex = popLsb(moveBoard);
+				result.emplace_back(source, toPosition(destinationIndex));
 			}
 		}
-	}
 
-	struct LookupTableInitializer
-	{
-		LookupTableInitializer()
-		{
-			populateKnightLookupTable();
-		}
-	} lookupTableInitializer;
+		return result;
+	}
 }

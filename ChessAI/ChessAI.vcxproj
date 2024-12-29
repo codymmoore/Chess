@@ -209,6 +209,7 @@
     <ClInclude Include="constants.h" />
     <ClInclude Include="enum.h" />
     <ClInclude Include="move\move.h" />
+    <ClInclude Include="move\moveLookupTable.h" />
     <ClInclude Include="move\moveUtil.h" />
     <ClInclude Include="move\moveGeneration.h" />
     <ClInclude Include="util\bitboard\bitboardSet.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="chessController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="move\move.cpp" />
+    <ClCompile Include="move\moveLookupTable.cpp" />
     <ClCompile Include="move\moveUtil.cpp" />
     <ClCompile Include="move\moveGeneration.cpp" />
     <ClCompile Include="util\bitboard\bitboardSet.cpp" />
