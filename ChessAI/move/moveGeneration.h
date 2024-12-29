@@ -16,7 +16,7 @@ namespace move
 	 *
 	 * \param chessState game state
 	 * \param player the player whose moves are being generated
-	 * \return valid moves for all the players pawns
+	 * \return valid moves for all the player's pawns
 	 */
 	std::vector<Move> generatePawnMoves(const ChessState& chessState, const Color player);
 
@@ -25,7 +25,16 @@ namespace move
 	 *
 	 * \param chessState game state
 	 * \param player the player whose moves are being generated
-	 * \return valid moves for all the players knights
+	 * \return valid moves for all the player's knights
 	 */
 	std::vector<Move> generateKnightMoves(const ChessState& chessState, const Color player);
+
+	/**
+	 * Generate moves for all of the specified player's bishops.
+	 *
+	 * \param chessState game state
+	 * \param player the player whose moves are being generated
+	 * \return valid moves for all the player's bishops
+	 */
+	std::vector<Move> generateBishopMoves(const ChessState& chessState, const Color player);
 }

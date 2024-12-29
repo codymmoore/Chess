@@ -102,14 +102,15 @@ namespace util
 			return result;
 		}
 
-		void print(const Bitboard bitboard)
+		void print(const Bitboard bitboard, const std::string& indent)
 		{
 			for (int y = 0; y < RANK_COUNT; y++)
 			{
+				std::cout << indent;
 				for (int x = 0; x < FILE_COUNT; x++)
 				{
 					const uint64_t position = positionToBitboard(x, y);
-					std::cout << (bitboard & position ? '1' : '0');
+					std::cout << "  " << (bitboard & position ? '1' : '0');
 				}
 				std::cout << std::endl;
 			}

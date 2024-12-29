@@ -2,6 +2,7 @@
 
 #include <inttypes.h>
 #include <initializer_list>
+#include <string>
 
 #include "../../constants.h"
 
@@ -70,7 +71,7 @@ namespace util
 		 *
 		 * \param bitboard the bitboard to be printed
 		 */
-		void print(const Bitboard bitboard);
+		void print(const Bitboard bitboard, const std::string& indent = "");
 
 		/**
 		 * Stores horizontal and vertical direction and magnitude used to shift a bitboard.
