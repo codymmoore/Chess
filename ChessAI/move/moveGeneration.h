@@ -37,4 +37,13 @@ namespace move
 	 * \return valid moves for all the player's bishops
 	 */
 	std::vector<Move> generateBishopMoves(const ChessState& chessState, const Color player);
+
+	/**
+	 * Generate moves for all of the specified player's rooks.
+	 *
+	 * \param chessState game state
+	 * \param player the player whose moves are being generated
+	 * \return valid moves for all the player's rooks
+	 */
+	std::vector<Move> generateRookMoves(const ChessState& chessState, const Color player);
 }

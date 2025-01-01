@@ -164,4 +164,34 @@ namespace move
 
 		return result;
 	}
+
+	std::vector<Move> generateRookMoves(const ChessState& chessState, const Color player)
+	{
+		std::vector<Move> result;
+		const BitboardSet& board = chessState.getBoard();
+		Bitboard rookBoard = board.getBitboard(player, PieceType::ROOK);
+
+		if (rookBoard == 0)
+		{
+			return result;
+		}
+
+		const Bitboard occupancyBoard = board.getOccupancyBoard();
+		const Bitboard playerOccupancyBoard = board.getOccupancyBoard(player);
+
+		while (rookBoard)
+		{
+			const int rookIndex = popLsb(rookBoard);
+			Bitboard moveBoard = getRookMoveBoard(rookIndex, occupancyBoard) & ~playerOccupancyBoard;
+
+			const Position source = toPosition(rookIndex);
+			while (moveBoard)
+			{
+				const int destinationIndex = popLsb(moveBoard);
+				result.emplace_back(source, toPosition(destinationIndex));
+			}
+		}
+
+		return result;
+	}
 }

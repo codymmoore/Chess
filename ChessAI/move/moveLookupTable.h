@@ -25,4 +25,13 @@ namespace move
 	 * \return bitboard representation of moves
 	 */
 	Bitboard getBishopMoveBoard(const int positionIndex, const Bitboard occupancyBoard);
+
+	/**
+	 * Get the bitboard representation of moves for a rook at the specified position.
+	 *
+	 * \param positionIndex the index of the position of the rook whose moves are being retrieved
+	 * \param occupancyBoard the occupancy board for the game state in which moves are being retrieved
+	 * \return bitboard representation of moves
+	 */
+	Bitboard getRookMoveBoard(const int positionIndex, const Bitboard occupancyBoard);
 }
