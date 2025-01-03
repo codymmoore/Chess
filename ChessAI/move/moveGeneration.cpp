@@ -91,13 +91,13 @@ namespace move
 			}
 		}
 
-		const Bitboard leftCaptures = shiftBitboard(pawnBoard, { forward(1), left(1) }) & opponentOccupancyBoard;
+		const Bitboard leftCaptures = shiftBitboard(pawnBoard, forward(1) + left(1)) & opponentOccupancyBoard;
 		if (leftCaptures != 0) {
 			std::vector<Move> moves = getMovesFromBitboard(leftCaptures, 1, 1 * COLOR_COEFFICIENT);
 			result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));
 		}
 
-		const Bitboard rightCaptures = shiftBitboard(pawnBoard, { forward(1), right(1) }) & opponentOccupancyBoard;
+		const Bitboard rightCaptures = shiftBitboard(pawnBoard, forward(1) + right(1)) & opponentOccupancyBoard;
 		if (rightCaptures != 0) {
 			std::vector<Move> moves = getMovesFromBitboard(rightCaptures, -1, 1 * COLOR_COEFFICIENT);
 			result.insert(result.end(), std::make_move_iterator(moves.begin()), std::make_move_iterator(moves.end()));

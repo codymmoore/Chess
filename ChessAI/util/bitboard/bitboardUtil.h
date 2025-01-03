@@ -1,10 +1,10 @@
 #pragma once
 
 #include <inttypes.h>
-#include <initializer_list>
 #include <string>
 
 #include "../../constants.h"
+#include "shift.h"
 
 namespace boost
 {
@@ -74,55 +74,6 @@ namespace util
 		void print(const Bitboard bitboard, const std::string& indent = "");
 
 		/**
-		 * Stores horizontal and vertical direction and magnitude used to shift a bitboard.
-		 */
-		struct Shift
-		{
-			int horizontal;
-			int vertical;
-
-			/**
-			 * Create a default Shift instance.
-			 *
-			 */
-			Shift();
-
-			/**
-			 * Create a new Shift instance.
-			 *
-			 * \param horizontal the direction and magnitude of the horizontal shift
-			 *		(horizontal < 0 -> left, horizontal > 0 -> right)
-			 * \param vertical the direction and magnitude of the vertical shift
-			 *		(vertical < 0 -> up, vertical > 0 -> down)
-			 */
-			Shift(const int horizontal, const int vertical);
-
-			/**
-			 * Create a new Shift instance from a list of Shifts.
-			 *
-			 * \param shifts the list of Shifts to be combined into the new instance
-			 */
-			Shift(const std::initializer_list<Shift> shifts);
-
-			/**
-			 * Sets the calling object equal to a combined list of Shifts.
-			 *
-			 * \param shifts the list of Shifts to be combined into the current instance
-			 * \return a reference to the calling object
-			 */
-			Shift& operator=(const std::initializer_list<Shift> shifts);
-		};
-
-		/**
-		 * Shifts a bitboard and applies a bit mask to account for pieces being moved off the board.
-		 *
-		 * \param bitboard the bitboard being shifted
-		 * \param shifts a list of shifts to apply to the bitboard
-		 * \return a shifted copy of the bitboad
-		 */
-		Bitboard shiftBitboard(Bitboard bitboard, const std::initializer_list<Shift> shifts);
-
-		/**
 		 * Shifts a bitboard and applies a bit mask to account for pieces being moved off the board.
 		 *
 		 * \param bitboard the bitboard being shifted
@@ -130,37 +81,5 @@ namespace util
 		 * \return a shifted copy of the bitboad
 		 */
 		Bitboard shiftBitboard(Bitboard bitboard, const Shift& shift);
-
-		/**
-		 * Provides a Shift object to be used to shift a bitboard up.
-		 *
-		 * \param magnitude the distance the bitboard will be shifted
-		 * \return a Shift object to be used to shift a bitboard
-		 */
-		Shift up(const int magnitude);
-
-		/**
-		 * Provides a Shift object to be used to shift a bitboard down.
-		 *
-		 * \param magnitude the distance the bitboard will be shifted
-		 * \return a Shift object to be used to shift a bitboard
-		 */
-		Shift down(const int magnitude);
-
-		/**
-		 * Provides a Shift object to be used to shift a bitboard left.
-		 *
-		 * \param magnitude the distance the bitboard will be shifted
-		 * \return a Shift object to be used to shift a bitboard
-		 */
-		Shift left(const int magnitude);
-
-		/**
-		 * Provides a Shift object to be used to shift a bitboard right.
-		 *
-		 * \param magnitude the distance the bitboard will be shifted
-		 * \return a Shift object to be used to shift a bitboard
-		 */
-		Shift right(const int magnitude);
 	}
 }

@@ -116,114 +116,46 @@ namespace util
 			}
 		}
 
-		Shift::Shift() :
-			horizontal(0),
-			vertical(0)
+		Bitboard shiftBitboard(Bitboard bitboard, const Shift& shift)
 		{
-		}
-
-		Shift::Shift(const int horizontal, const int vertical) :
-			horizontal(horizontal),
-			vertical(vertical)
-		{
-		}
-
-		Shift::Shift(const std::initializer_list<Shift> shifts) :
-			horizontal(0),
-			vertical(0)
-		{
-			for (const Shift& shift : shifts)
-			{
-				horizontal += shift.horizontal;
-				vertical += shift.vertical;
-			}
-		}
-
-		Shift& Shift::operator=(const std::initializer_list<Shift> shifts)
-		{
-			for (const Shift& shift : shifts)
-			{
-				horizontal += shift.horizontal;
-				vertical += shift.vertical;
-			}
-
-			return *this;
-		}
-
-
-		Bitboard shiftBitboard(Bitboard bitboard, const std::initializer_list<Shift> shifts)
-		{
-			int totalHorizontalShift = 0;
-			int totalVerticalShift = 0;
-
-			for (const Shift& shift : shifts) {
-				totalHorizontalShift += shift.horizontal;
-				totalVerticalShift += shift.vertical;
-			}
-
-			if (totalHorizontalShift > FILE_COUNT) {
+			if (shift.horizontal > FILE_COUNT) {
 				throw std::exception("Horizontal shift exceeds the number of files");
 			}
-			else if (totalVerticalShift > RANK_COUNT) {
+			else if (shift.vertical > RANK_COUNT) {
 				throw std::exception("Vertical shift exceeds the number of ranks");
 			}
 
-			if (totalHorizontalShift < 0) // left
+			if (shift.horizontal < 0) // left
 			{
 				Bitboard leftShiftMask = 0xFEFEFEFEFEFEFEFE;
-				for (int i = totalHorizontalShift + 1; i < 0; i++)
+				for (int i = shift.horizontal + 1; i < 0; i++)
 				{
 					leftShiftMask &= (leftShiftMask << 1);
 				}
 
-				bitboard = (bitboard & leftShiftMask) >> -totalHorizontalShift;
+				bitboard = (bitboard & leftShiftMask) >> -shift.horizontal;
 			}
-			else if (totalHorizontalShift != 0) // right
+			else if (shift.horizontal != 0) // right
 			{
 				Bitboard rightShiftMask = 0x7F7F7F7F7F7F7F7F;
-				for (int i = 1; i < totalHorizontalShift; i++)
+				for (int i = 1; i < shift.horizontal; i++)
 				{
 					rightShiftMask &= rightShiftMask >> 1;
 				}
 
-				bitboard = (bitboard & rightShiftMask) << totalHorizontalShift;
+				bitboard = (bitboard & rightShiftMask) << shift.horizontal;
 			}
 
-			if (totalVerticalShift < 0) // up
+			if (shift.vertical < 0) // up
 			{
-				bitboard >>= (-totalVerticalShift * FILE_COUNT);
+				bitboard >>= (-shift.vertical * FILE_COUNT);
 			}
-			else if (totalVerticalShift != 0) // down
+			else if (shift.vertical != 0) // down
 			{
-				bitboard <<= (totalVerticalShift * FILE_COUNT);
+				bitboard <<= (shift.vertical * FILE_COUNT);
 			}
 
 			return bitboard;
-		}
-
-		Bitboard shiftBitboard(Bitboard bitboard, const Shift& shift)
-		{
-			return shiftBitboard(bitboard, { shift });
-		}
-
-		Shift up(const int magnitude)
-		{
-			return Shift(0, -magnitude);
-		}
-
-		Shift down(const int magnitude)
-		{
-			return Shift(0, magnitude);
-		}
-
-		Shift left(const int magnitude)
-		{
-			return Shift(-magnitude, 0);
-		}
-
-		Shift right(const int magnitude)
-		{
-			return Shift(magnitude, 0);
 		}
 	}
 }

@@ -59,14 +59,14 @@ namespace move
 	void populateKnightMoveLookupTable()
 	{
 		static std::vector<Shift> knightShifts = {
-			Shift({ up(2), left(1) }),
-			Shift({ up(1), left(2) }),
-			Shift({ up(2), right(1) }),
-			Shift({ up(1), right(2) }),
-			Shift({ down(2), left(1) }),
-			Shift({ down(1), left(2) }),
-			Shift({ down(2), right(1) }),
-			Shift({ down(1), right(2) })
+			up(2) + left(1),
+			up(1) + left(2),
+			up(2) + right(1),
+			up(1) + right(2),
+			down(2) + left(1),
+			down(1) + left(2),
+			down(2) + right(1),
+			down(1) + right(2)
 		};
 
 		for (int i = 0; i < FILE_COUNT * RANK_COUNT; i++)
@@ -91,28 +91,28 @@ namespace move
 		int distance = 1;
 		while (x - distance > 0 && y - distance > 0)
 		{
-			blockerMask |= shiftBitboard(source, { up(distance), left(distance) });
+			blockerMask |= shiftBitboard(source, up(distance) + left(distance));
 			distance += 1;
 		}
 
 		distance = 1;
 		while (x + distance < FILE_COUNT - 1 && y - distance > 0)
 		{
-			blockerMask |= shiftBitboard(source, { up(distance), right(distance) });
+			blockerMask |= shiftBitboard(source, up(distance) + right(distance));
 			distance += 1;
 		}
 
 		distance = 1;
 		while (x + distance < FILE_COUNT - 1 && y + distance < RANK_COUNT - 1)
 		{
-			blockerMask |= shiftBitboard(source, { down(distance), right(distance) });
+			blockerMask |= shiftBitboard(source, down(distance) + right(distance));
 			distance += 1;
 		}
 
 		distance = 1;
 		while (x - distance > 0 && y + distance < RANK_COUNT - 1)
 		{
-			blockerMask |= shiftBitboard(source, { down(distance), left(distance) });
+			blockerMask |= shiftBitboard(source, down(distance) + left(distance));
 			distance += 1;
 		}
 
@@ -158,7 +158,7 @@ namespace move
 		int distance = 1;
 		while (x - distance >= 0 && y - distance >= 0)
 		{
-			Bitboard destination = shiftBitboard(source, { up(distance), left(distance) });
+			Bitboard destination = shiftBitboard(source, up(distance) + left(distance));
 			moveBoard |= destination;
 			if (destination & blockerBoard)
 			{
@@ -170,7 +170,7 @@ namespace move
 		distance = 1;
 		while (x + distance < FILE_COUNT && y - distance >= 0)
 		{
-			Bitboard destination = shiftBitboard(source, { up(distance), right(distance) });
+			Bitboard destination = shiftBitboard(source, up(distance) + right(distance));
 			moveBoard |= destination;
 			if (destination & blockerBoard)
 			{
@@ -182,7 +182,7 @@ namespace move
 		distance = 1;
 		while (x + distance < FILE_COUNT && y + distance < RANK_COUNT)
 		{
-			Bitboard destination = shiftBitboard(source, { down(distance), right(distance) });
+			Bitboard destination = shiftBitboard(source, down(distance) + right(distance));
 			moveBoard |= destination;
 			if (destination & blockerBoard)
 			{
@@ -194,7 +194,7 @@ namespace move
 		distance = 1;
 		while (x - distance >= 0 && y + distance < RANK_COUNT)
 		{
-			Bitboard destination = shiftBitboard(source, { down(distance), left(distance) });
+			Bitboard destination = shiftBitboard(source, down(distance) + left(distance));
 			moveBoard |= destination;
 			if (destination & blockerBoard)
 			{

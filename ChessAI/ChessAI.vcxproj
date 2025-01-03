@@ -214,6 +214,7 @@
     <ClInclude Include="move\moveGeneration.h" />
     <ClInclude Include="util\bitboard\bitboardSet.h" />
     <ClInclude Include="util\bitboard\bitboardUtil.h" />
+    <ClInclude Include="util\bitboard\shift.h" />
     <ClInclude Include="util\position.h" />
     <ClInclude Include="util\utility.h" />
     <ClInclude Include="websocket\message\endGameRequest.h" />
@@ -241,6 +242,7 @@
     <ClCompile Include="move\moveGeneration.cpp" />
     <ClCompile Include="util\bitboard\bitboardSet.cpp" />
     <ClCompile Include="util\bitboard\bitboardUtil.cpp" />
+    <ClCompile Include="util\bitboard\shift.cpp" />
     <ClCompile Include="util\position.cpp" />
     <ClCompile Include="util\utility.cpp" />
     <ClCompile Include="websocket\message\endGameRequest.cpp" />
