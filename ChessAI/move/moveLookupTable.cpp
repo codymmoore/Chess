@@ -125,7 +125,7 @@ namespace move
 					blockerBoard |= (Bitboard(1) << blockerPositions[j]);
 				}
 			}
-			blockerBoards.push_back(blockerBoard);
+			blockerBoards[i] = blockerBoard;
 		}
 
 		return blockerBoards;
@@ -167,28 +167,26 @@ namespace move
 
 	Bitboard generateRandomCoefficient()
 	{
-		const Bitboard randomBitboard = getRandomBitboard();
-		return randomBitboard & randomBitboard & randomBitboard;
+		return getRandomBitboard() & getRandomBitboard() & getRandomBitboard();
 	}
 
 	Bitboard findBlockerHashCoefficient(const Bitboard blockerMask, const std::vector<Bitboard>& blockerBoards, std::vector<Bitboard>& moveBoards)
 	{
 		static const int MIN_POPCOUNT_THRESHOLD = 6;
 		const int blockerCount = std::popcount(blockerMask);
-		std::vector<Bitboard> moveTable(moveBoards.size());
 
 		while (true)
 		{
 			const Bitboard coefficient = generateRandomCoefficient();
-			if (std::popcount((blockerMask * coefficient) >> 64) < MIN_POPCOUNT_THRESHOLD)
+			if (std::popcount((blockerMask * coefficient) & 0xFF00000000000000) < MIN_POPCOUNT_THRESHOLD)
 			{
 				continue;
 			}
 
-			std::fill(moveTable.begin(), moveTable.end(), 0);
+			std::vector<Bitboard> moveTable(moveBoards.size(), 0);
 			bool isMagic = true;
 
-			for (int i = 0; i < blockerCount; i++)
+			for (int i = 0; i < moveBoards.size(); i++)
 			{
 				const Bitboard blockerBoard = blockerBoards[i];
 				const Bitboard moveBoard = moveBoards[i];
