@@ -81,39 +81,22 @@ namespace move
 		}
 	}
 
-	Bitboard generateBishopBlockerMask(const int positionIndex)
+	Bitboard generateBlockerMask(const int positionIndex, const std::vector<Shift>& shifts)
 	{
 		const int x = positionIndex % FILE_COUNT;
 		const int y = positionIndex / FILE_COUNT;
 		const Bitboard source = Bitboard(1) << positionIndex;
 		Bitboard blockerMask = 0;
 
-		int distance = 1;
-		while (x - distance > 0 && y - distance > 0)
+		for (const Shift& shift : shifts)
 		{
-			blockerMask |= shiftBitboard(source, up(distance) + left(distance));
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x + distance < FILE_COUNT - 1 && y - distance > 0)
-		{
-			blockerMask |= shiftBitboard(source, up(distance) + right(distance));
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x + distance < FILE_COUNT - 1 && y + distance < RANK_COUNT - 1)
-		{
-			blockerMask |= shiftBitboard(source, down(distance) + right(distance));
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x - distance > 0 && y + distance < RANK_COUNT - 1)
-		{
-			blockerMask |= shiftBitboard(source, down(distance) + left(distance));
-			distance += 1;
+			Shift shiftIt = shift;
+			while ((shiftIt.horizontal == 0 || (x + shiftIt.horizontal > 0 && x + shiftIt.horizontal < FILE_COUNT - 1))
+				&& (shiftIt.vertical == 0 || (y + shiftIt.vertical > 0 && y + shiftIt.vertical < RANK_COUNT - 1)))
+			{
+				blockerMask |= shiftBitboard(source, shiftIt);
+				shiftIt += shift;
+			}
 		}
 
 		return blockerMask;
@@ -148,59 +131,28 @@ namespace move
 		return blockerBoards;
 	}
 
-	Bitboard generateBishopMoves(const int positionIndex, const Bitboard blockerBoard)
+	Bitboard generateMoves(const int positionIndex, const Bitboard blockerBoard, const std::vector<Shift>& shifts)
 	{
 		const int x = positionIndex % FILE_COUNT;
 		const int y = positionIndex / FILE_COUNT;
 		const Bitboard source = Bitboard(1) << positionIndex;
 		Bitboard moveBoard = 0;
 
-		int distance = 1;
-		while (x - distance >= 0 && y - distance >= 0)
+		for (const Shift& shift : shifts)
 		{
-			Bitboard destination = shiftBitboard(source, up(distance) + left(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
+			Shift shiftIt = shift;
+			while (
+				x + shiftIt.horizontal >= 0 && x + shiftIt.horizontal < FILE_COUNT
+				&& y + shiftIt.vertical >= 0 && y + shiftIt.vertical < RANK_COUNT)
 			{
-				break;
+				Bitboard destination = shiftBitboard(source, shiftIt);
+				moveBoard |= destination;
+				if (destination & blockerBoard)
+				{
+					break;
+				}
+				shiftIt += shift;
 			}
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x + distance < FILE_COUNT && y - distance >= 0)
-		{
-			Bitboard destination = shiftBitboard(source, up(distance) + right(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x + distance < FILE_COUNT && y + distance < RANK_COUNT)
-		{
-			Bitboard destination = shiftBitboard(source, down(distance) + right(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x - distance >= 0 && y + distance < RANK_COUNT)
-		{
-			Bitboard destination = shiftBitboard(source, down(distance) + left(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
 		}
 
 		return moveBoard;
@@ -263,9 +215,16 @@ namespace move
 
 	void populateBishopMoveLookupTable()
 	{
+		static const std::vector<Shift> bishopShifts = {
+			up(1) + left(1),
+			up(1) + right(1),
+			down(1) + left(1),
+			down(1) + right(1)
+		};
+
 		for (int positionIndex = 0; positionIndex < SQUARE_COUNT; positionIndex++)
 		{
-			const Bitboard blockerMask = generateBishopBlockerMask(positionIndex);
+			const Bitboard blockerMask = generateBlockerMask(positionIndex, bishopShifts);
 			const std::vector<Bitboard> blockerBoards = generateBlockerBoards(positionIndex, blockerMask);
 			std::vector<Bitboard> moves;
 
@@ -273,7 +232,7 @@ namespace move
 
 			for (const Bitboard blockerBoard : blockerBoards)
 			{
-				moves.push_back(generateBishopMoves(positionIndex, blockerBoard));
+				moves.push_back(generateMoves(positionIndex, blockerBoard, bishopShifts));
 			}
 
 			bishopMoveLookupTable[positionIndex].resize(blockerBoards.size());
@@ -290,107 +249,18 @@ namespace move
 		}
 	}
 
-	Bitboard generateRookBlockerMask(const int positionIndex)
-	{
-		const int x = positionIndex % FILE_COUNT;
-		const int y = positionIndex / FILE_COUNT;
-		const Bitboard source = Bitboard(1) << positionIndex;
-		Bitboard blockerMask = 0;
-
-		int distance = 1;
-		while (y - distance > 0)
-		{
-			blockerMask |= shiftBitboard(source, up(distance));
-			distance += 1;
-		}
-
-		distance = 1;
-		while (y + distance < RANK_COUNT - 1)
-		{
-			blockerMask |= shiftBitboard(source, down(distance));
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x - distance > 0)
-		{
-			blockerMask |= shiftBitboard(source, left(distance));
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x + distance < FILE_COUNT - 1)
-		{
-			blockerMask |= shiftBitboard(source, right(distance));
-			distance += 1;
-		}
-
-		return blockerMask;
-	}
-
-	Bitboard generateRookMoves(const int positionIndex, const Bitboard blockerBoard)
-	{
-		const int x = positionIndex % FILE_COUNT;
-		const int y = positionIndex / FILE_COUNT;
-		const Bitboard source = Bitboard(1) << positionIndex;
-		Bitboard moveBoard = 0;
-
-		int distance = 1;
-		while (y - distance >= 0)
-		{
-			Bitboard destination = shiftBitboard(source, up(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
-		}
-
-		distance = 1;
-		while (y + distance < RANK_COUNT)
-		{
-			Bitboard destination = shiftBitboard(source, down(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x - distance >= 0)
-		{
-			Bitboard destination = shiftBitboard(source, left(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
-		}
-
-		distance = 1;
-		while (x + distance < FILE_COUNT)
-		{
-			Bitboard destination = shiftBitboard(source, right(distance));
-			moveBoard |= destination;
-			if (destination & blockerBoard)
-			{
-				break;
-			}
-			distance += 1;
-		}
-
-		return moveBoard;
-	}
-
 	void populateRookMoveLookupTable()
 	{
+		static const std::vector<Shift> rookShifts = {
+			up(1),
+			down(1),
+			left(1),
+			right(1)
+		};
+
 		for (int positionIndex = 0; positionIndex < SQUARE_COUNT; positionIndex++)
 		{
-			const Bitboard blockerMask = generateRookBlockerMask(positionIndex);
+			const Bitboard blockerMask = generateBlockerMask(positionIndex, rookShifts);
 			const std::vector<Bitboard> blockerBoards = generateBlockerBoards(positionIndex, blockerMask);
 			std::vector<Bitboard> moves;
 
@@ -398,7 +268,7 @@ namespace move
 
 			for (const Bitboard blockerBoard : blockerBoards)
 			{
-				moves.push_back(generateRookMoves(positionIndex, blockerBoard));
+				moves.push_back(generateMoves(positionIndex, blockerBoard, rookShifts));
 			}
 
 			rookMoveLookupTable[positionIndex].resize(blockerBoards.size());
