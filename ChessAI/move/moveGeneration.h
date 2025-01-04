@@ -46,4 +46,13 @@ namespace move
 	 * \return valid moves for all the player's rooks
 	 */
 	std::vector<Move> generateRookMoves(const ChessState& chessState, const Color player);
+
+	/**
+	 * Generate moves for all of the specified player's queens.
+	 *
+	 * \param chessState game state
+	 * \param player the player whose moves are being generated
+	 * \return valid moves for all the player's queens
+	 */
+	std::vector<Move> generateQueenMoves(const ChessState& chessState, const Color player);
 }

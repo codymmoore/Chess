@@ -213,14 +213,14 @@ namespace move
 		std::vector<Move> rookMoves = generateRookMoves(chessState, player);
 		result.insert(result.end(), std::make_move_iterator(rookMoves.begin()), std::make_move_iterator(rookMoves.end()));
 
+		std::vector<Move> queenMoves = generateQueenMoves(chessState, player);
+		result.insert(result.end(), std::make_move_iterator(queenMoves.begin()), std::make_move_iterator(queenMoves.end()));
+
 		for (const PieceNode& piece : pieces)
 		{
 			std::vector<Position> moves;
 			switch (piece.m_pieceType)
 			{
-			case QUEEN:
-				getValidMovesLinear(player, piece, chessState, queenDirections, moves);
-				break;
 			case KING:
 				getValidMovesKing(player, piece, chessState, moves);
 				break;
@@ -234,7 +234,6 @@ namespace move
 			}
 		}
 
-		//std::vector<Position>::iterator move = moves.begin();
 		std::vector<Move>::iterator move = result.begin();
 
 		while (move != result.end())

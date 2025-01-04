@@ -14,8 +14,6 @@
 using namespace util;
 using namespace util::bitboard;
 
-using namespace std;
-
 namespace move
 {
 	Position toPosition(const int index)
@@ -185,6 +183,36 @@ namespace move
 			Bitboard moveBoard = getRookMoveBoard(rookIndex, occupancyBoard) & ~playerOccupancyBoard;
 
 			const Position source = toPosition(rookIndex);
+			while (moveBoard)
+			{
+				const int destinationIndex = popLsb(moveBoard);
+				result.emplace_back(source, toPosition(destinationIndex));
+			}
+		}
+
+		return result;
+	}
+
+	std::vector<Move> generateQueenMoves(const ChessState& chessState, const Color player)
+	{
+		std::vector<Move> result;
+		const BitboardSet& board = chessState.getBoard();
+		Bitboard queenBoard = board.getBitboard(player, PieceType::QUEEN);
+
+		if (queenBoard == 0)
+		{
+			return result;
+		}
+
+		const Bitboard occupancyBoard = board.getOccupancyBoard();
+		const Bitboard playerOccupancyBoard = board.getOccupancyBoard(player);
+
+		while (queenBoard)
+		{
+			const int queenIndex = popLsb(queenBoard);
+			Bitboard moveBoard = (getBishopMoveBoard(queenIndex, occupancyBoard) | getRookMoveBoard(queenIndex, occupancyBoard)) & ~playerOccupancyBoard;
+
+			const Position source = toPosition(queenIndex);
 			while (moveBoard)
 			{
 				const int destinationIndex = popLsb(moveBoard);
