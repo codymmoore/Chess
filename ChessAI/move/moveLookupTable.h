@@ -34,4 +34,12 @@ namespace move
 	 * \return bitboard representation of moves
 	 */
 	Bitboard getRookMoveBoard(const int positionIndex, const Bitboard occupancyBoard);
+
+	/**
+	 * Get the bitboard representation of moves for a king at the specified position.
+	 *
+	 * \param positionIndex the index of the position of the king whose moves are being retrieved
+	 * \return bitboard representation of moves
+	 */
+	Bitboard getKingMoveBoard(const int positionIndex);
 }

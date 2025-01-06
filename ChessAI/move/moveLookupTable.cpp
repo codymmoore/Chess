@@ -29,6 +29,8 @@ namespace move
 	Bitboard rookBlockerHashCoefficients[SQUARE_COUNT];
 	std::vector<Bitboard> rookMoveLookupTable[SQUARE_COUNT];
 
+	Bitboard kingMoveLookupTable[SQUARE_COUNT];
+
 	Bitboard getKnightMoveBoard(const int positionIndex)
 	{
 		return knightMoveLookupTable[positionIndex];
@@ -54,6 +56,11 @@ namespace move
 		const int blockerHash = (rookBlockerHashCoefficients[positionIndex] * blockerBoard) >> (64 - blockerCount);
 
 		return moveBoards[blockerHash];
+	}
+
+	Bitboard getKingMoveBoard(const int positionIndex)
+	{
+		return kingMoveLookupTable[positionIndex];
 	}
 
 	void populateKnightMoveLookupTable()
@@ -283,6 +290,31 @@ namespace move
 		}
 	}
 
+	void populateKingMoveLookupTable()
+	{
+		static std::vector<Shift> kingShifts = {
+			up(1),
+			down(1),
+			left(1),
+			right(1),
+			up(1) + left(1),
+			up(1) + right(1),
+			down(1) + left(1),
+			down(1) + right(1)
+		};
+
+		for (int i = 0; i < FILE_COUNT * RANK_COUNT; i++)
+		{
+			const Bitboard source = Bitboard(1) << i;
+			kingMoveLookupTable[i] = 0;
+
+			for (const Shift& shift : kingShifts)
+			{
+				kingMoveLookupTable[i] |= shiftBitboard(source, shift);
+			}
+		}
+	}
+
 	struct LookupTableInitializer
 	{
 		LookupTableInitializer()
@@ -290,6 +322,7 @@ namespace move
 			populateKnightMoveLookupTable();
 			populateBishopMoveLookupTable();
 			populateRookMoveLookupTable();
+			populateKingMoveLookupTable();
 		}
 	} lookupTableInitializer;
 }

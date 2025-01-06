@@ -4,6 +4,7 @@
 #include "../enum.h"
 #include "../util/utility.h"
 #include "../chess.h"
+#include "../util/bitboard/bitboardUtil.h"
 #include "move.h"
 #include "moveGeneration.h"
 
@@ -100,7 +101,7 @@ namespace move
 		return underAttack;
 	}
 
-	bool canCastle(const Color player, const PieceNode& piece, const ChessState& game, const bool kingSide)
+	bool canCastle(const Color player, const ChessState& game, const Position& position, const bool kingSide)
 	{
 		bool canCastle;
 		Position direction;
@@ -119,7 +120,7 @@ namespace move
 		if (canCastle)
 		{
 			bool blocked = false;
-			Position pos = piece.m_position + direction;
+			Position pos = position + direction;
 
 			// Set block to true if there are any pieces between king and rook
 			while (!blocked && pos.x < FILE_COUNT - 1 && pos.x > 0)
@@ -132,8 +133,8 @@ namespace move
 			{
 				// Set safePath to false if any position the king would pass over could be attacked
 				//      (this include the position the king lands on)
-				bool safePath = !(isUnderAttack(player, game, piece.m_position + direction)
-					|| isUnderAttack(player, game, piece.m_position + direction * 2));
+				bool safePath = !(isUnderAttack(player, game, position + direction)
+					|| isUnderAttack(player, game, position + direction * 2));
 
 				if (safePath)
 				{
@@ -145,45 +146,26 @@ namespace move
 		return false;
 	}
 
-	void getValidMovesKing(const Color player, const PieceNode& piece, const ChessState& game, std::vector<Position>& moves)
+	std::vector<Move> getValidMovesKing(const Color player, const ChessState& chessState)
 	{
-		static const std::vector<Position> kingMoves = {
-			UP,
-			DOWN,
-			LEFT,
-			RIGHT,
-			UP + RIGHT,
-			UP + LEFT,
-			DOWN + RIGHT,
-			DOWN + LEFT
-		};
-
-		// Loop through each possible move
-		for (const Position& move : kingMoves)
-		{
-			Position newPos = piece.m_position + move;
-
-			bool inBounds = newPos.x >= 0 && newPos.x < FILE_COUNT &&
-				newPos.y >= 0 && newPos.y < RANK_COUNT;
-
-			// If position exists on board and does not contain piece of same color
-			if (inBounds && !game.m_board.posIsOccupied(newPos, player))
-			{
-				moves.push_back(newPos);
-			}
-		}
+		std::vector<Move> moves = generateKingMoves(chessState, player);
+		Bitboard kingBoard = chessState.getBoard().getBitboard(player, PieceType::KING);
+		const int kingPositionIndex = util::bitboard::popLsb(kingBoard);
+		const Position source(kingPositionIndex % FILE_COUNT, kingPositionIndex / FILE_COUNT);
 
 		// If king can kind-side castle
-		if (canCastle(player, piece, game, true))
+		if (canCastle(player, chessState, source, true))
 		{
-			moves.push_back(piece.m_position + RIGHT * 2);
+			moves.emplace_back(source, source + RIGHT * 2);
 		}
 
 		// If king can queen-side castle
-		if (canCastle(player, piece, game, false))
+		if (canCastle(player, chessState, source, false))
 		{
-			moves.push_back(piece.m_position + LEFT * 2);
+			moves.emplace_back(source, source + LEFT * 2);
 		}
+
+		return moves;
 	}
 
 	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player)
@@ -216,23 +198,8 @@ namespace move
 		std::vector<Move> queenMoves = generateQueenMoves(chessState, player);
 		result.insert(result.end(), std::make_move_iterator(queenMoves.begin()), std::make_move_iterator(queenMoves.end()));
 
-		for (const PieceNode& piece : pieces)
-		{
-			std::vector<Position> moves;
-			switch (piece.m_pieceType)
-			{
-			case KING:
-				getValidMovesKing(player, piece, chessState, moves);
-				break;
-			default:
-				break;
-			}
-
-			for (const Position& destination : moves)
-			{
-				result.emplace_back(piece.m_position, destination);
-			}
-		}
+		std::vector<Move> kingMoves = getValidMovesKing(player, chessState);
+		result.insert(result.end(), std::make_move_iterator(kingMoves.begin()), std::make_move_iterator(kingMoves.end()));
 
 		std::vector<Move>::iterator move = result.begin();
 
@@ -410,12 +377,12 @@ namespace move
 					// kingside castling
 					if (deltaX == 2)
 					{
-						return canCastle(player, piece, chessState, true);
+						return canCastle(player, chessState, piece.m_position, true);
 					}
 					// queenside castling
 					else if (deltaX == -2)
 					{
-						return canCastle(player, piece, chessState, false);
+						return canCastle(player, chessState, piece.m_position, false);
 					}
 				}
 

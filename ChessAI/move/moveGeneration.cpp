@@ -222,4 +222,24 @@ namespace move
 
 		return result;
 	}
+
+	std::vector<Move> generateKingMoves(const ChessState& chessState, const Color player)
+	{
+		std::vector<Move> result;
+		const BitboardSet& board = chessState.getBoard();
+		Bitboard kingBoard = board.getBitboard(player, PieceType::KING);
+		const Bitboard playerOccupancyBoard = board.getOccupancyBoard(player);
+		const int kingIndex = popLsb(kingBoard);
+
+		Bitboard moveBitboard = getKingMoveBoard(kingIndex) & ~playerOccupancyBoard;
+
+		const Position source = toPosition(kingIndex);
+		while (moveBitboard)
+		{
+			const int destinationIndex = popLsb(moveBitboard);
+			result.emplace_back(source, toPosition(destinationIndex));
+		}
+
+		return result;
+	}
 }

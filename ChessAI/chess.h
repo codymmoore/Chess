@@ -146,6 +146,8 @@ public:
 	std::string getFenString() const;
 	const util::bitboard::BitboardSet& getBoard() const;
 	const std::deque<MoveHistoryNode>& getMoveHistory() const;
+	bool canKingSideCastle(const Color player) const;
+	bool canQueenSideCastle(const Color player) const;
 
 	// Modifiers
 	void setState(const std::string& gameState);

@@ -536,6 +536,28 @@ const std::deque<MoveHistoryNode>& ChessState::getMoveHistory() const
 	return m_moveHistory;
 }
 
+/**
+ * Determine if a player can king-side castle.
+ *
+ * \param player
+ * \return true if player can perform a king-side castle, false otherwise
+ */
+bool ChessState::canKingSideCastle(const Color player) const
+{
+	return player == Color::WHITE ? m_wKingSideCastle : m_bKingSideCastle;
+}
+
+/**
+ * Determine if a player can queen-side castle.
+ *
+ * \param player
+ * \return true if player can perform a queen-side castle, false otherwise
+ */
+bool ChessState::canQueenSideCastle(const Color player) const
+{
+	return player == Color::WHITE ? m_wQueenSideCastle : m_bQueenSideCastle;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  void setState(const std::string& gameState)
 ///
