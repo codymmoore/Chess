@@ -21,6 +21,17 @@ namespace getValidMovesTest
 		ChessState chessState;
 	};
 
+	std::vector<Move> getPieceMoves(const std::vector<Move>& moves, const Position& position)
+	{
+		const auto predicate = [&position](const Move& move)
+			{
+				return move.source == position;
+			};
+		std::vector<Move> result;
+		std::copy_if(moves.begin(), moves.end(), std::back_inserter(result), predicate);
+		return result;
+	}
+
 	TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_white)
 	{
 		const Color COLOR = Color::WHITE;
@@ -53,12 +64,12 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::PAWN);
 			chessState.setState("4k3/8/8/8/8/8/3P4/RNBQKBNR w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
-			const std::vector<Move> pawnMoves = {
+			const std::vector<Move> pawnMoves = getPieceMoves(validMoves, SOURCE);
+			const std::vector<Move> expectedMoves = {
 				Move(SOURCE, SOURCE + forward(COLOR)),
 				Move(SOURCE, SOURCE + forward(COLOR) * 2)
 			};
-
-			EXPECT_THAT(pawnMoves, IsSubsetOf(validMoves.begin(), validMoves.end()));
+			EXPECT_THAT(expectedMoves, UnorderedElementsAreArray(pawnMoves));
 		}
 
 		TEST_F(GetValidMovesTest, pawnMoveForward_black)
@@ -68,12 +79,12 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::PAWN);
 			chessState.setState("rnbqkbnr/3p4/8/8/8/8/8/4K3 b - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
-			const std::vector<Move> pawnMoves = {
+			const std::vector<Move> pawnMoves = getPieceMoves(validMoves, SOURCE);
+			const std::vector<Move> expectedMoves = {
 				Move(SOURCE, SOURCE + forward(COLOR)),
 				Move(SOURCE, SOURCE + forward(COLOR) * 2)
 			};
-
-			EXPECT_THAT(pawnMoves, IsSubsetOf(validMoves.begin(), validMoves.end()));
+			EXPECT_THAT(expectedMoves, UnorderedElementsAreArray(pawnMoves));
 		}
 
 		TEST_F(GetValidMovesTest, pawnMoveForward_outOfBoundsAbove)
@@ -177,6 +188,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::KNIGHT);
 			chessState.setState("4k3/8/8/3N4/8/8/8/4K3 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+			const std::vector<Move> knightMoves = getPieceMoves(validMoves, SOURCE);
 			const std::vector<Move> expectedMoves = {
 				Move(SOURCE, SOURCE + UP * 2 + RIGHT),
 				Move(SOURCE, SOURCE + UP * 2 + LEFT),
@@ -187,7 +199,7 @@ namespace getValidMovesTest
 				Move(SOURCE, SOURCE + RIGHT * 2 + DOWN),
 				Move(SOURCE, SOURCE + LEFT * 2 + DOWN)
 			};
-			EXPECT_THAT(expectedMoves, IsSubsetOf(validMoves.begin(), validMoves.end()));
+			EXPECT_THAT(expectedMoves, UnorderedElementsAreArray(knightMoves));
 		}
 
 		TEST_F(GetValidMovesTest, knight_outOfBoundsUpAndRight)
@@ -251,6 +263,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::BISHOP);
 			chessState.setState("4k3/8/8/3B4/8/8/8/4K3 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+			const std::vector<Move> bishopMoves = getPieceMoves(validMoves, SOURCE);
 			const std::vector<Move> expectedMoves = {
 				Move(SOURCE, Position(4, 4)),
 				Move(SOURCE, Position(5, 5)),
@@ -269,7 +282,7 @@ namespace getValidMovesTest
 				Move(SOURCE, Position(1, 1)),
 				Move(SOURCE, Position(0, 0))
 			};
-			EXPECT_THAT(expectedMoves, IsSubsetOf(validMoves.begin(), validMoves.end()));
+			EXPECT_THAT(bishopMoves, UnorderedElementsAreArray(expectedMoves));
 		}
 
 		TEST_F(GetValidMovesTest, bishop_blocked)
@@ -314,6 +327,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::ROOK);
 			chessState.setState("4k3/8/8/3R4/8/8/8/4K3 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+			const std::vector<Move> rookMoves = getPieceMoves(validMoves, SOURCE);
 			const std::vector<Move> expectedMoves = {
 				Move(SOURCE, Position(3, 2)),
 				Move(SOURCE, Position(3, 1)),
@@ -333,7 +347,7 @@ namespace getValidMovesTest
 				Move(SOURCE, Position(6, 3)),
 				Move(SOURCE, Position(7, 3))
 			};
-			EXPECT_THAT(expectedMoves, IsSubsetOf(validMoves.begin(), validMoves.end()));
+			EXPECT_THAT(rookMoves, UnorderedElementsAreArray(expectedMoves));
 		}
 
 		TEST_F(GetValidMovesTest, rook_blocked)
@@ -378,6 +392,7 @@ namespace getValidMovesTest
 			const PieceNode PIECE = PieceNode(SOURCE, PieceType::QUEEN);
 			chessState.setState("4k3/8/8/3Q4/8/8/8/4K3 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+			const std::vector<Move> queenMoves = getPieceMoves(validMoves, SOURCE);
 			const std::vector<Move> expectedMoves = {
 				Move(SOURCE, Position(4, 4)),
 				Move(SOURCE, Position(5, 5)),
