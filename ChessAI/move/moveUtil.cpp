@@ -17,63 +17,6 @@ using namespace util;
 
 namespace move
 {
-	void getValidMovesKnight(const Color player, const PieceNode& piece, const ChessState& game, std::vector<Position>& moves)
-	{
-		static const std::vector<Position> knightMoves = {
-			UP * 2 + RIGHT,
-			UP * 2 + LEFT,
-			DOWN * 2 + RIGHT,
-			DOWN * 2 + LEFT,
-			LEFT * 2 + UP,
-			LEFT * 2 + DOWN,
-			RIGHT * 2 + UP,
-			RIGHT * 2 + DOWN
-		};
-
-		for (const Position& move : knightMoves)
-		{
-			Position newPos = piece.m_position + move;
-
-			// If position exists on board
-			if (newPos.x >= 0 && newPos.x < FILE_COUNT
-				&& newPos.y >= 0 && newPos.y < RANK_COUNT)
-			{
-				// If piece of same color is not in new position
-				if (!game.m_board.posIsOccupied(newPos, player))
-				{
-					moves.push_back(newPos);
-				}
-			}
-		}
-	}
-
-	void getValidMovesLinear(const Color player, const PieceNode& piece, const ChessState& game,
-		const std::vector<Position>& directions, std::vector<Position>& moves)
-	{
-		/* ----- Check each position in each direction ----- */
-		for (const Position& direction : directions)
-		{
-			Position newPos = piece.m_position + direction;
-			bool inBounds = newPos.x >= 0 && newPos.x < FILE_COUNT &&
-				newPos.y >= 0 && newPos.y < RANK_COUNT;
-
-			while (inBounds && !game.m_board.posIsOccupied(newPos))
-			{
-				moves.push_back(newPos);
-
-				newPos += direction;
-				inBounds = newPos.x >= 0 && newPos.x < FILE_COUNT &&
-					newPos.y >= 0 && newPos.y < RANK_COUNT;
-			}
-
-			// If a capture at new position is possible
-			if (inBounds && game.m_board.posIsOccupied(newPos, ~player))
-			{
-				moves.push_back(newPos);
-			}
-		}
-	}
-
 	bool isUnderAttack(const Color player, const ChessState& game, const Position& position)
 	{
 		bool underAttack = false;
@@ -101,10 +44,11 @@ namespace move
 		return underAttack;
 	}
 
-	bool canCastle(const Color player, const ChessState& game, const Position& position, const bool kingSide)
+	bool canCastle(const Color player, const ChessState& game, const bool kingSide)
 	{
 		bool canCastle;
 		Position direction;
+		const Position kingPosition = ChessState::KING_START_POS[player];
 
 		if (kingSide)
 		{
@@ -120,13 +64,13 @@ namespace move
 		if (canCastle)
 		{
 			bool blocked = false;
-			Position pos = position + direction;
+			Position position = kingPosition + direction;
 
 			// Set block to true if there are any pieces between king and rook
-			while (!blocked && pos.x < FILE_COUNT - 1 && pos.x > 0)
+			while (!blocked && position.x < FILE_COUNT - 1 && position.x > 0)
 			{
-				blocked = game.m_board.posIsOccupied(pos);
-				pos += direction;
+				blocked = game.m_board.posIsOccupied(position);
+				position += direction;
 			}
 
 			if (!blocked && !inCheck(player, game))
@@ -146,44 +90,8 @@ namespace move
 		return false;
 	}
 
-	std::vector<Move> getValidMovesKing(const Color player, const ChessState& chessState)
-	{
-		std::vector<Move> moves = generateKingMoves(chessState, player);
-		Bitboard kingBoard = chessState.getBoard().getBitboard(player, PieceType::KING);
-		const int kingPositionIndex = util::bitboard::popLsb(kingBoard);
-		const Position source(kingPositionIndex % FILE_COUNT, kingPositionIndex / FILE_COUNT);
-
-		// If king can kind-side castle
-		if (canCastle(player, chessState, source, true))
-		{
-			moves.emplace_back(source, source + RIGHT * 2);
-		}
-
-		// If king can queen-side castle
-		if (canCastle(player, chessState, source, false))
-		{
-			moves.emplace_back(source, source + LEFT * 2);
-		}
-
-		return moves;
-	}
-
 	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player)
 	{
-		static const std::vector<Position> bishopDirections = { UP + LEFT, UP + RIGHT, DOWN + LEFT, DOWN + RIGHT };
-		static const std::vector<Position> rookDirections = { UP, DOWN, LEFT, RIGHT };
-		static const std::vector<Position> queenDirections = {
-			UP + LEFT,
-			UP + RIGHT,
-			DOWN + LEFT,
-			DOWN + RIGHT,
-			UP,
-			DOWN,
-			LEFT,
-			RIGHT
-		};
-
-		const std::vector<PieceNode>& pieces = player == Color::WHITE ? chessState.getWhitePieces() : chessState.getBlackPieces();
 		std::vector<Move> result = generatePawnMoves(chessState, player);
 
 		std::vector<Move> knightMoves = generateKnightMoves(chessState, player);
@@ -198,8 +106,19 @@ namespace move
 		std::vector<Move> queenMoves = generateQueenMoves(chessState, player);
 		result.insert(result.end(), std::make_move_iterator(queenMoves.begin()), std::make_move_iterator(queenMoves.end()));
 
-		std::vector<Move> kingMoves = getValidMovesKing(player, chessState);
+		std::vector<Move> kingMoves = generateKingMoves(chessState, player);
 		result.insert(result.end(), std::make_move_iterator(kingMoves.begin()), std::make_move_iterator(kingMoves.end()));
+
+		const Position kingStartPosition = ChessState::KING_START_POS[player];
+		if (canCastle(player, chessState, true))
+		{
+			result.emplace_back(kingStartPosition, kingStartPosition + RIGHT * 2);
+		}
+
+		if (canCastle(player, chessState, false))
+		{
+			result.emplace_back(kingStartPosition, kingStartPosition + LEFT * 2);
+		}
 
 		std::vector<Move>::iterator move = result.begin();
 
@@ -377,12 +296,12 @@ namespace move
 					// kingside castling
 					if (deltaX == 2)
 					{
-						return canCastle(player, chessState, piece.m_position, true);
+						return canCastle(player, chessState, true);
 					}
 					// queenside castling
 					else if (deltaX == -2)
 					{
-						return canCastle(player, chessState, piece.m_position, false);
+						return canCastle(player, chessState, false);
 					}
 				}
 

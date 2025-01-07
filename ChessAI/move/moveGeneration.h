@@ -57,7 +57,9 @@ namespace move
 	std::vector<Move> generateQueenMoves(const ChessState& chessState, const Color player);
 
 	/**
-	 * Generate moves for all of the specified player's kings.
+	 * Generate moves for the specified player's king.
+	 *
+	 * Note: does not include castling
 	 *
 	 * \param chessState game state
 	 * \param player the player whose moves are being generated

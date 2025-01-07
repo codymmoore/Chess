@@ -5,6 +5,11 @@
 using namespace util;
 using namespace util::bitboard;
 
+const Position ChessState::KING_START_POS[COLOR_COUNT] = {
+	Position(4, RANK_COUNT - 1),
+	Position(4, 0)
+};
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  PieceNode::PieceNode()
 ///

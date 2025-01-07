@@ -131,6 +131,7 @@ public:
 
 public:
 	static constexpr int PAWN_START_ROW[COLOR_COUNT] = { RANK_COUNT - 2, 1 };
+	static const util::Position KING_START_POS[COLOR_COUNT];
 
 	// Constructors
 	ChessState();
