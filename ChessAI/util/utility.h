@@ -76,6 +76,14 @@ namespace util
 	 * \return The string associated with the PieceType
 	 */
 	std::string toString(const PieceType& pieceType);
+
+	/**
+	 * Convert an index to a Position object.
+	 *
+	 * \param positionIndex an integer (0-63) corresponding with a position on a board
+	 * \return index's correpsonding Position object
+	 */
+	Position toPosition(const int positionIndex);
 }
 
 
