@@ -13,35 +13,24 @@
 #define LEFT Position::LEFT
 #define RIGHT Position::RIGHT
 
-using namespace util;
+using util::operator~;
+using util::toPosition;
+using util::Position;
+
+using util::bitboard::BitboardSet;
 
 namespace move
 {
-	bool isUnderAttack(const Color player, const ChessState& game, const Position& position)
+	bool isUnderAttack(const Color player, const ChessState& chessState, const Position& position)
 	{
-		bool underAttack = false;
-		Color enemy = ~player;
-		std::vector<PieceNode>::const_iterator enemyPiece, end;
+		const auto predicate = [&position](const Move& move)
+			{
+				return move.destination == position;
+			};
+		const std::vector<Move> enemyMoves = getValidMoves(chessState, ~player);
+		const auto it = std::find_if(enemyMoves.begin(), enemyMoves.end(), predicate);
 
-		if (player == WHITE)
-		{
-			enemyPiece = game.m_blackPieces.begin();
-			end = game.m_blackPieces.end();
-		}
-		else // player == BLACK
-		{
-			enemyPiece = game.m_whitePieces.begin();
-			end = game.m_whitePieces.end();
-		}
-
-		// Check if moving to position is valid for any opposing piece
-		while (!underAttack && enemyPiece != end)
-		{
-			underAttack = isValidMove(enemy, *enemyPiece, position, game);
-			enemyPiece++;
-		}
-
-		return underAttack;
+		return it != enemyMoves.end();
 	}
 
 	bool canCastle(const Color player, const ChessState& game, const bool kingSide)
@@ -142,83 +131,163 @@ namespace move
 		return result;
 	}
 
-	bool isValidMove(const Color player, const PieceNode& piece, const Position& destination, const ChessState& chessState)
+	bool isValidMove(const Color player, const Position& source, const Position& destination, const ChessState& chessState)
 	{
-		// If piece has moved and is in bounds
-		if (destination.x >= 0 && destination.x < FILE_COUNT &&
-			destination.y >= 0 && destination.y < RANK_COUNT &&
-			destination != piece.m_position)
+		if (source == destination)
 		{
-			switch (piece.m_pieceType)
+			return false;
+		}
+
+		if (destination.x < 0 || destination.x >= FILE_COUNT ||
+			destination.y < 0 || destination.y >= RANK_COUNT)
+		{
+			return false;
+		}
+
+		const BitboardSet& board = chessState.getBoard();
+		if (!board.posIsOccupied(source, player))
+		{
+			return false;
+		}
+
+		if (board.posIsOccupied(destination, player))
+		{
+			return false;
+		}
+
+		const PieceType pieceType = board.getPieceType(source);
+
+		switch (pieceType)
+		{
+		case PAWN:
+		{
+			const Position FORWARD = (player == WHITE ? UP : DOWN);
+			const int ORIGINAL_ROW = ChessState::PAWN_START_ROW[player];
+
+			if (destination == source + FORWARD)
 			{
-				/* ---------- PAWN ---------- */
-			case PAWN:
-			{
-				const Position FORWARD = (player == WHITE ? UP : DOWN);
-				const int ORIGINAL_ROW = (player == WHITE ? RANK_COUNT - 2 : 1);
-
-				// If pawn is moving one space forward
-				if (destination == (piece.m_position + FORWARD))
-				{
-					return !chessState.m_board.posIsOccupied(destination);
-				}
-				// If pawn is moving two spaces forward
-				else if (destination == (piece.m_position + FORWARD * 2))
-				{
-					return !chessState.m_board.posIsOccupied(destination)
-						&& !chessState.m_board.posIsOccupied(piece.m_position + FORWARD)
-						&& piece.m_position.y == ORIGINAL_ROW;
-				}
-				// If pawn is moving diagonal
-				else if (destination == (piece.m_position + FORWARD + LEFT) || destination == (piece.m_position + FORWARD + RIGHT))
-				{
-					if (chessState.m_board.posIsOccupied(destination, ~player))
-					{
-						return true;
-					}
-					// En Passant
-					else if (!chessState.m_moveHistory.empty() && chessState.m_moveHistory.back().m_pieceType == PAWN)
-					{
-						MoveHistoryNode prevMove = chessState.m_moveHistory.back();
-
-						return prevMove.m_prevPos == (destination + FORWARD) && prevMove.m_currPos == (destination - FORWARD);
-					}
-				}
-
-				return false;
+				return !chessState.m_board.posIsOccupied(destination);
 			}
-
-			/* ---------- KNIGHT ---------- */
-			case KNIGHT:
+			else if (destination == source + FORWARD * 2)
 			{
-				int deltaXsq = destination.x - piece.m_position.x,
-					deltaYsq = destination.y - piece.m_position.y;
-
-				deltaXsq = deltaXsq * deltaXsq;
-				deltaYsq = deltaYsq * deltaYsq;
-
-				if (((deltaXsq == 4 && deltaYsq == 1) || (deltaXsq == 1 && deltaYsq == 4))
-					&& !chessState.m_board.posIsOccupied(destination, player))
+				return !chessState.m_board.posIsOccupied(destination)
+					&& !chessState.m_board.posIsOccupied(source + FORWARD)
+					&& source.y == ORIGINAL_ROW;
+			}
+			else if (destination == (source + FORWARD + LEFT) || destination == (source + FORWARD + RIGHT))
+			{
+				if (chessState.m_board.posIsOccupied(destination, ~player))
 				{
 					return true;
 				}
+				// En Passant
+				else if (!chessState.m_moveHistory.empty() && chessState.m_moveHistory.back().m_pieceType == PAWN)
+				{
+					MoveHistoryNode prevMove = chessState.m_moveHistory.back();
 
+					return prevMove.m_prevPos == (destination + FORWARD) && prevMove.m_currPos == (destination - FORWARD);
+				}
+			}
+
+			return false;
+		}
+		case KNIGHT:
+		{
+			int deltaXsq = destination.x - source.x,
+				deltaYsq = destination.y - source.y;
+
+			deltaXsq = deltaXsq * deltaXsq;
+			deltaYsq = deltaYsq * deltaYsq;
+
+			if ((deltaXsq == 4 && deltaYsq == 1) || (deltaXsq == 1 && deltaYsq == 4))
+			{
+				return true;
+			}
+
+			return false;
+		}
+		case BISHOP:
+		{
+			int deltaX = destination.x - source.x;
+			Position direction(0, 0);
+
+			if ((destination.y + deltaX) == source.y)
+			{
+				direction = (deltaX < 0 ? DOWN + LEFT : UP + RIGHT);
+			}
+			else if ((destination.y - deltaX) == source.y)
+			{
+				direction = (deltaX < 0 ? UP + LEFT : DOWN + RIGHT);
+			}
+			else
+			{
 				return false;
 			}
 
-			/* ---------- BISHOP ---------- */
-			case BISHOP:
+			for (Position index = source + direction; index != destination; index += direction)
 			{
-				int deltaX = destination.x - piece.m_position.x;
-				Position direction(0, 0);
+				if (chessState.m_board.posIsOccupied(index))
+				{
+					return false;
+				}
+			}
 
-				// If piece is moving in an up right or down left diagonal
-				if ((destination.y + deltaX) == piece.m_position.y)
+			return true;
+		}
+		case ROOK:
+		{
+			Position direction(0, 0);
+
+			if (destination.y == source.y)
+			{
+				direction = (destination.x < source.x ? LEFT : RIGHT);
+			}
+			else if (destination.x == source.x)
+			{
+				direction = (destination.y < source.y ? UP : DOWN);
+			}
+			else
+			{
+				return false;
+			}
+
+			for (Position index = source + direction; index != destination; index += direction)
+			{
+				if (chessState.m_board.posIsOccupied(index))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+		case QUEEN:
+		{
+			int deltaX = destination.x - source.x;
+			Position direction(0, 0);
+
+			if (deltaX == 0)
+			{
+				if (destination.y == source.y)
+				{
+					direction = (destination.x < source.x ? LEFT : RIGHT);
+				}
+				else if (destination.x == source.x)
+				{
+					direction = (destination.y < source.y ? UP : DOWN);
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if ((destination.y + deltaX) == source.y)
 				{
 					direction = (deltaX < 0 ? DOWN + LEFT : UP + RIGHT);
 				}
-				// If piece is moving in an up left or down right diagonal
-				else if ((destination.y - deltaX) == piece.m_position.y)
+				else if ((destination.y - deltaX) == source.y)
 				{
 					direction = (deltaX < 0 ? UP + LEFT : DOWN + RIGHT);
 				}
@@ -226,115 +295,62 @@ namespace move
 				{
 					return false;
 				}
-
-				for (Position index = piece.m_position + direction; index != destination; index += direction)
-				{
-					if (chessState.m_board.posIsOccupied(index))
-					{
-						return false;
-					}
-				}
-
-				// Return true if destination is not occupied by same color
-				return !chessState.m_board.posIsOccupied(destination, player);
 			}
 
-			/* ---------- ROOK ---------- */
-			case ROOK:
+			for (Position index = source + direction; index != destination; index += direction)
 			{
-				Position direction(0, 0);
-
-				// If piece is moving horizontally
-				if (destination.y == piece.m_position.y)
-				{
-					direction = (destination.x < piece.m_position.x ? LEFT : RIGHT);
-				}
-				// If piece is moving vertically
-				else if (destination.x == piece.m_position.x)
-				{
-					direction = (destination.y < piece.m_position.y ? UP : DOWN);
-				}
-				else
+				if (chessState.m_board.posIsOccupied(index))
 				{
 					return false;
 				}
-
-				for (Position index = piece.m_position + direction; index != destination; index += direction)
-				{
-					if (chessState.m_board.posIsOccupied(index))
-					{
-						return false;
-					}
-				}
-
-				return !chessState.m_board.posIsOccupied(destination, player);
 			}
 
-			/* ---------- QUEEN ---------- */
-			case QUEEN:
+			return true;
+		}
+		case KING:
+		{
+			int deltaX = destination.x - source.x,
+				deltaY = destination.y - source.y;
+
+			if (deltaX * deltaX <= 1 && deltaY * deltaY <= 1)
 			{
-				PieceNode bishop(piece), rook(piece);
-				bishop.m_pieceType = BISHOP;
-				rook.m_pieceType = ROOK;
-
-				// Return true if move is valid for bishop or rook
-				return isValidMove(player, bishop, destination, chessState) || isValidMove(player, rook, destination, chessState);
+				return true;
 			}
-
-			/* ---------- KING ---------- */
-			case KING:
+			else if (deltaY == 0)
 			{
-				int deltaX = destination.x - piece.m_position.x,
-					deltaY = destination.y - piece.m_position.y;
-
-				if (deltaX * deltaX <= 1 && deltaY * deltaY <= 1)
+				// kingside castling
+				if (deltaX == 2)
 				{
-					return !chessState.m_board.posIsOccupied(destination, player);
+					return canCastle(player, chessState, true);
 				}
-				else if (deltaY == 0)
+				// queenside castling
+				else if (deltaX == -2)
 				{
-					// kingside castling
-					if (deltaX == 2)
-					{
-						return canCastle(player, chessState, true);
-					}
-					// queenside castling
-					else if (deltaX == -2)
-					{
-						return canCastle(player, chessState, false);
-					}
+					return canCastle(player, chessState, false);
 				}
-
-				return false;
 			}
 
-			default:
-				return false;
-			}
+			return false;
 		}
 
-		// TODO: return false if move results in player being put in check
+		default:
+			return false;
+		}
 
+		// TODO return false if move results in player being put in check
 		return false;
 	}
 
 	bool inCheck(const Color player, const ChessState& chessState)
 	{
-		std::vector<PieceNode> allies = (player == WHITE ? chessState.getWhitePieces() : chessState.getBlackPieces());
-		Position kingPos;
-		std::vector<PieceNode>::const_iterator piece = allies.begin();
-
-		// Find ally king's current position
-		while (piece != allies.end() && piece->m_pieceType != KING)
-		{
-			piece++;
-		}
-
-		kingPos = piece->m_position;
+		const BitboardSet& board = chessState.getBoard();
+		Bitboard kingBoard = board.getBitboard(player, PieceType::KING);
+		const int kingPositionIndex = util::bitboard::popLsb(kingBoard);
+		const Position kingPosition = util::toPosition(kingPositionIndex);
 
 		// Return true if king's position can be attacked by opposing player
 		//      return false otherwise
-		return isUnderAttack(player, chessState, kingPos);
+		return isUnderAttack(player, chessState, kingPosition);
 	}
 
 	void makeMove(const Color player, const Move move, ChessState& chessState, const PieceType promotion)
@@ -344,71 +360,40 @@ namespace move
 
 	void makeMove(const Color player, const Position& source, const Position& destination, ChessState& chessState, const PieceType promotion)
 	{
-		std::vector<PieceNode>& pieces = player == WHITE ? chessState.m_whitePieces : chessState.m_blackPieces;
-		std::vector<PieceNode>::iterator pieceIt = std::find_if(pieces.begin(), pieces.end(), [&source](const PieceNode& piece) {
-			return piece.m_position == source;
-			});
+		const BitboardSet& board = chessState.getBoard();
+		PieceType pieceType = board.getPieceType(source, player);
 
-		if (pieceIt == pieces.end())
+		if (pieceType == PieceType::NONE)
 		{
 			std::string errorMessage = "Piece not found at position (" + std::to_string(source.x) +
 				", " + std::to_string(source.y) + ")";
 			throw std::exception(errorMessage.c_str());
 		}
 
-		PieceNode& pieceRef = *pieceIt;
-
-		if (pieceRef.m_pieceType == PAWN)
+		if (pieceType == PieceType::PAWN)
 		{
 			// Pawn advancement resets half turns to 0
-			chessState.m_numHalfTurns = -1; // (half turns are incremented at end of function)
+			//   (half turns are incremented at end of function)
+			chessState.m_numHalfTurns = -1;
 
 			// If an en passant occurs
-			if ((destination.x - pieceRef.m_position.x) != 0 && !chessState.m_board.posIsOccupied(destination))
+			if ((destination.x - source.x) != 0 && !chessState.m_board.posIsOccupied(destination))
 			{
-				Position backward;
-				std::vector<PieceNode>* enemies;
-
-				if (player == WHITE)
-				{
-					backward = DOWN;
-					enemies = &chessState.m_blackPieces;
-				}
-				else // player == BLACK
-				{
-					backward = UP;
-					enemies = &chessState.m_whitePieces;
-				}
-
-				/* ----- Remove captured piece ----- */
+				const Position backward = player == Color::WHITE ? DOWN : UP;
 				chessState.m_board.clearPos(destination + backward, ~player);
-
-				std::vector<PieceNode>::iterator enemyPiece = enemies->begin(),
-					end = enemies->end();
-
-				// Find captured piece in opposing player's piece vector
-				while (enemyPiece != end && enemyPiece->m_position != (destination + backward))
-				{
-					enemyPiece++;
-				}
-
-				enemies->erase(enemyPiece);
 			}
 
 			int endOfBoard = (player == WHITE ? 0 : RANK_COUNT - 1);
-
-			// If a promotion can occur
+			// promotion
 			if (destination.y == endOfBoard)
 			{
-				pieceRef.m_pieceType = promotion;
-
-				// Update board
-				chessState.m_board.clearPos(source, player, PAWN);
+				chessState.m_board.clearPos(source, player, PieceType::PAWN);
 				chessState.m_board.addPiece(source, player, promotion);
+				pieceType = promotion;
 			}
 		}
 
-		else if (pieceRef.m_pieceType == KING)
+		else if (pieceType == PieceType::KING)
 		{
 			int deltaX = destination.x - source.x;
 
@@ -416,8 +401,6 @@ namespace move
 			if (deltaX * deltaX > 1)
 			{
 				Position oldRookPosition, newRookPosition;
-
-				oldRookPosition.y = source.y;
 
 				// If kingside castling occurs
 				if (deltaX > 1)
@@ -431,155 +414,114 @@ namespace move
 					oldRookPosition.x = 0;
 					newRookPosition = destination + RIGHT;
 				}
+				oldRookPosition.y = source.y;
 
-				/* ----- Move Rook ----- */
-				// Update board
-				chessState.m_board.clearPos(oldRookPosition, player, ROOK);
-				chessState.m_board.addPiece(newRookPosition, player, ROOK);
-
-				std::vector<PieceNode>::iterator allyPiece, end;
-
-				if (player == WHITE)
-				{
-					allyPiece = chessState.m_whitePieces.begin();
-					end = chessState.m_whitePieces.end();
-				}
-				else // player == BLACK
-				{
-					allyPiece = chessState.m_blackPieces.begin();
-					end = chessState.m_blackPieces.end();
-				}
-
-				while (allyPiece != end && allyPiece->m_position != oldRookPosition)
-					allyPiece++;
-
-				// Update Rooks position
-				allyPiece->m_position = newRookPosition;
-
+				chessState.m_board.clearPos(oldRookPosition, player, PieceType::ROOK);
+				chessState.m_board.addPiece(newRookPosition, player, PieceType::ROOK);
 			}
 
-			// Castling is not allowed after a king moves
-			if (player == WHITE)
+			if (player == Color::WHITE)
 			{
 				chessState.m_wKingSideCastle = false;
 				chessState.m_wQueenSideCastle = false;
 			}
-			else // player == BLACK
+			else // player == Color::BLACK
 			{
 				chessState.m_bKingSideCastle = false;
 				chessState.m_bQueenSideCastle = false;
 			}
 		}
 
-		else if (pieceRef.m_pieceType == ROOK)
+		else if (pieceType == PieceType::ROOK)
 		{
-			// If black queen side rook is moved
 			if (source == Position(0, 0))
 			{
 				chessState.m_bQueenSideCastle = false;
 			}
-			// If black king side rook is moved
 			else if (source == Position(FILE_COUNT - 1, 0))
 			{
 				chessState.m_bKingSideCastle = false;
 			}
-			// If white queen side rook is moved
 			else if (source == Position(0, RANK_COUNT - 1))
 			{
 				chessState.m_wQueenSideCastle = false;
 			}
-			// If white king side rook is moved
 			else if (source == Position(FILE_COUNT - 1, RANK_COUNT - 1))
 			{
 				chessState.m_wKingSideCastle = false;
 			}
 		}
 
-		// If a capture occura
+		// capture
 		if (chessState.m_board.posIsOccupied(destination, ~player))
 		{
-			// If a rook is captured
-			if (chessState.m_board.posIsOccupied(destination, ~player, ROOK))
+			if (chessState.m_board.posIsOccupied(destination, ~player, PieceType::ROOK))
 			{
 				if (destination.x == 0)
 				{
-					bool* queenSideCastle = (player == WHITE ? &chessState.m_bQueenSideCastle : &chessState.m_wQueenSideCastle);
-
-					// Opponent cannot queen side castle if queen side rook has been captured
-					*queenSideCastle = false;
+					if (player == Color::WHITE)
+					{
+						chessState.m_bQueenSideCastle = false;
+					}
+					else // player == Color::BLACK
+					{
+						chessState.m_wQueenSideCastle = false;
+					}
 				}
 				else if (destination.x == FILE_COUNT - 1)
 				{
-					bool* kingSideCastle = (player == WHITE ? &chessState.m_bKingSideCastle : &chessState.m_wKingSideCastle);
-
-					// Opponent cannot king side castle if king side rook has been captured
-					*kingSideCastle = false;
+					if (player == Color::WHITE)
+					{
+						chessState.m_bKingSideCastle = false;
+					}
+					else // player == Color::BLACK
+					{
+						chessState.m_wKingSideCastle = false;
+					}
 				}
 			}
+			chessState.m_board.clearPos(destination, ~player);
 
 			// Half turns are reset when a capture occurs
+			//   (half turns are incremented at end of function)
 			chessState.m_numHalfTurns = -1;
-			std::vector<PieceNode>* enemies = (player == Color::WHITE ? &chessState.m_blackPieces : &chessState.m_whitePieces);
-
-			std::vector<PieceNode>::iterator enemyPiece = enemies->begin(),
-				end = enemies->end();
-
-			while (enemyPiece != end && enemyPiece->m_position != destination)
-			{
-				enemyPiece++;
-			}
-
-			// Remove captured piece
-			chessState.m_board.clearPos(destination, ~player, enemyPiece->m_pieceType);
-			enemies->erase(enemyPiece);
 		}
 
 		chessState.m_numHalfTurns += 1;
 
-		/* ----- Update move history ----- */
-		chessState.m_moveHistory.push_back(MoveHistoryNode(player, pieceRef, destination));
-		// Only last 8 moves need to be kept in move history
+		chessState.m_moveHistory.emplace_back(source, destination, player, pieceType);
 		if (chessState.m_moveHistory.size() > 8)
 		{
 			chessState.m_moveHistory.pop_front();
 		}
 
-		// If it has been 8 half turns since last pawn advance or capture, check for tie
+		// check for tie
 		if (chessState.m_moveHistory.size() >= 8 && chessState.m_numHalfTurns >= 8)
 		{
 			bool tie = true;
 			int prevMoveIndex = 0,
 				moveHistorySize = (int)chessState.m_moveHistory.size();
 
-			// Check if game is a draw
 			while (tie && prevMoveIndex < (moveHistorySize / 2))
 			{
 				tie = chessState.m_moveHistory[prevMoveIndex] == chessState.m_moveHistory[prevMoveIndex + 4];
 				prevMoveIndex += 1;
 			}
 
-			// If a draw has occured, indicate it by setting next turn to neutral
 			if (tie)
 			{
 				chessState.m_nextTurn = NEUTRAL;
 			}
 		}
 
-		/* ----- Move Piece ----- */
-		// Update board
-		chessState.m_board.clearPos(source, player, pieceRef.m_pieceType);
-		chessState.m_board.addPiece(destination, player, pieceRef.m_pieceType);
+		chessState.m_board.clearPos(source, player, pieceType);
+		chessState.m_board.addPiece(destination, player, pieceType);
 
-		// Update piece's position
-		pieceRef.m_position = destination;
-
-		// Increment full turns if black moved
 		if (chessState.m_nextTurn == Color::BLACK)
 		{
 			chessState.m_numFullTurns += 1;
 		}
 
-		// Update turn
 		if (chessState.m_nextTurn != NEUTRAL)
 		{
 			chessState.m_nextTurn = ~player;

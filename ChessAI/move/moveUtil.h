@@ -25,7 +25,7 @@ namespace move
 	 * \param chessState game state
 	 * \return true if move is valid, false otherwise
 	 */
-	bool isValidMove(const Color player, const PieceNode& piece, const util::Position& destination, const ChessState& chessState);
+	bool isValidMove(const Color player, const util::Position& source, const util::Position& destination, const ChessState& chessState);
 
 	/**
 	 * Determines if a player is in chech.
