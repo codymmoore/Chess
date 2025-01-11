@@ -21,13 +21,16 @@ using util::bitboard::BitboardSet;
 
 namespace move
 {
+	// Forward declaration
+	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player, const bool removeChecks);
+
 	bool isUnderAttack(const Color player, const ChessState& chessState, const Position& position)
 	{
 		const auto predicate = [&position](const Move& move)
 			{
 				return move.destination == position;
 			};
-		const std::vector<Move> enemyMoves = getValidMoves(chessState, ~player);
+		const std::vector<Move> enemyMoves = getValidMoves(chessState, ~player, false);
 		const auto it = std::find_if(enemyMoves.begin(), enemyMoves.end(), predicate);
 
 		return it != enemyMoves.end();
@@ -79,7 +82,7 @@ namespace move
 		return false;
 	}
 
-	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player)
+	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player, const bool removeChecks)
 	{
 		std::vector<Move> result = generatePawnMoves(chessState, player);
 
@@ -109,26 +112,34 @@ namespace move
 			result.emplace_back(kingStartPosition, kingStartPosition + LEFT * 2);
 		}
 
-		std::vector<Move>::iterator move = result.begin();
-
-		while (move != result.end())
+		if (removeChecks)
 		{
-			ChessState gameCopy(chessState);
+			std::vector<Move>::iterator move = result.begin();
 
-			makeMove(player, *move, gameCopy);
+			while (move != result.end())
+			{
+				ChessState gameCopy(chessState);
 
-			if (inCheck(player, gameCopy))
-			{
-				// Erase current move and set move equal to next move
-				move = result.erase(move);
-			}
-			else
-			{
-				move++;
+				makeMove(player, *move, gameCopy);
+
+				if (inCheck(player, gameCopy))
+				{
+					// Erase current move and set move equal to next move
+					move = result.erase(move);
+				}
+				else
+				{
+					move++;
+				}
 			}
 		}
 
 		return result;
+	}
+
+	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player)
+	{
+		return getValidMoves(chessState, player, true);
 	}
 
 	bool isValidMove(const Color player, const Position& source, const Position& destination, const ChessState& chessState)
