@@ -102,11 +102,8 @@ export default function Game() {
             const piece = board[source.y][source.x];
 
             const request = new MakeMoveRequest({
-                piece: {
-                    color: piece!.color,
-                    type: piece!.type,
-                    position: source
-                },
+                player: piece!.color,
+                source: source,
                 destination: destination,
                 promotion: PieceType.Queen
             });

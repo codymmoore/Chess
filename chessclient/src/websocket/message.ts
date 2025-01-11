@@ -184,7 +184,8 @@ export class GetValidMovesResponse extends Message {
  * Request to move a piece.
  */
 export class MakeMoveRequest extends Message {
-    piece: PiecePayload | null = null;
+    player: Color | null = null;
+    source: Position | null = null;
     destination: Position | null = null;
     promotion: PieceType | null = null;
 
@@ -194,14 +195,16 @@ export class MakeMoveRequest extends Message {
      * @param data The data used to populate the message
      */
     constructor(data: {
-        piece: PiecePayload,
+        player: Color,
+        source: Position,
         destination: Position,
         promotion: PieceType
     } | null = null) {
         super(MessageType.MakeMoveRequest);
 
         if (data) {
-            this.piece = data.piece;
+            this.player = data.player;
+            this.source = data.source;
             this.destination = data.destination;
             this.promotion = data.promotion;
         }
@@ -210,14 +213,16 @@ export class MakeMoveRequest extends Message {
     fromJson(json: string): void {
         const data = JSON.parse(json)['data'];
 
-        this.piece = data['piece'];
+        this.player = data['player'] as Color;
+        this.source = data['source'];
         this.destination = data['destination'];
         this.promotion = data['promotion'] as PieceType;
     }
 
     getData(): object {
         return {
-            piece: this.piece,
+            player: this.player,
+            source: this.source,
             destination: this.destination,
             promotion: this.promotion
         };
