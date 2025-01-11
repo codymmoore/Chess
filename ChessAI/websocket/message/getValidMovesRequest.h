@@ -20,8 +20,6 @@ namespace websocket
 		 */
 		struct GetValidMovesRequest : Message
 		{
-			PiecePayload piece;
-
 			GetValidMovesRequest() = default;
 
 			/**
