@@ -3,11 +3,14 @@
 #include "enum.h"
 #include "util/utility.h"
 #include "move/moveUtil.h"
+#include "util/bitboard/bitboardSet.h"
 
 #include <chrono>
 
 using namespace util;
 using move::Move;
+
+using util::bitboard::BitboardSet;
 
 typedef std::chrono::high_resolution_clock::time_point chronoTime;
 typedef std::chrono::duration<std::chrono::nanoseconds> chronoDuration;
@@ -81,18 +84,24 @@ double Agent::evaluateGameState(const ChessState& chessState, const Color player
 {
 	double result = 0.0;
 	const Color enemyPlayer = ~player;
-	const std::vector<PieceNode>& allyPieces = player == Color::WHITE ? chessState.getWhitePieces() : chessState.getBlackPieces();
-	const std::vector<PieceNode>& enemyPieces = enemyPlayer == Color::WHITE ? chessState.getWhitePieces() : chessState.getBlackPieces();
-
-	for (const PieceNode& piece : allyPieces)
-	{
-		result += PIECE_VALUES[piece.m_pieceType];
-	}
 
 	double capturePoints = FULL_TEAM_VALUE;
-	for (const PieceNode& piece : enemyPieces)
+	const BitboardSet& board = chessState.getBoard();
+	for (int i = PieceType::PAWN; i < PieceType::KING; i++)
 	{
-		capturePoints -= PIECE_VALUES[piece.m_pieceType];
+		const PieceType pieceType = (PieceType)i;
+		const double pieceValue = PIECE_VALUES[pieceType];
+		const Bitboard pieceBoard = board.getBitboard(player, pieceType);
+		if (pieceBoard)
+		{
+			result += std::popcount(board.getBitboard(player, pieceType)) * pieceValue;
+		}
+
+		const Bitboard enemyPieceBoard = board.getBitboard(enemyPlayer, pieceType);
+		if (enemyPieceBoard)
+		{
+			capturePoints -= std::popcount(board.getBitboard(enemyPlayer, pieceType)) * pieceValue;
+		}
 	}
 
 	result += capturePoints;
@@ -131,16 +140,7 @@ double Agent::getMoveValue(const ChessState& chessState, const Color player, con
 
 	if (board.posIsOccupied(move.destination))
 	{
-		PieceType capturedPieceType;
-		for (int i = PieceType::PAWN; i < PieceType::KING; i++)
-		{
-			const PieceType pieceType = (PieceType)i;
-			if (board.posIsOccupied(move.destination, enemyPlayer, pieceType))
-			{
-				capturedPieceType = pieceType;
-				break;
-			}
-		}
+		const PieceType capturedPieceType = board.getPieceType(move.destination, enemyPlayer);
 		result += BASE_CAPTURE_SCORE + PIECE_VALUES[capturedPieceType];
 	}
 	else
