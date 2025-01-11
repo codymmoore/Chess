@@ -22,7 +22,7 @@ using util::bitboard::BitboardSet;
 namespace move
 {
 	// Forward declaration
-	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player, const bool removeChecks);
+	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player, const bool removeChecks, const bool castling);
 
 	bool isUnderAttack(const Color player, const ChessState& chessState, const Position& position)
 	{
@@ -30,7 +30,7 @@ namespace move
 			{
 				return move.destination == position;
 			};
-		const std::vector<Move> enemyMoves = getValidMoves(chessState, ~player, false);
+		const std::vector<Move> enemyMoves = getValidMoves(chessState, ~player, false, false);
 		const auto it = std::find_if(enemyMoves.begin(), enemyMoves.end(), predicate);
 
 		return it != enemyMoves.end();
@@ -82,7 +82,7 @@ namespace move
 		return false;
 	}
 
-	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player, const bool removeChecks)
+	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player, const bool removeChecks, const bool castling)
 	{
 		std::vector<Move> result = generatePawnMoves(chessState, player);
 
@@ -102,12 +102,12 @@ namespace move
 		result.insert(result.end(), std::make_move_iterator(kingMoves.begin()), std::make_move_iterator(kingMoves.end()));
 
 		const Position kingStartPosition = ChessState::KING_START_POS[player];
-		if (canCastle(player, chessState, true))
+		if (castling && canCastle(player, chessState, true))
 		{
 			result.emplace_back(kingStartPosition, kingStartPosition + RIGHT * 2);
 		}
 
-		if (canCastle(player, chessState, false))
+		if (castling && canCastle(player, chessState, false))
 		{
 			result.emplace_back(kingStartPosition, kingStartPosition + LEFT * 2);
 		}
@@ -139,7 +139,7 @@ namespace move
 
 	std::vector<Move> getValidMoves(const ChessState& chessState, const Color player)
 	{
-		return getValidMoves(chessState, player, true);
+		return getValidMoves(chessState, player, true, true);
 	}
 
 	bool isValidMove(const Color player, const Position& source, const Position& destination, const ChessState& chessState)
