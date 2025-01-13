@@ -315,14 +315,11 @@ namespace move
 		}
 	}
 
-	struct LookupTableInitializer
+	void populateLookupTables()
 	{
-		LookupTableInitializer()
-		{
-			populateKnightMoveLookupTable();
-			populateBishopMoveLookupTable();
-			populateRookMoveLookupTable();
-			populateKingMoveLookupTable();
-		}
-	} lookupTableInitializer;
+		populateKnightMoveLookupTable();
+		populateBishopMoveLookupTable();
+		populateRookMoveLookupTable();
+		populateKingMoveLookupTable();
+	}
 }
