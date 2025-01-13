@@ -20,13 +20,11 @@ namespace websocket
 
 		void MakeMoveRequest::fromJson(const json::object& json)
 		{
-			json::object pieceJson = json.at("piece").as_object();
-			piece.color = util::getColorFromString(pieceJson.at("color").as_string().c_str());
-			piece.type = util::getPieceTypeFromString(pieceJson.at("type").as_string().c_str());
+			player = util::getColorFromString(json.at("player").as_string().c_str());
 
-			json::object positionJson = pieceJson.at("position").as_object();
-			piece.position.x = positionJson.at("x").as_int64();
-			piece.position.y = positionJson.at("y").as_int64();
+			json::object sourceJson = json.at("source").as_object();
+			source.x = sourceJson["x"].as_int64();
+			source.y = sourceJson["y"].as_int64();
 
 			json::object destinationJson = json.at("destination").as_object();
 			destination.x = destinationJson["x"].as_int64();
@@ -41,16 +39,12 @@ namespace websocket
 
 			json::object data;
 
-			json::object pieceJson;
-			pieceJson["color"] = util::toString(piece.color);
-			pieceJson["type"] = util::toString(piece.type);
+			data["player"] = util::toString(player);
 
-			json::object positionJson;
-			positionJson["x"] = piece.position.x;
-			positionJson["y"] = piece.position.y;
-			pieceJson["position"] = positionJson;
-
-			data["piece"] = pieceJson;
+			json::object sourceJson;
+			sourceJson["x"] = source.x;
+			sourceJson["y"] = source.y;
+			data["source"] = sourceJson;
 
 			json::object destinationJson;
 			destinationJson["x"] = destination.x;

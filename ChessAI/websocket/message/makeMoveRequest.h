@@ -21,7 +21,8 @@ namespace websocket
 		 */
 		struct MakeMoveRequest : Message
 		{
-			PiecePayload piece;
+			Color player;
+			util::Position source;
 			util::Position destination;
 			PieceType promotion;
 

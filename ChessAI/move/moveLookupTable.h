@@ -42,4 +42,9 @@ namespace move
 	 * \return bitboard representation of moves
 	 */
 	Bitboard getKingMoveBoard(const int positionIndex);
+
+	/**
+	 * Populate the move lookup tables to be used during move generation.
+	 */
+	void populateLookupTables();
 }

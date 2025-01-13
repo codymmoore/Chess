@@ -11,123 +11,6 @@ const Position ChessState::KING_START_POS[COLOR_COUNT] = {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  PieceNode::PieceNode()
-///
-/// \brief:  Create default PieceNode object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-PieceNode::PieceNode() : m_position(0, 0), m_pieceType(NONE) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  PieceNode::PieceNode(const int xCoord, const int yCoord, const PieceType pieceType)
-///
-/// \brief:  Create PieceNode object
-///
-/// \param [in]:  xCoord : x-coordinate of piece contained by calling object
-/// \param [in]:  yCoord : y-coordinate of piece contained by calling object
-/// \param [in]:  pieceType : type of piece contained by calling object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-PieceNode::PieceNode(const int xCoord, const int yCoord, const PieceType pieceType) :
-	m_position(xCoord, yCoord),
-	m_pieceType(pieceType) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  PieceNode::PieceNode(const Position& position, const PieceType pieceType)
-///
-/// \brief:  Create PieceNode object
-///
-/// \param [in]:  position : current position of piece contained by calling object
-/// \param [in]:  pieceType : type of piece contained by calling object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-PieceNode::PieceNode(const Position& position, const PieceType pieceType) :
-	m_position(position),
-	m_pieceType(pieceType) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  PieceNode& PieceNode::operator=(const PieceNode& rightOperand)
-///
-/// \brief:  Set calling object equal to right operand
-///
-/// \param [in]:  rightOperand : object that calling object will be set equal to
-///
-/// \return:  PieceNode& : reference to calling object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-PieceNode& PieceNode::operator=(const PieceNode& rightOperand)
-{
-	m_position = rightOperand.m_position;
-	m_pieceType = rightOperand.m_pieceType;
-
-	return *this;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  bool PieceNode::operator==(const PieceNode& rightOperand) const
-///
-/// \brief:  Determine whether two PieceNode objects are equivalent
-///
-/// \param [in]:  rightOperand : object to compare calling object to
-///
-/// \return:  bool : true if objects are equivalent, false otherwise
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-bool PieceNode::operator==(const PieceNode& rightOperand) const
-{
-	return m_position == rightOperand.m_position && m_pieceType == rightOperand.m_pieceType;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  bool PieceNode::operator!=(const PieceNode& rightOperand) const
-///
-/// \brief:  Determine whether two PieceNode objects are not equivalent
-///
-/// \param [in]:  rightOperand : object to compare calling object to
-///
-/// \return:  bool : true if objects are not equivalent, false otherwise
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-bool PieceNode::operator!=(const PieceNode& rightOperand) const
-{
-	return !(*this == rightOperand);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  std::ostream& operator<<(std::ostream& out, const PieceNode& piece)
-///
-/// \brief:  Output PieceNode to ostream
-///
-/// \param [in, out]:  out : ostream that PieceNode object will be output to
-/// \param [in]:  piece : PieceNode object to be output
-///
-/// \return:  ostream& : reference to updated ostream variable
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-std::ostream& operator<<(std::ostream& out, const PieceNode& piece)
-{
-	out << "{" << piece.m_position << ", " << toString(piece.m_pieceType) << "}";
-
-	return out;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  MoveHistoryNode::MoveHistoryNode(const Color color, const PieceNode& piece, const Position& currPos)
-///
-/// \brief:  Create MoveHistoryNode object
-///
-/// \param [in]:  color : color of piece
-/// \param [in]:  piece : contains previous position and type of piece
-/// \param [in]:  currPos : new position of piece
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-MoveHistoryNode::MoveHistoryNode(const Color color, const PieceNode& piece, const Position& currPos) :
-	m_prevPos(piece.m_position),
-	m_currPos(currPos),
-	m_color(color),
-	m_pieceType(piece.m_pieceType) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
 /// \fn:  MoveHistoryNode::MoveHistoryNode(const Position& prevPos, const Position& currPos, const Color color, const PieceType pieceType)
 ///
 /// \brief:  Create MoveHistoryNode object
@@ -329,9 +212,6 @@ ChessState::ChessState(const std::string& gameState)
 ChessState::ChessState(const ChessState& source) :
 	m_board(source.m_board),
 
-	m_whitePieces(source.m_whitePieces),
-	m_blackPieces(source.m_blackPieces),
-
 	m_moveHistory(source.m_moveHistory),
 
 	m_winner(source.m_winner),
@@ -381,32 +261,6 @@ Color ChessState::getNextTurn() const
 Color ChessState::getWinner() const
 {
 	return m_winner;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  const std::vector<PieceNode>& ChessState::getWhitePieces() const
-///
-/// \brief:  Get constant reference to white player's pieces
-///
-/// \return:  std::vector<PieceNode>& : contains white player's pieces
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-const std::vector<PieceNode>& ChessState::getWhitePieces() const
-{
-	return m_whitePieces;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  const std::vector<PieceNode>& ChessState::getBlackPieces() const
-///
-/// \brief:  Get constant reference to white player's pieces
-///
-/// \return:  std::vector<PieceNode>& : contains black player's pieces
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-const std::vector<PieceNode>& ChessState::getBlackPieces() const
-{
-	return m_blackPieces;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -575,8 +429,6 @@ void ChessState::setState(const std::string& gameState)
 {
 	m_board.clear();
 	m_moveHistory.clear();
-	m_whitePieces.clear();
-	m_blackPieces.clear();
 	m_winner = NEUTRAL;
 
 	m_wKingSideCastle = false;
@@ -629,8 +481,6 @@ void ChessState::setState(const std::string& gameState)
 
 				// Add piece to board
 				m_board.addPiece(x, y, color, pieceType);
-				// Add piece to white piece vector
-				m_whitePieces.push_back(PieceNode(x, y, pieceType));
 			}
 			// If current char is lowercase (black piece)
 			else if (boardStrings[y][stringIndex] >= 'a' && boardStrings[y][stringIndex] <= 'z')
@@ -665,8 +515,6 @@ void ChessState::setState(const std::string& gameState)
 
 				// Add piece to board
 				m_board.addPiece(x, y, color, pieceType);
-				// Add piece to black piece vector
-				m_blackPieces.push_back(PieceNode(x, y, pieceType));
 			}
 			// If current char is numerical
 			else if (boardStrings[y][stringIndex] >= '0' && boardStrings[y][stringIndex] <= '9')
@@ -754,9 +602,6 @@ void ChessState::clear()
 {
 	m_board.clear();
 
-	m_whitePieces.clear();
-	m_blackPieces.clear();
-
 	m_moveHistory.clear();
 
 	m_wKingSideCastle = false;
@@ -804,46 +649,6 @@ void ChessState::initialize()
 	m_wQueenSideCastle = true;
 	m_bKingSideCastle = true;
 	m_bQueenSideCastle = true;
-
-	/* ---- Fill Piece Vectors ---- */
-	/* -- Rooks -- */
-	// Add to piece vectors
-	m_blackPieces.push_back(PieceNode(0, 0, PieceType::ROOK));
-	m_blackPieces.push_back(PieceNode(FILE_COUNT - 1, 0, PieceType::ROOK));
-	m_whitePieces.push_back(PieceNode(0, RANK_COUNT - 1, PieceType::ROOK));
-	m_whitePieces.push_back(PieceNode(FILE_COUNT - 1, RANK_COUNT - 1, PieceType::ROOK));
-
-	/* -- Knights -- */
-	// Add to piece vectors
-	m_blackPieces.push_back(PieceNode(1, 0, PieceType::KNIGHT));
-	m_blackPieces.push_back(PieceNode(FILE_COUNT - 2, 0, PieceType::KNIGHT));
-	m_whitePieces.push_back(PieceNode(1, RANK_COUNT - 1, PieceType::KNIGHT));
-	m_whitePieces.push_back(PieceNode(FILE_COUNT - 2, RANK_COUNT - 1, PieceType::KNIGHT));
-
-	/* -- Bishops -- */
-	// Add to piece vectors
-	m_blackPieces.push_back(PieceNode(2, 0, PieceType::BISHOP));
-	m_blackPieces.push_back(PieceNode(FILE_COUNT - 3, 0, PieceType::BISHOP));
-	m_whitePieces.push_back(PieceNode(2, RANK_COUNT - 1, PieceType::BISHOP));
-	m_whitePieces.push_back(PieceNode(FILE_COUNT - 3, RANK_COUNT - 1, PieceType::BISHOP));
-
-	/* -- Queens -- */
-	// Add to piece vectors
-	m_blackPieces.push_back(PieceNode(3, 0, PieceType::QUEEN));
-	m_whitePieces.push_back(PieceNode(3, RANK_COUNT - 1, PieceType::QUEEN));
-
-	/* -- Kings -- */
-	// Add to piece vectors
-	m_blackPieces.push_back(PieceNode(4, 0, PieceType::KING));
-	m_whitePieces.push_back(PieceNode(4, RANK_COUNT - 1, PieceType::KING));
-
-	/* -- Pawns -- */
-	for (int i = 0; i < FILE_COUNT; i++)
-	{
-		// Add to piece vectors
-		m_blackPieces.push_back(PieceNode(i, 1, PieceType::PAWN));
-		m_whitePieces.push_back(PieceNode(i, RANK_COUNT - 2, PieceType::PAWN));
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -865,18 +670,6 @@ void ChessState::print() const
 /////////////////////////////////////////////////////////////////////////////////////////////
 void ChessState::printDebug() const
 {
-	// Output list of remaining white pieces
-	std::cout << "WHITE PIECES: ";
-	for (const PieceNode& piece : m_whitePieces)
-		std::cout << piece << " ";
-	std::cout << std::endl;
-
-	// Output list of remaining black pieces
-	std::cout << "BLACK PIECES: ";
-	for (const PieceNode& piece : m_blackPieces)
-		std::cout << piece << " ";
-	std::cout << std::endl;
-
 	// Output last 8 moves
 	std::cout << "MOVE HISTORY: ";
 	for (const MoveHistoryNode& move : m_moveHistory)

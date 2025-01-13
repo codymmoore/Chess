@@ -3,6 +3,7 @@
 #include "agent.h"
 #include "move/move.h"
 #include "move/moveUtil.h"
+#include "move/moveLookupTable.h"
 
 #include "websocket/message/startGameRequest.h"
 #include "websocket/message/startGameResponse.h"
@@ -49,6 +50,7 @@ std::string toString(const GameType gameType)
 
 ChessServer::ChessServer(const tcp::endpoint& endpoint) : _webSocketManager(endpoint), _chessController(_chessState)
 {
+	move::populateLookupTables();
 }
 
 void ChessServer::run()

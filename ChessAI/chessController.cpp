@@ -35,10 +35,7 @@ GetValidMovesResponse ChessController::getValidMoves(const GetValidMovesRequest&
 {
 	GetValidMovesResponse response;
 
-	PieceNode piece;
-	piece.m_pieceType = request.piece.type;
-	piece.m_position = request.piece.position;
-	//response.moves = move::getValidMoves(_chessState, request.piece.color);
+	// TODO
 
 	return response;
 }
@@ -46,11 +43,10 @@ GetValidMovesResponse ChessController::getValidMoves(const GetValidMovesRequest&
 MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 {
 	MakeMoveResponse response;
-	PieceNode piece(request.piece.position, request.piece.type);
 
-	if (move::isValidMove(request.piece.color, piece, request.destination, _chessState))
+	if (move::isValidMove(request.player, request.source, request.destination, _chessState))
 	{
-		move::makeMove(request.piece.color, request.piece.position, request.destination, _chessState, request.promotion);
+		move::makeMove(request.player, request.source, request.destination, _chessState, request.promotion);
 		response.success = true;
 	}
 	else

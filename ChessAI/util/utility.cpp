@@ -106,4 +106,17 @@ namespace util
 			return "NONE";
 		}
 	}
+
+	Position toPosition(const int positionIndex)
+	{
+		if (positionIndex < 0 || positionIndex >= (FILE_COUNT * RANK_COUNT))
+		{
+			std::string errorMessage = "Invalid position index: " + std::to_string(positionIndex) + ". Index must be 0-63";
+			throw std::exception(errorMessage.c_str());
+		}
+
+		const int x = positionIndex % FILE_COUNT;
+		const int y = positionIndex / FILE_COUNT;
+		return Position(x, y);
+	}
 }

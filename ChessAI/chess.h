@@ -19,31 +19,6 @@ const double TOTAL_PLAYER_TURN_TIME = 15.0 * 60.0 * 1000000000.0; // 15 minutes 
 const unsigned int MAX_MOVE_HISTORY_SIZE = 8;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-/// \struct: PieceNode
-///
-/// \brief:  Used to fille piece vector in ChessState class
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-struct PieceNode
-{
-	util::Position m_position;
-	PieceType m_pieceType;
-
-	PieceNode();
-	PieceNode(const PieceNode& source) = default;
-	PieceNode(const int xCoord, const int yCoord, const PieceType pieceType);
-	PieceNode(const util::Position& position, const PieceType pieceType);
-
-	PieceNode& operator=(const PieceNode& rightOperand);
-
-	bool operator==(const PieceNode& rightOperand) const;
-	bool operator!=(const PieceNode& rightOperand) const;
-};
-
-// Used to output PieceNode objects
-std::ostream& operator<<(std::ostream& out, const PieceNode& piece);
-
-/////////////////////////////////////////////////////////////////////////////////////////////
 /// \struct:  MoveHistoryNode
 ///
 /// \brief:   Used to fill move history structure in ChessState class
@@ -58,7 +33,6 @@ struct MoveHistoryNode
 
 	MoveHistoryNode() = default;
 	MoveHistoryNode(const MoveHistoryNode& source) = default;
-	MoveHistoryNode(const Color color, const PieceNode& piece, const util::Position& currPos);
 	MoveHistoryNode(const util::Position& prevPos,
 		const util::Position& currPos,
 		const Color color,
@@ -114,8 +88,6 @@ class ChessState
 public:
 #endif
 	util::bitboard::BitboardSet m_board;
-	std::vector<PieceNode> m_whitePieces; // List of white pieces present on board
-	std::vector<PieceNode> m_blackPieces; // List of black pieces present on board
 	std::deque<MoveHistoryNode>  m_moveHistory;  // Contains previous 8 moves
 	Color m_winner, m_nextTurn;
 	int m_numHalfTurns, // Number of half turns since last capture or pawn advance
@@ -142,8 +114,6 @@ public:
 	// Getters
 	Color getNextTurn() const;
 	Color getWinner() const;
-	const std::vector<PieceNode>& getWhitePieces() const;
-	const std::vector<PieceNode>& getBlackPieces() const;
 	std::string getFenString() const;
 	const util::bitboard::BitboardSet& getBoard() const;
 	const std::deque<MoveHistoryNode>& getMoveHistory() const;
