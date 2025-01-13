@@ -32,25 +32,83 @@ namespace getValidMovesTest
 		return result;
 	}
 
-	TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_white)
+	namespace check
 	{
-		const Color COLOR = Color::WHITE;
-		const Position SOURCE = Position(4, 7);
-		chessState.setState("4k3/8/8/8/8/8/6p1/4K3 w - - 0 1");
-		const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_pawm_white)
+		{
+			const Color COLOR = Color::WHITE;
+			const Position SOURCE = Position(4, 7);
+			chessState.setState("4k3/8/8/8/8/8/6p1/4K3 w - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
 
-		const Position source(4, 7);
-		const Position destination(5, 7);
-		EXPECT_THAT(validMoves, Not(Contains(Move(source, destination))));
-	}
+			const Position source(4, 7);
+			const Position destination(5, 7);
+			EXPECT_THAT(validMoves, Not(Contains(Move(source, destination))));
+		}
 
-	TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_black)
-	{
-		const Color COLOR = Color::BLACK;
-		const Position SOURCE = Position(4, 0);
-		chessState.setState("4k3/6P1/8/8/8/8/8/4K3 b - - 0 1");
-		const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
-		EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(5, 0)))));
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_pawn_black)
+		{
+			const Color COLOR = Color::BLACK;
+			const Position SOURCE = Position(4, 0);
+			chessState.setState("4k3/6P1/8/8/8/8/8/4K3 b - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(5, 0)))));
+		}
+
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_knight)
+		{
+			const Color COLOR = Color::WHITE;
+			chessState.setState("2n1k1n1/2n5/7n/4K3/1n6/6n1/2n3n1/8 b - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+
+			EXPECT_TRUE(validMoves.empty());
+		}
+
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_slider_bishop)
+		{
+			const Color COLOR = Color::WHITE;
+			const Position SOURCE(4, 3);
+			chessState.setState("4k3/1b6/6b1/4K3/7b/b7/8/8 b - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(3, 2)))));
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(5, 2)))));
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(3, 3)))));
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(5, 3)))));
+		}
+
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_slider_rook)
+		{
+			const Color COLOR = Color::WHITE;
+			const Position SOURCE(4, 3);
+			chessState.setState("4k3/8/r4r2/4K3/6r1/8/3r4/8 b - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(5, 3)))));
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(3, 3)))));
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(4, 2)))));
+			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(4, 4)))));
+		}
+
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_slider_queen)
+		{
+			const Color COLOR = Color::WHITE;
+			const Position SOURCE(4, 3);
+			chessState.setState("4kq2/q7/7q/4K3/8/8/8/7q b - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+
+			EXPECT_TRUE(validMoves.empty());
+		}
+
+		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_slider_blocked)
+		{
+			const Color COLOR = Color::WHITE;
+			const Position SOURCE(4, 3);
+			chessState.setState("4k3/8/8/4K3/r1p5/2ppppp1/b7/2qq1r1b b - - 0 1");
+			const std::vector<Move> validMoves = getValidMoves(chessState, COLOR);
+
+			EXPECT_EQ(validMoves.size(), 8);
+		}
 	}
 
 	namespace pawn
