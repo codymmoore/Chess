@@ -129,6 +129,9 @@
     <ClInclude Include="util\bitboard\shift.h">
       <Filter>Header Files\util\bitboard</Filter>
     </ClInclude>
+    <ClInclude Include="util\threadPool.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="agent.cpp">

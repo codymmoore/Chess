@@ -7,6 +7,7 @@
 #include <stack>
 
 #include "../util/bitboard/bitboardUtil.h"
+#include "../util/threadPool.h"
 
 using util::bitboard::shiftBitboard;
 using util::bitboard::Shift;
@@ -14,6 +15,8 @@ using util::bitboard::up;
 using util::bitboard::left;
 using util::bitboard::down;
 using util::bitboard::right;
+
+util::ThreadPool& threadPool = util::ThreadPool::getInstance();
 
 namespace move
 {
@@ -229,28 +232,30 @@ namespace move
 
 		for (int positionIndex = 0; positionIndex < SQUARE_COUNT; positionIndex++)
 		{
-			const Bitboard blockerMask = generateBlockerMask(positionIndex, bishopShifts);
-			const std::vector<Bitboard> blockerBoards = generateBlockerBoards(positionIndex, blockerMask);
-			std::vector<Bitboard> moves;
+			threadPool.submit([positionIndex]() {
+				const Bitboard blockerMask = generateBlockerMask(positionIndex, bishopShifts);
+				const std::vector<Bitboard> blockerBoards = generateBlockerBoards(positionIndex, blockerMask);
+				std::vector<Bitboard> moves;
 
-			bishopBlockerMask[positionIndex] = blockerMask;
+				bishopBlockerMask[positionIndex] = blockerMask;
 
-			for (const Bitboard blockerBoard : blockerBoards)
-			{
-				moves.push_back(generateMoves(positionIndex, blockerBoard, bishopShifts));
-			}
+				for (const Bitboard blockerBoard : blockerBoards)
+				{
+					moves.push_back(generateMoves(positionIndex, blockerBoard, bishopShifts));
+				}
 
-			bishopMoveLookupTable[positionIndex].resize(blockerBoards.size());
+				bishopMoveLookupTable[positionIndex].resize(blockerBoards.size());
 
-			const Bitboard blockerHashCoefficient = findBlockerHashCoefficient(blockerMask, blockerBoards, moves);
-			const int blockerCount = std::popcount(blockerMask);
-			bishopBlockerHashCoefficients[positionIndex] = blockerHashCoefficient;
+				const Bitboard blockerHashCoefficient = findBlockerHashCoefficient(blockerMask, blockerBoards, moves);
+				const int blockerCount = std::popcount(blockerMask);
+				bishopBlockerHashCoefficients[positionIndex] = blockerHashCoefficient;
 
-			for (const Bitboard blockerBoard : blockerBoards)
-			{
-				const int blockerHash = (blockerBoard * blockerHashCoefficient) >> (64 - blockerCount);
-				bishopMoveLookupTable[positionIndex] = moves;
-			}
+				for (const Bitboard blockerBoard : blockerBoards)
+				{
+					const int blockerHash = (blockerBoard * blockerHashCoefficient) >> (64 - blockerCount);
+					bishopMoveLookupTable[positionIndex] = moves;
+				}
+			});
 		}
 	}
 
@@ -265,28 +270,30 @@ namespace move
 
 		for (int positionIndex = 0; positionIndex < SQUARE_COUNT; positionIndex++)
 		{
-			const Bitboard blockerMask = generateBlockerMask(positionIndex, rookShifts);
-			const std::vector<Bitboard> blockerBoards = generateBlockerBoards(positionIndex, blockerMask);
-			std::vector<Bitboard> moves;
+			threadPool.submit([positionIndex]() {
+				const Bitboard blockerMask = generateBlockerMask(positionIndex, rookShifts);
+				const std::vector<Bitboard> blockerBoards = generateBlockerBoards(positionIndex, blockerMask);
+				std::vector<Bitboard> moves;
 
-			rookBlockerMask[positionIndex] = blockerMask;
+				rookBlockerMask[positionIndex] = blockerMask;
 
-			for (const Bitboard blockerBoard : blockerBoards)
-			{
-				moves.push_back(generateMoves(positionIndex, blockerBoard, rookShifts));
-			}
+				for (const Bitboard blockerBoard : blockerBoards)
+				{
+					moves.push_back(generateMoves(positionIndex, blockerBoard, rookShifts));
+				}
 
-			rookMoveLookupTable[positionIndex].resize(blockerBoards.size());
+				rookMoveLookupTable[positionIndex].resize(blockerBoards.size());
 
-			const Bitboard blockerHashCoefficient = findBlockerHashCoefficient(blockerMask, blockerBoards, moves);
-			const int blockerCount = std::popcount(blockerMask);
-			rookBlockerHashCoefficients[positionIndex] = blockerHashCoefficient;
+				const Bitboard blockerHashCoefficient = findBlockerHashCoefficient(blockerMask, blockerBoards, moves);
+				const int blockerCount = std::popcount(blockerMask);
+				rookBlockerHashCoefficients[positionIndex] = blockerHashCoefficient;
 
-			for (const Bitboard blockerBoard : blockerBoards)
-			{
-				const int blockerHash = (blockerBoard * blockerHashCoefficient) >> (64 - blockerCount);
-				rookMoveLookupTable[positionIndex] = moves;
-			}
+				for (const Bitboard blockerBoard : blockerBoards)
+				{
+					const int blockerHash = (blockerBoard * blockerHashCoefficient) >> (64 - blockerCount);
+					rookMoveLookupTable[positionIndex] = moves;
+				}
+			});
 		}
 	}
 
@@ -317,9 +324,15 @@ namespace move
 
 	void populateLookupTables()
 	{
-		populateKnightMoveLookupTable();
-		populateBishopMoveLookupTable();
-		populateRookMoveLookupTable();
-		populateKingMoveLookupTable();
+		std::vector<std::future<void>> futures;
+		futures.push_back(threadPool.submit(populateKnightMoveLookupTable));
+		futures.push_back(threadPool.submit(populateBishopMoveLookupTable));
+		futures.push_back(threadPool.submit(populateRookMoveLookupTable));
+		futures.push_back(threadPool.submit(populateKingMoveLookupTable));
+
+		for (const std::future<void>& future : futures)
+		{
+			future.wait();
+		}
 	}
 }

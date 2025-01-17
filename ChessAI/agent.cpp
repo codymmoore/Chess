@@ -4,6 +4,7 @@
 #include "util/utility.h"
 #include "move/moveUtil.h"
 #include "util/bitboard/bitboardSet.h"
+#include "util/threadPool.h"
 
 #include <chrono>
 
@@ -41,21 +42,32 @@ Color Agent::getPlayer() const
 
 Move Agent::getMove()
 {
-	Move result;
-	double maxValue = INT_MIN;
-
+	const Color enemyPlayer = ~_player;
 	const std::vector<Move> moves = move::getValidMoves(_chessState, _player);
+	std::vector<std::pair<Move, std::future<double>>> moveValuePairs;
+
 	for (const Move& move : moves)
 	{
-		ChessState newState(_chessState);
-		move::makeMove(_player, move.source, move.destination, newState);
+		std::future<double> futureMoveValue = util::ThreadPool::getInstance().submit([this, move, enemyPlayer, newState = _chessState]() mutable {
+			move::makeMove(_player, move.source, move.destination, newState);
+			return -this->getNegaMaxValue(enemyPlayer, newState, 1, -DBL_MAX, DBL_MAX);
+		});
 
-		const double newValue = -getNegaMaxValue(~_player, newState, 1, -DBL_MAX, DBL_MAX);
+		moveValuePairs.push_back(std::make_pair(move, std::move(futureMoveValue)));
+	}
 
-		if (newValue > maxValue)
+	Move result;
+	double maxValue = INT_MIN;
+	for (std::pair<Move, std::future<double>>& moveValuePair : moveValuePairs)
+	{
+		std::future<double> moveFuture = std::move(moveValuePair.second);
+		moveFuture.wait();
+		const double moveValue = moveFuture.get();
+
+		if (moveValue > maxValue)
 		{
-			maxValue = newValue;
-			result = move;
+			maxValue = moveValue;
+			result = moveValuePair.first;
 		}
 	}
 
