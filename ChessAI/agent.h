@@ -75,7 +75,7 @@ private:
 	 * \param validMoves all valid moves for the player in the given game state
 	 * \return true if game state is "quiet", false otherwise
 	 */
-	bool isQuiescent(const ChessState& game, const std::vector<move::Move>& validMoves) const;
+	bool isQuiescent(const ChessState& chessState, const std::vector<move::Move>& validMoves) const;
 
 	/**
 	 * Scores a move based on how desireable it is for the given player.

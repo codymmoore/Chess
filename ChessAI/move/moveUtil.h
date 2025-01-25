@@ -35,25 +35,4 @@ namespace move
 	 * \return true if player is in check, false otherwise
 	 */
 	bool inCheck(const Color player, const ChessState& chessState);
-
-	/**
-	 * Moves a piece and updates the game state.
-	 *
-	 * \param player owner of the piece being move
-	 * \param move contains move information
-	 * \param chessState game state
-	 * \param promotion piece type to promote to; default is queen
-	 */
-	void makeMove(const Color player, const Move move, ChessState& chessState, const PieceType promotion = PieceType::QUEEN);
-
-	/**
-	 * Moves a piece and updates the game state.
-	 *
-	 * \param player owner of the piece being move
-	 * \param piece the piece being moved
-	 * \param destination the position the piece is being moved to
-	 * \param chessState game state
-	 * \param promotion piece type to promote to; default is queen
-	 */
-	void makeMove(const Color player, const util::Position& source, const util::Position& destination, ChessState& chessState, const PieceType promotion = PieceType::QUEEN);
 }

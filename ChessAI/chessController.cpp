@@ -46,7 +46,7 @@ MakeMoveResponse ChessController::makeMove(const MakeMoveRequest& request)
 
 	if (move::isValidMove(request.player, request.source, request.destination, _chessState))
 	{
-		move::makeMove(request.player, request.source, request.destination, _chessState, request.promotion);
+		_chessState.update(request.player, request.source, request.destination, request.promotion);
 		response.success = true;
 	}
 	else

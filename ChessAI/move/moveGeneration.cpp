@@ -76,14 +76,14 @@ namespace move
 		const std::deque<MoveHistoryNode> moveHistory = chessState.getMoveHistory();
 		if (!moveHistory.empty()) {
 			const MoveHistoryNode& prevMove = moveHistory.back();
-			if (prevMove.m_pieceType == PieceType::PAWN)
+			if (prevMove.pieceType == PieceType::PAWN)
 			{
-				const int prevY = prevMove.m_prevPos.y;
-				const int currY = prevMove.m_currPos.y;
+				const int prevY = prevMove.source.y;
+				const int currY = prevMove.destination.y;
 
 				if (abs(currY - prevY) == 2)
 				{
-					const Position enPassantPos = prevMove.m_prevPos + (prevMove.m_color == Color::WHITE ? Position::UP : Position::DOWN);
+					const Position enPassantPos = prevMove.source + (prevMove.player == Color::WHITE ? Position::UP : Position::DOWN);
 					opponentOccupancyBoard |= positionToBitboard(enPassantPos);
 				}
 			}

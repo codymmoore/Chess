@@ -38,7 +38,7 @@ namespace websocket
 
 			data["board"] = util::bitboard::getJsonFromBoard(*board);
 			data["nextTurn"] = util::toString(nextTurn);
-			data["winner"] = util::toString(winner);
+			data["winner"] = (winner ? boost::json::value(util::toString(winner.value())) : boost::json::value(nullptr));;
 
 			result["data"] = data;
 
