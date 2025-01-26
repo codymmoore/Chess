@@ -38,7 +38,7 @@ namespace move
 		const BitboardSet& board = chessState.getBoard();
 
 		Position attackerPos = position + backward + LEFT;
-		if (attackerPos.x > 0 && board.posIsOccupied(attackerPos, enemyPlayer, PieceType::PAWN))
+		if (attackerPos.x >= 0 && board.posIsOccupied(attackerPos, enemyPlayer, PieceType::PAWN))
 		{
 			return true;
 		}
