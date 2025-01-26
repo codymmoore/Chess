@@ -2,304 +2,106 @@
 
 #include "util/utility.h"
 
+#define UP Position::UP
+#define DOWN Position::DOWN
+#define LEFT Position::LEFT
+#define RIGHT Position::RIGHT
+
 using namespace util;
 using namespace util::bitboard;
 
-const Position ChessState::KING_START_POS[COLOR_COUNT] = {
-	Position(4, RANK_COUNT - 1),
-	Position(4, 0)
-};
+MoveHistoryNode::MoveHistoryNode(const Position& source, const Position& destination, const Color color, const PieceType pieceType) :
+	source(source),
+	destination(destination),
+	player(color),
+	pieceType(pieceType) {}
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  MoveHistoryNode::MoveHistoryNode(const Position& prevPos, const Position& currPos, const Color color, const PieceType pieceType)
-///
-/// \brief:  Create MoveHistoryNode object
-///
-/// \param [in]:  prevPos : previous position of piece
-/// \param [in]:  currPos : updated positon of piece
-/// \param [in]:  color : color of piece
-/// \param [in]:  pieceType : type of piece
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-MoveHistoryNode::MoveHistoryNode(const Position& prevPos, const Position& currPos, const Color color, const PieceType pieceType) :
-	m_prevPos(prevPos),
-	m_currPos(currPos),
-	m_color(color),
-	m_pieceType(pieceType) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  MoveHistoryNode& MoveHistoryNode::operator=(const MoveHistoryNode& rightOperand)
-///
-/// \brief:  Set calling object equal to right operand
-///
-/// \param [in]:  rightOperand : object that calling object will be set equal to
-///
-/// \return:  MoveHistoryNode& : reference to calling object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 MoveHistoryNode& MoveHistoryNode::operator=(const MoveHistoryNode& rightOperand)
 {
-	m_prevPos = rightOperand.m_prevPos;
-	m_currPos = rightOperand.m_currPos;
-	m_color = rightOperand.m_color;
-	m_pieceType = rightOperand.m_pieceType;
+	source = rightOperand.source;
+	destination = rightOperand.destination;
+	player = rightOperand.player;
+	pieceType = rightOperand.pieceType;
 
 	return *this;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  bool MoveHistoryNode::operator==(const MoveHistoryNode& rightOperand) const
-///
-/// \brief:  Determine whether two MoveHistoryNode objects are equivalent
-///
-/// \param [in]:  rightOperand : object to compare calling object to
-///
-/// \return:  bool : true if objects are equivalent, false otherwise
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 bool MoveHistoryNode::operator==(const MoveHistoryNode& rightOperand) const
 {
-	return m_prevPos == rightOperand.m_prevPos && m_currPos == rightOperand.m_currPos;
+	return source == rightOperand.source && destination == rightOperand.destination;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  bool MoveHistoryNode::operator!=(const MoveHistoryNode& rightOperand) const
-///
-/// \brief:  Determine whether two MoveHistoryNode objects are not equivalent
-///
-/// \param [in]:  rightOperand : object to compare calling object to
-///
-/// \return:  bool : true if objects are not equivalent, false otherwise
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 bool MoveHistoryNode::operator!=(const MoveHistoryNode& rightOperand) const
 {
 	return !(*this == rightOperand);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  std::ostream& operator<<(std::ostream& out, const MoveHistoryNode& move)
-///
-/// \brief:  Output MoveHistoryNode to ostream
-///
-/// \param [in, out]:  out : ostream that PieceNode object will be output to
-/// \param [in]:  move : MoveHistoryNode object to be output
-///
-/// \return:  ostream& : reference to updated ostream variable
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& out, const MoveHistoryNode& move)
 {
-	out << "{" << move.m_prevPos << ", " << move.m_currPos << ", " << toString(move.m_color) << ", " << toString(move.m_pieceType) << "}";
+	out << "{" << move.source << ", " << move.destination << ", " << toString(move.player) << ", " << toString(move.pieceType) << "}";
 	return out;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  MoveNode::MoveNode(const Position& source, const Position& destination, const PieceType promotion)
-///
-/// \brief:  Create MoveNode object
-///
-/// \param [in]:  source : the position the piece moved from
-/// \param [in]:  piece : the position the piece is moving to
-/// \param [in]:  promotion : the piece type a pawn is being promoted to
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-MoveNode::MoveNode(const Position& source, const Position& destination, const PieceType promotion) :
-	m_source(source),
-	m_destination(destination),
-	m_promotion(promotion) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  MoveHistoryNode& MoveHistoryNode::operator=(const MoveHistoryNode& rightOperand)
-///
-/// \brief:  Set calling object equal to right operand
-///
-/// \param [in]:  rightOperand : object that calling object will be set equal to
-///
-/// \return:  MoveNode& : reference to calling object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-MoveNode& MoveNode::operator=(const MoveNode& rightOperand)
-{
-	m_source = rightOperand.m_source;
-	m_destination = rightOperand.m_destination;
-	m_promotion = rightOperand.m_promotion;
-
-	return *this;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  bool MoveNode::operator==(const MoveNode& rightOperand) const
-///
-/// \brief:  Determine whether two MoveNode objects are equivalent
-///
-/// \param [in]:  rightOperand : object to compare calling object to
-///
-/// \return:  bool : true if objects are equivalent, false otherwise
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-bool MoveNode::operator==(const MoveNode& rightOperand) const
-{
-	return m_source == rightOperand.m_source
-		&& m_destination == rightOperand.m_destination
-		&& m_promotion == rightOperand.m_promotion;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  bool MoveNode::operator!=(const MoveNode& rightOperand) const
-///
-/// \brief:  Determine whether two MoveNode objects are not equivalent
-///
-/// \param [in]:  rightOperand : object to compare calling object to
-///
-/// \return:  bool : true if objects are not equivalent, false otherwise
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-bool MoveNode::operator!=(const MoveNode& rightOperand) const
-{
-	return !(*this == rightOperand);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  std::ostream& operator<<(std::ostream& out, const MoveNode& move)
-///
-/// \brief:  Output MoveNode to ostream
-///
-/// \param [in, out]:  out : ostream that PieceNode object will be output to
-/// \param [in]:  move : MoveNode object to be output
-///
-/// \return:  ostream& : reference to updated ostream variable
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-std::ostream& operator<<(std::ostream& out, const MoveNode& move)
-{
-	out << "{" << move.m_source << ", " << move.m_destination << ", " << toString(move.m_promotion) << "}";
-	return out;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  ChessState::ChessState()
-///
-/// \brief:  Create default starting chess state
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 ChessState::ChessState()
 {
 	initialize();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  ChessState::ChessState(const std::string& gameState)
-///
-/// \brief:  Create ChessState object from Forsyth-Edwards Notation (FEN) string
-///
-/// \param [in]:  gameState: FEN string representation of a game state  
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-ChessState::ChessState(const std::string& gameState)
+ChessState::ChessState(const std::string& fenString)
 {
-	setState(gameState);
+	setState(fenString);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  ChessState::ChessState(const ChessState& source)
-///
-/// \brief:  Create ChessState copy
-///
-/// \param [in]:  source : ChessState to be copied
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 ChessState::ChessState(const ChessState& source) :
-	m_board(source.m_board),
+	_board(source._board),
+	_moveHistory(source._moveHistory),
+	_winner(source._winner),
+	_nextTurn(source._nextTurn),
+	_halfTurnCount(source._halfTurnCount),
+	_fullTurnCount(source._fullTurnCount),
+	_wKingSideCastle(source._wKingSideCastle),
+	_wQueenSideCastle(source._wQueenSideCastle),
+	_bKingSideCastle(source._bKingSideCastle),
+	_bQueenSideCastle(source._bQueenSideCastle) {}
 
-	m_moveHistory(source.m_moveHistory),
-
-	m_winner(source.m_winner),
-	m_nextTurn(source.m_nextTurn),
-
-	m_numHalfTurns(source.m_numHalfTurns),
-	m_numFullTurns(source.m_numFullTurns),
-
-	// Castling variables
-	m_wKingSideCastle(source.m_wKingSideCastle),
-	m_wQueenSideCastle(source.m_wQueenSideCastle),
-	m_bKingSideCastle(source.m_bKingSideCastle),
-	m_bQueenSideCastle(source.m_bQueenSideCastle) {}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  ChessState::ChessState(const ChessState& source)
-///
-/// \brief:  Destroy ChessState object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 ChessState::~ChessState()
 {
 	clear();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  Color ChessState::getNextTurn() const
-///
-/// \brief:  Get color of next player to move
-///
-/// \return:  Color : color of next player to move
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 Color ChessState::getNextTurn() const
 {
-	return m_nextTurn;
+	return _nextTurn;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  Color ChessState::getWinner() const
-///
-/// \brief:  Get color of winner
-///
-/// \return:  Color : color of winner
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-Color ChessState::getWinner() const
+std::optional<Color> ChessState::getWinner() const
 {
-	return m_winner;
+	return _winner;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  std::string ChessState::getFenString() const
-///
-/// \brief:  Get FEN representation of current chess state
-///
-/// \return:  std::string : FEN string representation of chess state
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 std::string ChessState::getFenString() const
 {
 	std::string fenString = "";
 
-	/* ----- Convert board ----- */
 	int numZeros = 0;
-
 	for (int y = 0; y < RANK_COUNT; y++)
 	{
 		for (int x = 0; x < FILE_COUNT; x++)
 		{
-			bool occupied = false;
+			bool occupied = true;
 			char output;
-			int color = WHITE;
 
-			while (color < COLOR_COUNT && !occupied)
+			if (_board.posIsOccupied(x, y, Color::WHITE))
 			{
-				int pieceType = PAWN;
-
-				while (pieceType < PIECE_TYPE_COUNT && !occupied)
-				{
-					if (m_board.posIsOccupied(x, y, (Color)color, (PieceType)pieceType))
-					{
-						output = PIECE_SYMBOLS[color][pieceType];
-						occupied = true;
-					}
-					pieceType += 1;
-				}
-				color += 1;
+				output = PIECE_SYMBOLS[Color::WHITE][_board.getPieceType(x, y)];
+			}
+			else if (_board.posIsOccupied(x, y, Color::BLACK))
+			{
+				output = PIECE_SYMBOLS[Color::BLACK][_board.getPieceType(x, y)];
+			}
+			else
+			{
+				occupied = false;
 			}
 
 			if (occupied)
@@ -331,192 +133,370 @@ std::string ChessState::getFenString() const
 	}
 	fenString += " ";
 
-	// Add turn to FEN string
-	fenString += (m_nextTurn == Color::WHITE ? 'w' : 'b');
+	fenString += (_nextTurn == Color::WHITE ? 'w' : 'b');
 	fenString += ' ';
 
-	// Add castling variables to FEN string
 	std::string castlingStr = "";
-
-	if (m_wKingSideCastle)
+	if (_wKingSideCastle)
 		castlingStr += 'K';
-	if (m_wQueenSideCastle)
+	if (_wQueenSideCastle)
 		castlingStr += 'Q';
-	if (m_bKingSideCastle)
+	if (_bKingSideCastle)
 		castlingStr += 'k';
-	if (m_bQueenSideCastle)
+	if (_bQueenSideCastle)
 		castlingStr += 'q';
-
 	fenString += (castlingStr.empty() ? "-" : castlingStr) + " ";
 
-	// Add en passant to FEN string
 	std::string enPassantStr = "";
-
-	if (!m_moveHistory.empty())
+	if (!_moveHistory.empty())
 	{
-		if (m_moveHistory.back().m_pieceType == PieceType::PAWN)
+		if (_moveHistory.back().pieceType == PieceType::PAWN)
 		{
-			int deltaY = m_moveHistory.back().m_prevPos.y - m_moveHistory.back().m_currPos.y;
+			int deltaY = _moveHistory.back().source.y - _moveHistory.back().destination.y;
 
 			if (deltaY * deltaY > 1)
 			{
 				// Add file to en passant string
-				enPassantStr += (char)(m_moveHistory.back().m_currPos.x + 97);
+				enPassantStr += (char)(_moveHistory.back().destination.x + 97);
 
 				// Add rank to en passant string
-				enPassantStr += std::to_string(RANK_COUNT - m_moveHistory.back().m_currPos.y - (int)(deltaY / 2));
+				enPassantStr += std::to_string(RANK_COUNT - _moveHistory.back().destination.y - (int)(deltaY / 2));
 			}
 		}
 	}
-
 	fenString += (enPassantStr.empty() ? "-" : enPassantStr) + " ";
 
-	// Add half turns to FEN string
-	fenString += std::to_string(m_numHalfTurns) + " ";
-
-	// Add full turns to FEN string
-	fenString += std::to_string(m_numFullTurns);
+	fenString += std::to_string(_halfTurnCount) + " ";
+	fenString += std::to_string(_fullTurnCount);
 
 	return fenString;
 }
 
-/**
- * Retrieve the board.
- *
- * \return The BitBoard instance representing the board state
- */
 const BitboardSet& ChessState::getBoard() const
 {
-	return m_board;
+	return _board;
 }
 
 const std::deque<MoveHistoryNode>& ChessState::getMoveHistory() const
 {
-	return m_moveHistory;
+	return _moveHistory;
 }
 
-/**
- * Determine if a player can king-side castle.
- *
- * \param player
- * \return true if player can perform a king-side castle, false otherwise
- */
+int ChessState::getHalfTurnCount() const
+{
+	return _halfTurnCount;
+}
+
+int ChessState::getFullTurnCount() const
+{
+	return _fullTurnCount;
+}
+
 bool ChessState::canKingSideCastle(const Color player) const
 {
-	return player == Color::WHITE ? m_wKingSideCastle : m_bKingSideCastle;
+	return player == Color::WHITE ? _wKingSideCastle : _bKingSideCastle;
 }
 
-/**
- * Determine if a player can queen-side castle.
- *
- * \param player
- * \return true if player can perform a queen-side castle, false otherwise
- */
 bool ChessState::canQueenSideCastle(const Color player) const
 {
-	return player == Color::WHITE ? m_wQueenSideCastle : m_bQueenSideCastle;
+	return player == Color::WHITE ? _wQueenSideCastle : _bQueenSideCastle;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  void setState(const std::string& gameState)
-///
-/// \brief:  Set game state according to FEN string
-///
-/// \param [in]:  gameState : FEN string representing game state
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-void ChessState::setState(const std::string& gameState)
+void ChessState::update(const Color player, const move::Move& move, const PieceType promotion)
 {
-	m_board.clear();
-	m_moveHistory.clear();
-	m_winner = NEUTRAL;
+	update(player, move.source, move.destination, promotion);
+}
 
-	m_wKingSideCastle = false;
-	m_wQueenSideCastle = false;
-	m_bKingSideCastle = false;
-	m_bQueenSideCastle = false;
+void ChessState::update(const Color player, const Position& source, const Position& destination, const PieceType promotion)
+{
+	PieceType pieceType = _board.getPieceType(source, player);
 
-	// Split FEN string
-	std::vector<std::string> substrings = stringSplit(gameState, ' ');
+	if (pieceType == PieceType::NONE)
+	{
+		std::string errorMessage = "Piece not found at position (" + std::to_string(source.x) +
+			", " + std::to_string(source.y) + ")";
+		throw std::exception(errorMessage.c_str());
+	}
 
-	// Seperate board string into rows
+	if (pieceType == PieceType::PAWN)
+	{
+		// Pawn advancement resets half turns to 0
+		//   (half turns are incremented at end of function)
+		_halfTurnCount = -1;
+
+		// If an en passant occurs
+		if ((destination.x - source.x) != 0 && !_board.posIsOccupied(destination))
+		{
+			const Position backward = player == Color::WHITE ? DOWN : UP;
+			_board.clearPos(destination + backward, ~player);
+		}
+
+		int endOfBoard = (player == WHITE ? 0 : RANK_COUNT - 1);
+		// promotion
+		if (destination.y == endOfBoard)
+		{
+			_board.clearPos(source, player, PieceType::PAWN);
+			_board.addPiece(source, player, promotion);
+			pieceType = promotion;
+		}
+	}
+
+	else if (pieceType == PieceType::KING)
+	{
+		int deltaX = destination.x - source.x;
+
+		// If castling occurs
+		if (deltaX * deltaX > 1)
+		{
+			Position oldRookPosition, newRookPosition;
+
+			// If kingside castling occurs
+			if (deltaX > 1)
+			{
+				oldRookPosition.x = FILE_COUNT - 1;
+				newRookPosition = destination + LEFT;
+			}
+			// If queenside castling occurs
+			else
+			{
+				oldRookPosition.x = 0;
+				newRookPosition = destination + RIGHT;
+			}
+			oldRookPosition.y = source.y;
+
+			_board.clearPos(oldRookPosition, player, PieceType::ROOK);
+			_board.addPiece(newRookPosition, player, PieceType::ROOK);
+		}
+
+		if (player == Color::WHITE)
+		{
+			_wKingSideCastle = false;
+			_wQueenSideCastle = false;
+		}
+		else // player == Color::BLACK
+		{
+			_bKingSideCastle = false;
+			_bQueenSideCastle = false;
+		}
+	}
+
+	else if (pieceType == PieceType::ROOK)
+	{
+		if (source == Position(0, 0))
+		{
+			_bQueenSideCastle = false;
+		}
+		else if (source == Position(FILE_COUNT - 1, 0))
+		{
+			_bKingSideCastle = false;
+		}
+		else if (source == Position(0, RANK_COUNT - 1))
+		{
+			_wQueenSideCastle = false;
+		}
+		else if (source == Position(FILE_COUNT - 1, RANK_COUNT - 1))
+		{
+			_wKingSideCastle = false;
+		}
+	}
+
+	// capture
+	if (_board.posIsOccupied(destination, ~player))
+	{
+		if (_board.posIsOccupied(destination, ~player, PieceType::ROOK))
+		{
+			if (destination.x == 0)
+			{
+				if (player == Color::WHITE)
+				{
+					_bQueenSideCastle = false;
+				}
+				else // player == Color::BLACK
+				{
+					_wQueenSideCastle = false;
+				}
+			}
+			else if (destination.x == FILE_COUNT - 1)
+			{
+				if (player == Color::WHITE)
+				{
+					_bKingSideCastle = false;
+				}
+				else // player == Color::BLACK
+				{
+					_wKingSideCastle = false;
+				}
+			}
+		}
+		_board.clearPos(destination, ~player);
+
+		// Half turns are reset when a capture occurs
+		//   (half turns are incremented at end of function)
+		_halfTurnCount = -1;
+	}
+
+	_halfTurnCount += 1;
+
+	_moveHistory.emplace_back(source, destination, player, pieceType);
+	if (_moveHistory.size() > 8)
+	{
+		_moveHistory.pop_front();
+	}
+
+	// check for tie
+	if (_moveHistory.size() >= 8 && _halfTurnCount >= 8)
+	{
+		bool tie = true;
+		int prevMoveIndex = 0,
+			moveHistorySize = (int)_moveHistory.size();
+
+		while (tie && prevMoveIndex < (moveHistorySize / 2))
+		{
+			tie = _moveHistory[prevMoveIndex] == _moveHistory[prevMoveIndex + 4];
+			prevMoveIndex += 1;
+		}
+
+		if (tie)
+		{
+			_nextTurn = NEUTRAL;
+		}
+	}
+
+	_board.clearPos(source, player, pieceType);
+	_board.addPiece(destination, player, pieceType);
+
+	if (_nextTurn == Color::BLACK)
+	{
+		_fullTurnCount += 1;
+	}
+
+	if (_nextTurn != NEUTRAL)
+	{
+		_nextTurn = ~player;
+	}
+}
+
+void ChessState::clear()
+{
+	_board.clear();
+
+	_moveHistory.clear();
+
+	_wKingSideCastle = false;
+	_wQueenSideCastle = false;
+	_bKingSideCastle = false;
+	_bQueenSideCastle = false;
+
+	_winner = std::nullopt;
+	_nextTurn = Color::WHITE;
+
+	_halfTurnCount = 0;
+	_fullTurnCount = 0;
+}
+
+void ChessState::reset()
+{
+	clear();
+	initialize();
+}
+
+void ChessState::initialize()
+{
+	_board.populateBoard();
+
+	_winner = std::nullopt;
+	_nextTurn = Color::WHITE; // White starts by default
+
+	_halfTurnCount = 0;
+	_fullTurnCount = 1;
+
+	_wKingSideCastle = true;
+	_wQueenSideCastle = true;
+	_bKingSideCastle = true;
+	_bQueenSideCastle = true;
+}
+
+void ChessState::setState(const std::string& fenString)
+{
+	_board.clear();
+	_moveHistory.clear();
+	_winner = std::nullopt;
+
+	_wKingSideCastle = false;
+	_wQueenSideCastle = false;
+	_bKingSideCastle = false;
+	_bQueenSideCastle = false;
+
+	std::vector<std::string> substrings = stringSplit(fenString, ' ');
 	std::vector<std::string> boardStrings = stringSplit(substrings[0], '/');
 
-	// Fill board
 	for (int y = 0; y < RANK_COUNT; y++)
 	{
 		int stringIndex = 0;
 		for (int x = 0; x < FILE_COUNT; x++)
 		{
-			// If current char is capital (white piece)
 			if (boardStrings[y][stringIndex] >= 'A' && boardStrings[y][stringIndex] <= 'Z')
 			{
 				Color color = Color::WHITE;
-				PieceType pieceType = NONE;
+				PieceType pieceType = PieceType::NONE;
 
-				// Convert char to PieceType
 				switch (boardStrings[y][stringIndex])
 				{
-				case PIECE_SYMBOLS[WHITE][PAWN]:
-					pieceType = PAWN;
-					break;
-				case PIECE_SYMBOLS[WHITE][KNIGHT]:
-					pieceType = KNIGHT;
-					break;
-				case PIECE_SYMBOLS[WHITE][BISHOP]:
-					pieceType = BISHOP;
-					break;
-				case PIECE_SYMBOLS[WHITE][ROOK]:
-					pieceType = ROOK;
-					break;
-				case PIECE_SYMBOLS[WHITE][QUEEN]:
-					pieceType = QUEEN;
-					break;
-				case PIECE_SYMBOLS[WHITE][KING]:
-					pieceType = KING;
-					break;
-				default:
-					break;
+					case PIECE_SYMBOLS[Color::WHITE][PieceType::PAWN]:
+						pieceType = PieceType::PAWN;
+						break;
+					case PIECE_SYMBOLS[Color::WHITE][PieceType::KNIGHT]:
+						pieceType = PieceType::KNIGHT;
+						break;
+					case PIECE_SYMBOLS[Color::WHITE][PieceType::BISHOP]:
+						pieceType = PieceType::BISHOP;
+						break;
+					case PIECE_SYMBOLS[Color::WHITE][PieceType::ROOK]:
+						pieceType = PieceType::ROOK;
+						break;
+					case PIECE_SYMBOLS[Color::WHITE][PieceType::QUEEN]:
+						pieceType = PieceType::QUEEN;
+						break;
+					case PIECE_SYMBOLS[Color::WHITE][PieceType::KING]:
+						pieceType = PieceType::KING;
+						break;
+					default:
+						break;
 				}
 
-				// Add piece to board
-				m_board.addPiece(x, y, color, pieceType);
+				_board.addPiece(x, y, color, pieceType);
 			}
-			// If current char is lowercase (black piece)
 			else if (boardStrings[y][stringIndex] >= 'a' && boardStrings[y][stringIndex] <= 'z')
 			{
 				Color color = Color::BLACK;
-				PieceType pieceType = NONE;
+				PieceType pieceType = PieceType::NONE;
 
-				// Convert char to PieceType
 				switch (boardStrings[y][stringIndex])
 				{
-				case PIECE_SYMBOLS[BLACK][PAWN]:
-					pieceType = PieceType::PAWN;
-					break;
-				case PIECE_SYMBOLS[BLACK][KNIGHT]:
-					pieceType = PieceType::KNIGHT;
-					break;
-				case PIECE_SYMBOLS[BLACK][BISHOP]:
-					pieceType = PieceType::BISHOP;
-					break;
-				case PIECE_SYMBOLS[BLACK][ROOK]:
-					pieceType = PieceType::ROOK;
-					break;
-				case PIECE_SYMBOLS[BLACK][QUEEN]:
-					pieceType = PieceType::QUEEN;
-					break;
-				case PIECE_SYMBOLS[BLACK][KING]:
-					pieceType = PieceType::KING;
-					break;
-				default:
-					break;
+					case PIECE_SYMBOLS[Color::BLACK][PieceType::PAWN]:
+						pieceType = PieceType::PAWN;
+						break;
+					case PIECE_SYMBOLS[Color::BLACK][PieceType::KNIGHT]:
+						pieceType = PieceType::KNIGHT;
+						break;
+					case PIECE_SYMBOLS[Color::BLACK][PieceType::BISHOP]:
+						pieceType = PieceType::BISHOP;
+						break;
+					case PIECE_SYMBOLS[Color::BLACK][PieceType::ROOK]:
+						pieceType = PieceType::ROOK;
+						break;
+					case PIECE_SYMBOLS[Color::BLACK][PieceType::QUEEN]:
+						pieceType = PieceType::QUEEN;
+						break;
+					case PIECE_SYMBOLS[Color::BLACK][PieceType::KING]:
+						pieceType = PieceType::KING;
+						break;
+					default:
+						break;
 				}
 
-				// Add piece to board
-				m_board.addPiece(x, y, color, pieceType);
+				_board.addPiece(x, y, color, pieceType);
 			}
-			// If current char is numerical
 			else if (boardStrings[y][stringIndex] >= '0' && boardStrings[y][stringIndex] <= '9')
 			{
 				int numEmpties = (int)boardStrings[y][stringIndex] - 48;
@@ -527,167 +507,91 @@ void ChessState::setState(const std::string& gameState)
 					numEmpties += (int)boardStrings[y][stringIndex] - 48;
 					stringIndex += 1;
 				}
-
-				// Skip blank spaces
 				x += numEmpties - 1;
 			}
 			stringIndex += 1;
 		}
 	}
 
-	m_nextTurn = (substrings[1] == "w" ? Color::WHITE : Color::BLACK);
+	_nextTurn = (substrings[1] == "w" ? Color::WHITE : Color::BLACK);
 
-	// Set castling variables
 	if (substrings[2] != "-")
 	{
 		for (int i = 0; i < (int)substrings[2].size(); i++)
 		{
 			switch (substrings[2][i])
 			{
-			case PIECE_SYMBOLS[WHITE][KING]:
-				m_wKingSideCastle = true;
-				break;
-			case PIECE_SYMBOLS[WHITE][QUEEN]:
-				m_wQueenSideCastle = true;
-				break;
-			case PIECE_SYMBOLS[BLACK][KING]:
-				m_bKingSideCastle = true;
-				break;
-			case PIECE_SYMBOLS[BLACK][QUEEN]:
-				m_bQueenSideCastle = true;
-				break;
-			default:
-				break;
+				case PIECE_SYMBOLS[Color::WHITE][PieceType::KING]:
+					_wKingSideCastle = true;
+					break;
+				case PIECE_SYMBOLS[Color::WHITE][PieceType::QUEEN]:
+					_wQueenSideCastle = true;
+					break;
+				case PIECE_SYMBOLS[Color::BLACK][PieceType::KING]:
+					_bKingSideCastle = true;
+					break;
+				case PIECE_SYMBOLS[Color::BLACK][PieceType::QUEEN]:
+					_bQueenSideCastle = true;
+					break;
+				default:
+					break;
 			}
 		}
 	}
 
-	// If En Passant is possible, add to move history
 	if (substrings[3] != "-")
 	{
-		int x = (int)substrings[3][0] - 97, // Convert file to x-coordinate
-			y = RANK_COUNT - ((int)substrings[3][1] - 48); // Convert rank to y-coordinate
+		int x = (int)substrings[3][0] - 97,
+			y = RANK_COUNT - ((int)substrings[3][1] - 48);
 
-		// If last pawn to move was colorled by white
-		if (m_board.posIsOccupied(x, y - 1, WHITE, PAWN))
+		if (_board.posIsOccupied(x, y - 1, Color::WHITE, PieceType::PAWN))
 		{
-			// Add pawn move to move history
-			Position prevPos(x, y + 1),
+			Position source(x, y + 1),
 				currPos(x, y - 1);
 
-			m_moveHistory.push_back(MoveHistoryNode(prevPos, currPos, Color::WHITE, PieceType::PAWN));
+			_moveHistory.push_back(MoveHistoryNode(source, currPos, Color::WHITE, PieceType::PAWN));
 		}
-		// If last pawn to move was colorled by black
-		else if (m_board.posIsOccupied(x, y + 1, BLACK, PAWN))
+		else if (_board.posIsOccupied(x, y + 1, Color::BLACK, PieceType::PAWN))
 		{
 			// Add pawn move to move history
-			Position prevPos(x, y - 1),
+			Position source(x, y - 1),
 				currPos(x, y + 1);
 
-			m_moveHistory.push_back(MoveHistoryNode(prevPos, currPos, Color::BLACK, PieceType::PAWN));
+			_moveHistory.push_back(MoveHistoryNode(source, currPos, Color::BLACK, PieceType::PAWN));
 		}
 	}
 
-	m_numHalfTurns = std::stoi(substrings[4]);
-	m_numFullTurns = std::stoi(substrings[5]);
+	_halfTurnCount = std::stoi(substrings[4]);
+	_fullTurnCount = std::stoi(substrings[5]);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  void ChessState::clear()
-///
-/// \brief:  Clear ChessState object
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-void ChessState::clear()
-{
-	m_board.clear();
-
-	m_moveHistory.clear();
-
-	m_wKingSideCastle = false;
-	m_wQueenSideCastle = false;
-	m_bKingSideCastle = false;
-	m_bQueenSideCastle = false;
-
-	m_winner = Color::NEUTRAL;
-	m_nextTurn = Color::WHITE;
-
-	m_numHalfTurns = 0;
-	m_numFullTurns = 0;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  void ChessState::reset()
-///
-/// \brief:  Resets the initial game state.
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-void ChessState::reset()
-{
-	clear();
-	initialize();
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  void ChessState::initialize()
-///
-/// \brief:  Initializes ChessState instance for a new game.
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
-void ChessState::initialize()
-{
-	m_board.populateBoard();
-
-	m_winner = Color::NEUTRAL;
-	m_nextTurn = Color::WHITE; // White starts by default
-
-	m_numHalfTurns = 0;
-	m_numFullTurns = 1;
-
-	// Castling Variables
-	m_wKingSideCastle = true;
-	m_wQueenSideCastle = true;
-	m_bKingSideCastle = true;
-	m_bQueenSideCastle = true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  void ChessState::print() const
-///
-/// \brief:  Print current board state
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
 void ChessState::print() const
 {
-	m_board.print();
+	_board.print();
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn:  void ChessState::printDebug() const
-///
-/// \brief:  Print all information regarding current state
-///
-/////////////////////////////////////////////////////////////////////////////////////////////
+#ifdef _DEBUG
 void ChessState::printDebug() const
 {
 	// Output last 8 moves
 	std::cout << "MOVE HISTORY: ";
-	for (const MoveHistoryNode& move : m_moveHistory)
+	for (const MoveHistoryNode& move : _moveHistory)
 		std::cout << move << " ";
 	std::cout << std::endl;
 
-	std::cout << "NEXT TURN: " << toString(m_nextTurn) << std::endl;
-	std::cout << "NUMBER OF HALF TURNS: " << m_numHalfTurns << std::endl;
-	std::cout << "NUMBER OF FULL TURNS: " << m_numFullTurns << std::endl;
-	std::cout << "WINNER: " << toString(m_winner) << std::endl;
+	std::cout << "NEXT TURN: " << toString(_nextTurn) << std::endl;
+	std::cout << "NUMBER OF HALF TURNS: " << _halfTurnCount << std::endl;
+	std::cout << "NUMBER OF FULL TURNS: " << _fullTurnCount << std::endl;
+	std::cout << "WINNER: " << (_winner ? toString(_winner.value()) : "") << std::endl;
 
 	std::cout << "CASTLING: ";
-	if (m_wKingSideCastle) std::cout << PIECE_SYMBOLS[WHITE][KING];
-	if (m_wQueenSideCastle) std::cout << PIECE_SYMBOLS[WHITE][QUEEN];
-	if (m_bKingSideCastle) std::cout << PIECE_SYMBOLS[BLACK][KING];
-	if (m_bQueenSideCastle) std::cout << PIECE_SYMBOLS[BLACK][QUEEN];
+	if (_wKingSideCastle) std::cout << PIECE_SYMBOLS[Color::WHITE][PieceType::KING];
+	if (_wQueenSideCastle) std::cout << PIECE_SYMBOLS[Color::WHITE][PieceType::QUEEN];
+	if (_bKingSideCastle) std::cout << PIECE_SYMBOLS[Color::BLACK][PieceType::KING];
+	if (_bQueenSideCastle) std::cout << PIECE_SYMBOLS[Color::BLACK][PieceType::QUEEN];
 	std::cout << std::endl;
 
 	std::cout << "BOARD:" << std::endl;
-	m_board.print();
+	_board.print();
 }
+#endif

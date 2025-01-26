@@ -96,6 +96,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalIncludeDirectories>C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib\native;C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -143,6 +144,7 @@
       <PrecompiledHeaderOutputFile>
       </PrecompiledHeaderOutputFile>
       <AdditionalIncludeDirectories>C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib\native;C:\Users\Coco\Dev\Git\Chess\packages\boost.1.85.0\lib;C:\Users\Coco\Dev\Git\Chess\packages\gmock.1.11.0\lib\native\include\gmock;C:\Users\Coco\Dev\Git\Chess\packages\gmock.1.11.0\lib\native\include\gtest;C:\Users\Coco\Dev\Git\Chess\packages\gmock.1.11.0\lib\native\include\gtest\internal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

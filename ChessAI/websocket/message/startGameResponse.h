@@ -21,7 +21,8 @@ namespace websocket
 		struct StartGameResponse : Message
 		{
 			std::unique_ptr<const util::bitboard::BitboardSet> board;
-			Color nextTurn, winner;
+			Color nextTurn;
+			std::optional<Color> winner;
 
 			StartGameResponse() = default;
 

@@ -71,12 +71,12 @@ void ChessServer::run()
 
 		switch (gameType)
 		{
-		case HUMAN_VS_AI:
-			humanVsAi();
-			break;
-		case AI_VS_AI:
-			aiVsAi();
-			break;
+			case HUMAN_VS_AI:
+				humanVsAi();
+				break;
+			case AI_VS_AI:
+				aiVsAi();
+				break;
 		}
 	}
 }
@@ -130,7 +130,7 @@ bool ChessServer::handleAiTurn(Agent& agent)
 {
 	Move move = agent.getMove();
 
-	move::makeMove(agent.getPlayer(), move, _chessState);
+	_chessState.update(agent.getPlayer(), move);
 
 	UpdateClientRequest updateClientRequest;
 	updateClientRequest.board = std::make_unique<const util::bitboard::BitboardSet>(_chessState.getBoard());
@@ -154,24 +154,24 @@ std::unique_ptr<Message> ChessServer::handleRequest(const Message& request)
 {
 	switch (request.getMessageType())
 	{
-	case GET_VALID_MOVES_REQUEST:
-	{
-		const GetValidMovesRequest& getValidMovesRequest = dynamic_cast<const GetValidMovesRequest&>(request);
-		return std::make_unique<GetValidMovesResponse>(_chessController.getValidMoves(getValidMovesRequest));
-	}
-	case MAKE_MOVE_REQUEST:
-	{
-		const MakeMoveRequest& makeMoveRequest = dynamic_cast<const MakeMoveRequest&>(request);
-		return std::make_unique<MakeMoveResponse>(_chessController.makeMove(makeMoveRequest));
-	}
-	case END_GAME_REQUEST:
-	{
-		return std::make_unique<EndGameResponse>();
-	}
-	default:
-	{
-		std::string errorMessage = "Unexpected message type received: " + toString(request.getMessageType());
-		throw std::exception(errorMessage.c_str());
-	}
+		case GET_VALID_MOVES_REQUEST:
+		{
+			const GetValidMovesRequest& getValidMovesRequest = dynamic_cast<const GetValidMovesRequest&>(request);
+			return std::make_unique<GetValidMovesResponse>(_chessController.getValidMoves(getValidMovesRequest));
+		}
+		case MAKE_MOVE_REQUEST:
+		{
+			const MakeMoveRequest& makeMoveRequest = dynamic_cast<const MakeMoveRequest&>(request);
+			return std::make_unique<MakeMoveResponse>(_chessController.makeMove(makeMoveRequest));
+		}
+		case END_GAME_REQUEST:
+		{
+			return std::make_unique<EndGameResponse>();
+		}
+		default:
+		{
+			std::string errorMessage = "Unexpected message type received: " + toString(request.getMessageType());
+			throw std::exception(errorMessage.c_str());
+		}
 	}
 }

@@ -49,7 +49,7 @@ Move Agent::getMove()
 	for (const Move& move : moves)
 	{
 		std::future<double> futureMoveValue = util::ThreadPool::getInstance().submit([this, move, enemyPlayer, newState = _chessState]() mutable {
-			move::makeMove(_player, move.source, move.destination, newState);
+			newState.update(_player, move.source, move.destination);
 			return -this->getNegaMaxValue(enemyPlayer, newState, 1, -DBL_MAX, DBL_MAX);
 		});
 
@@ -130,11 +130,12 @@ bool Agent::timeHeuristic(const double timeElapsed, const double timeRemaining) 
 	return timeElapsed < turnTime;
 }
 
-bool Agent::isQuiescent(const ChessState& game, const std::vector<Move>& validMoves) const
+bool Agent::isQuiescent(const ChessState& chessState, const std::vector<Move>& validMoves) const
 {
+	const BitboardSet& board = chessState.getBoard();
 	for (const Move& move : validMoves)
 	{
-		if (game.m_board.posIsOccupied(move.destination))
+		if (board.posIsOccupied(move.destination))
 		{
 			return false;
 		}
@@ -215,7 +216,7 @@ double Agent::getNegaMaxValue(const Color player, const ChessState& chessState, 
 				const Move& move = playerMoves[entry.second];
 				ChessState gameCopy(chessState);
 
-				move::makeMove(player, move, gameCopy);
+				gameCopy.update(player, move);
 
 				const double value = -getNegaMaxValue(enemyPlayer, gameCopy, searchDepth + 1, -beta, -alpha);
 

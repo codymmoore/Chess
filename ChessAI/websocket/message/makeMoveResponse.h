@@ -23,7 +23,8 @@ namespace websocket
 		{
 			bool success;
 			std::unique_ptr<const util::bitboard::BitboardSet> board;
-			Color nextTurn, winner;
+			Color nextTurn;
+			std::optional<Color> winner;
 
 			MakeMoveResponse() = default;
 
