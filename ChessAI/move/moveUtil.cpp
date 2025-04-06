@@ -271,7 +271,7 @@ namespace move
 		{
 			ChessState gameCopy(chessState);
 
-			gameCopy.update(player, *move);
+			gameCopy.update(player, *move, PieceType::QUEEN, false);
 
 			if (inCheck(player, gameCopy))
 			{

@@ -62,7 +62,7 @@ namespace getValidMovesTest
 		TEST_F(GetValidMovesTest, removeMovesThatResultInCheck_knight)
 		{
 			const Color COLOR = Color::WHITE;
-			chessState = std::make_unique<ChessState>("2n1k1n1/2n5/7n/4K3/1n6/6n1/2n3n1/8 b - - 0 1");
+			chessState = std::make_unique<ChessState>("2n1k1n1/2n5/7n/4K3/1n6/6n1/2n3n1/8 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 
 			EXPECT_TRUE(validMoves.empty());
@@ -72,7 +72,7 @@ namespace getValidMovesTest
 		{
 			const Color COLOR = Color::WHITE;
 			const Position SOURCE(4, 3);
-			chessState = std::make_unique<ChessState>("4k3/1b6/6b1/4K3/7b/b7/8/8 b - - 0 1");
+			chessState = std::make_unique<ChessState>("4k3/1b6/6b1/4K3/7b/b7/8/8 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 
 			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(3, 2)))));
@@ -85,7 +85,7 @@ namespace getValidMovesTest
 		{
 			const Color COLOR = Color::WHITE;
 			const Position SOURCE(4, 3);
-			chessState = std::make_unique<ChessState>("4k3/8/r4r2/4K3/6r1/8/3r4/8 b - - 0 1");
+			chessState = std::make_unique<ChessState>("4k3/8/r4r2/4K3/6r1/8/3r4/8 w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 
 			EXPECT_THAT(validMoves, Not(Contains(Move(SOURCE, Position(5, 3)))));
@@ -98,7 +98,7 @@ namespace getValidMovesTest
 		{
 			const Color COLOR = Color::WHITE;
 			const Position SOURCE(4, 3);
-			chessState = std::make_unique<ChessState>("4kq2/q7/7q/4K3/8/8/8/7q b - - 0 1");
+			chessState = std::make_unique<ChessState>("4kq2/q7/7q/4K3/8/8/8/7q w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 
 			EXPECT_TRUE(validMoves.empty());
@@ -108,7 +108,7 @@ namespace getValidMovesTest
 		{
 			const Color COLOR = Color::WHITE;
 			const Position SOURCE(4, 3);
-			chessState = std::make_unique<ChessState>("4k3/8/8/4K3/r1p5/2ppppp1/b7/2qq1r1b b - - 0 1");
+			chessState = std::make_unique<ChessState>("4k3/8/8/4K3/r1p5/2ppppp1/b7/2qq1r1b w - - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 
 			EXPECT_EQ(validMoves.size(), 8);
@@ -569,7 +569,7 @@ namespace getValidMovesTest
 			const Color COLOR = Color::BLACK;
 			const Position SOURCE = Position(4, 0);
 			const Position DESTINATION = SOURCE + LEFT * 2;
-			chessState = std::make_unique<ChessState>("r3k3/8/8/8/8/8/8/4K3 w q - 0 1");
+			chessState = std::make_unique<ChessState>("r3k3/8/8/8/8/8/8/4K3 b q - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 			EXPECT_THAT(validMoves, Contains(Move(SOURCE, DESTINATION)));
 		}
@@ -589,7 +589,7 @@ namespace getValidMovesTest
 			const Color COLOR = Color::BLACK;
 			const Position SOURCE = Position(4, 0);
 			const Position DESTINATION = SOURCE + RIGHT * 2;
-			chessState = std::make_unique<ChessState>("4k2r/8/8/8/8/8/8/4K3 w k - 0 1");
+			chessState = std::make_unique<ChessState>("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
 			const std::vector<Move> validMoves = getValidMoves(*chessState, COLOR);
 			EXPECT_THAT(validMoves, Contains(Move(SOURCE, DESTINATION)));
 		}
