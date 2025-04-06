@@ -96,7 +96,6 @@ double Agent::evaluateGameState(const ChessState& chessState, const Color player
 {
 	double result = 0.0;
 	const Color enemyPlayer = ~player;
-
 	double capturePoints = FULL_TEAM_VALUE;
 	const BitboardSet& board = chessState.getBoard();
 	for (int i = PieceType::PAWN; i < PieceType::KING; i++)
@@ -198,9 +197,25 @@ MoveIndexMap Agent::getOrderedMoveIndexMap(const ChessState& chessState, const C
 double Agent::getNegaMaxValue(const Color player, const ChessState& chessState, const int searchDepth, double alpha, double beta)
 {
 	const Color enemyPlayer = ~player;
+	if (chessState.getWinner().has_value())
+	{
+		const Color winner = chessState.getWinner().value();
+		if (winner == player)
+		{
+			return DBL_MAX;
+		}
+		else if (winner == enemyPlayer)
+		{
+			return -DBL_MAX;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
 	const std::vector<Move> playerMoves = move::getValidMoves(chessState, player);
 	double maxValue = -DBL_MAX;
-
 	if (!playerMoves.empty())
 	{
 		if (searchDepth >= _depthLimit || (searchDepth >= _quiescentSearchDepth && isQuiescent(chessState, playerMoves)))
@@ -216,7 +231,7 @@ double Agent::getNegaMaxValue(const Color player, const ChessState& chessState, 
 				const Move& move = playerMoves[entry.second];
 				ChessState gameCopy(chessState);
 
-				gameCopy.update(player, move);
+				gameCopy.update(player, move, PieceType::QUEEN);
 
 				const double value = -getNegaMaxValue(enemyPlayer, gameCopy, searchDepth + 1, -beta, -alpha);
 
