@@ -57,14 +57,14 @@ Move Agent::getMove()
 	}
 
 	Move result;
-	double maxValue = INT_MIN;
+	double maxValue = -DBL_MAX;
 	for (std::pair<Move, std::future<double>>& moveValuePair : moveValuePairs)
 	{
 		std::future<double> moveFuture = std::move(moveValuePair.second);
 		moveFuture.wait();
 		const double moveValue = moveFuture.get();
 
-		if (moveValue > maxValue)
+		if (moveValue >= maxValue)
 		{
 			maxValue = moveValue;
 			result = moveValuePair.first;
