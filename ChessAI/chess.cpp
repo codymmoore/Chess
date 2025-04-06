@@ -1,6 +1,7 @@
 #include "chess.h"
 
 #include "util/utility.h"
+#include "move/moveUtil.h"
 
 #define UP Position::UP
 #define DOWN Position::DOWN
@@ -202,20 +203,30 @@ bool ChessState::canQueenSideCastle(const Color player) const
 	return player == Color::WHITE ? _wQueenSideCastle : _bQueenSideCastle;
 }
 
-void ChessState::update(const Color player, const move::Move& move, const PieceType promotion)
+void ChessState::update(const Color player, const move::Move& move, const PieceType promotion, const bool checkWinner)
 {
-	update(player, move.source, move.destination, promotion);
+	update(player, move.source, move.destination, promotion, checkWinner);
 }
 
-void ChessState::update(const Color player, const Position& source, const Position& destination, const PieceType promotion)
+void ChessState::update(const Color player, const Position& source, const Position& destination, const PieceType promotion, const bool checkWinner)
 {
 	PieceType pieceType = _board.getPieceType(source, player);
 
 	if (pieceType == PieceType::NONE)
 	{
-		std::string errorMessage = "Piece not found at position (" + std::to_string(source.x) +
+		std::string errorMessage = "Invalid move: Piece not found at position (" + std::to_string(source.x) +
 			", " + std::to_string(source.y) + ")";
 		throw std::exception(errorMessage.c_str());
+	}
+
+	if (_nextTurn == Color::NEUTRAL)
+	{
+		throw std::exception("Invalid move: Game has concluded.");
+	}
+
+	if (_nextTurn != player)
+	{
+		throw std::exception("Invalid move: Not player's turn.");
 	}
 
 	if (pieceType == PieceType::PAWN)
@@ -373,6 +384,34 @@ void ChessState::update(const Color player, const Position& source, const Positi
 	if (_nextTurn != NEUTRAL)
 	{
 		_nextTurn = ~player;
+	}
+	if (checkWinner)
+	{
+		// check for tie
+		if (_moveHistory.size() >= 8 && _halfTurnCount >= 8)
+		{
+			bool tie = true;
+			int prevMoveIndex = 0,
+				moveHistorySize = (int)_moveHistory.size();
+
+			while (tie && prevMoveIndex < (moveHistorySize / 2))
+			{
+				tie = _moveHistory[prevMoveIndex] == _moveHistory[prevMoveIndex + 4];
+				prevMoveIndex += 1;
+			}
+
+			if (tie)
+			{
+				_winner = Color::NEUTRAL;
+				_nextTurn = Color::NEUTRAL;
+			}
+		}
+
+		if (_nextTurn != Color::NEUTRAL && move::inCheck(_nextTurn, *this) && move::getValidMoves(*this, _nextTurn).empty())
+		{
+			_winner = player;
+			_nextTurn = Color::NEUTRAL;
+		}
 	}
 }
 

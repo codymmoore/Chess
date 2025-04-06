@@ -148,7 +148,7 @@ public:
 	 * \param move contains move information
 	 * \param promotion piece type to promote to; default is queen
 	 */
-	void update(const Color player, const move::Move& move, const PieceType promotion = PieceType::QUEEN);
+	void update(const Color player, const move::Move& move, const PieceType promotion = PieceType::QUEEN, const bool checkWinner = true);
 
 	/**
 	 * Moves a piece and updates the game state.
@@ -158,7 +158,7 @@ public:
 	 * \param destination the position the piece is being moved to
 	 * \param promotion piece type to promote to; default is queen
 	 */
-	void update(const Color player, const util::Position& source, const util::Position& destination, const PieceType promotion = PieceType::QUEEN);
+	void update(const Color player, const util::Position& source, const util::Position& destination, const PieceType promotion = PieceType::QUEEN, const bool checkWinner = true);
 
 	/**
 	 * Clear the current game state.

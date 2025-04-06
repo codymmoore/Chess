@@ -176,7 +176,7 @@ namespace makeMoveTest
 			const Color COLOR = Color::WHITE;
 			const Position SOURCE = Position(2, 2);
 			const Position DESTINATION = Position(0, 0);
-			chessState = std::make_unique<ChessState>("r3k3/8/2N5/8/8/8/4N3/4K3 b q - 0 1");
+			chessState = std::make_unique<ChessState>("r3k3/8/2N5/8/8/8/4N3/4K3 w q - 0 1");
 
 			EXPECT_TRUE(chessState->canQueenSideCastle(~COLOR));
 			chessState->update(COLOR, SOURCE, DESTINATION);
@@ -188,7 +188,7 @@ namespace makeMoveTest
 			const Color COLOR = Color::BLACK;
 			const Position SOURCE = Position(1, 5);
 			const Position DESTINATION = Position(0, 7);
-			chessState = std::make_unique<ChessState>("4k3/8/8/8/8/1n6/8/R3K3 w Q - 0 1");
+			chessState = std::make_unique<ChessState>("4k3/8/8/8/8/1n6/8/R3K3 b Q - 0 1");
 
 			EXPECT_TRUE(chessState->canQueenSideCastle(~COLOR));
 			chessState->update(COLOR, SOURCE, DESTINATION);
@@ -200,7 +200,7 @@ namespace makeMoveTest
 			const Color COLOR = Color::WHITE;
 			const Position SOURCE = Position(6, 2);
 			const Position DESTINATION = Position(7, 0);
-			chessState = std::make_unique<ChessState>("4k2r/8/6N1/8/8/8/8/4K3 b k - 0 1");
+			chessState = std::make_unique<ChessState>("4k2r/8/6N1/8/8/8/8/4K3 w k - 0 1");
 
 			EXPECT_TRUE(chessState->canKingSideCastle(~COLOR));
 			chessState->update(COLOR, SOURCE, DESTINATION);
@@ -212,7 +212,7 @@ namespace makeMoveTest
 			const Color COLOR = Color::BLACK;
 			const Position SOURCE = Position(6, 5);
 			const Position DESTINATION = Position(7, 7);
-			chessState = std::make_unique<ChessState>("4k3/8/8/8/8/6n1/8/4K2R w K - 0 1");
+			chessState = std::make_unique<ChessState>("4k3/8/8/8/8/6n1/8/4K2R b K - 0 1");
 
 			EXPECT_TRUE(chessState->canKingSideCastle(~COLOR));
 			chessState->update(COLOR, SOURCE, DESTINATION);
