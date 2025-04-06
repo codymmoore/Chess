@@ -28,7 +28,7 @@ namespace move
 
 	bool canBeCapturedByPawn(const ChessState& chessState, const Color player, const Position& position)
 	{
-		if (Color::WHITE == player && position.y == 0 || Color::BLACK == player && position.y == RANK_COUNT - 1)
+		if ((Color::WHITE == player && position.y == 0) || (Color::BLACK == player && position.y == RANK_COUNT - 1))
 		{
 			return false;
 		}
